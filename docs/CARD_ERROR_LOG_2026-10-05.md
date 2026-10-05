@@ -66,3 +66,13 @@ FIX3 прошёл `py_compile`. Native scanner extension между FIX1/FIX2/FI
 
 До прохождения полного цикла проверки не выдавать пользователю новый APK/Web-релиз
 как готовый или рабочий.
+
+## 2026-10-05 — INCIDENT-CARD-002 — Web scanner syntax regression
+
+**Наблюдение:** текущий `index.html` не проходил JavaScript parse: script3 завершался `SyntaxError: missing ) after argument list`.
+
+**Корень:** scanner FIX добавил лишнее экранирование кавычек в строке кнопки галереи: `\\\\'scanFile\\\\'` вместо `\\'scanFile\\'` внутри JS-строки. Это делало весь основной script неисполняемым.
+
+**Контроль:** E2 parse текущего `index.html` после исправления — все 4 script-блока PASS. Reverse-diff — ровно 1 строка. Service-worker cache поднят v6 → v7, чтобы устройство не удерживало дефектный cached index.
+
+**Статус:** Web FIX синтаксически подтверждён E2; live/device E3 ещё отсутствует. Не считать новым WP.
