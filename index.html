@@ -16,7 +16,7 @@
 h1{margin:0;font-size:28px}.sub{color:#737780;font-size:14px;margin-top:4px}.btn{border:0;border-radius:14px;padding:14px;font-weight:650}.icon{width:44px;height:44px;background:#fff;border:1px solid #e6e7eb;font-size:24px}.search{padding:8px 18px 16px}.search input,.sheet input,.sheet select{width:100%;padding:13px;border:1px solid #e2e3e8;border-radius:13px;background:#fff}
 .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;padding:0 18px}.card{min-height:150px;position:relative;overflow:hidden;background-size:cover;background-position:center;border:0;border-radius:22px;padding:17px;color:white;text-align:left;display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 8px 22px #0001}.card strong,.card small,.card .code{position:relative;z-index:1;text-shadow:0 1px 4px #0009}.card:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,#0001 20%,#0009 100%);z-index:0}.card strong{font-size:18px}.code{font:12px monospace;letter-spacing:2px}.empty{grid-column:1/-1;text-align:center;color:#737780;padding:60px 20px}.empty b{display:block;color:#17181c;font-size:20px;margin-bottom:8px}
 .fab{position:fixed;right:20px;bottom:24px;width:60px;height:60px;border:0;border-radius:20px;background:#17181c;color:#fff;font-size:30px;z-index:10}.overlay{display:none;position:fixed;inset:0;background:#0008;z-index:20;align-items:flex-end}.overlay.open{display:flex}.sheet{width:100%;max-width:720px;margin:auto;background:#fff;border-radius:26px 26px 0 0;padding:18px;max-height:90vh;overflow:auto}.sheet h2{margin:2px 0 18px}.close{float:right;border:0;background:#f0f1f4;border-radius:12px;width:38px;height:38px;font-size:20px}.primary{width:100%;background:#17181c;color:#fff;margin-top:10px}.secondary{width:100%;background:#f0f1f4;margin-top:10px}.danger{width:100%;background:#fff0ef;color:#d92d20;margin-top:10px}.row{display:flex;gap:10px;margin-top:10px}.row>*{flex:1}.detail{text-align:center}.brand{font-size:25px;font-weight:750;margin:8px}.codebox{background:#fff;border:1px solid #e6e7eb;border-radius:20px;padding:20px;margin:10px 0}.codebox svg{max-width:100%}.codeText{font:18px monospace;letter-spacing:2px;word-break:break-all;margin-top:12px}.hint{font-size:13px;color:#737780;line-height:1.45}#reader{width:100%;overflow:hidden;border-radius:18px;background:#111}
-@media(max-width:420px){.grid{gap:11px;padding:0 13px}.search{padding-left:13px;padding-right:13px}.card{min-height:138px;padding:14px}.card strong{font-size:16px}}
+@media(max-width:720px){.fab{bottom:88px}}\n@media(max-width:420px){.grid{gap:11px;padding:0 13px}.search{padding-left:13px;padding-right:13px}.card{min-height:138px;padding:14px}.card strong{font-size:16px}}
 </style>
 </head>
 <body>
@@ -28,23 +28,212 @@ h1{margin:0;font-size:28px}.sub{color:#737780;font-size:14px;margin-top:4px}.btn
 <button class="fab" onclick="addMenu()">＋</button>
 <div id="modal" class="overlay" onclick="if(event.target===this)closeModal()"><div class="sheet" id="sheet"></div></div>
 <script>
-const KEY="card_wallet_v1";let cards=JSON.parse(localStorage.getItem(KEY)||"[]");const colors=["#17181c","#3157d5","#16845b","#a35b17","#7b3db7","#c23b55"];
-function esc(s){return String(s||"").replace(/[&<>"']/g,function(m){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]})}
-function save(){localStorage.setItem(KEY,JSON.stringify(cards));render()}\nfunction readImage(file){return new Promise(function(resolve,reject){let r=new FileReader();r.onload=function(){resolve(String(r.result||""))};r.onerror=reject;r.readAsDataURL(file)})}
-function render(){let q=document.getElementById("search").value.toLowerCase().trim();let list=cards.filter(c=>(c.name+" "+c.code).toLowerCase().includes(q));document.getElementById("count").textContent=cards.length+" карт";let out=document.getElementById("cards");if(!list.length){out.innerHTML='<div class="empty"><b>'+(q?"Ничего не найдено":"Кошелёк пока пуст")+'</b><span>'+(q?"Попробуйте другой запрос":"Добавьте первую карту кнопкой ＋")+'</span></div>';return}out.innerHTML=list.map(function(c){let bg=c.image?'background-image:url("'+c.image+'");':'background:'+c.color+';';return '<button class="card" style="'+bg+'" onclick="openCard(\\''+c.id+'\\')"><strong>'+esc(c.name)+'</strong><small>'+esc(c.format)+'</small><span class="code">'+esc(c.code)+'</span></button>'}).join("")}
-function openModal(x){document.getElementById("sheet").innerHTML=x;document.getElementById("modal").classList.add("open")}function closeModal(){document.getElementById("modal").classList.remove("open")}
-function addMenu(){openModal('<button class="close" onclick="closeModal()">×</button><h2>Добавить карту</h2><button class="btn primary" onclick="scanner()">▣ Сканировать штрихкод / QR</button><button class="btn secondary" onclick="manual()">Ввести данные вручную</button><button class="btn secondary" onclick="exportData()">Сохранить резервную копию</button><button class="btn secondary" onclick="importData()">Восстановить из файла</button><input id="importFile" type="file" accept="application/json,.json" style="display:none" onchange="readImport(event)"><p class="hint">На iPhone камера работает через HTTPS после разрешения доступа.</p>')}
-function manual(data){data=data||{};openModal('<button class="close" onclick="addMenu()">×</button><h2>Новая скидочная карта</h2><input id="name" name="discount_name" autocomplete="off" placeholder="Название карты" value="'+esc(data.name)+'"><div class="row"><input id="code" name="discount_code" type="text" inputmode="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Код штрихкода или QR-кода" value="'+esc(data.code)+'"><select id="format"><option value="CODE_128">Штрихкод — CODE 128</option><option value="EAN_13">Штрихкод — EAN-13</option><option value="EAN_8">Штрихкод — EAN-8</option><option value="QR_CODE">QR-код</option></select></div><label class="hint" style="display:block;margin-top:12px">Фото карты<input id="cardImage" type="file" accept="image/*" style="width:100%;margin-top:6px"></label><button class="btn primary" onclick="addCard()">Сохранить карту</button>');if(data.format)document.getElementById("format").value=data.format};openModal('<button class="close" onclick="addMenu()">×</button><h2>Новая скидочная карта</h2><input id="name" name="discount_name" autocomplete="off" placeholder="Название карты" value="'+esc(data.name)+'"><div class="row"><input id="code" name="discount_code" type="text" inputmode="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Код штрихкода или QR-кода" value="'+esc(data.code)+'"><select id="format"><option value="CODE_128">Штрихкод — CODE 128</option><option value="EAN_13">Штрихкод — EAN-13</option><option value="EAN_8">Штрихкод — EAN-8</option><option value="QR_CODE">QR-код</option></select></div><button class="btn primary" onclick="addCard()">Сохранить карту</button>');if(data.format)document.getElementById("format").value=data.format};openModal('<button class="close" onclick="addMenu()">×</button><h2>Новая карта</h2><input id="name" placeholder="Название карты" value="'+esc(data.name)+'"><div class="row"><input id="code" placeholder="Номер / код" value="'+esc(data.code)+'"><select id="format"><option>CODE_128</option><option>EAN_13</option><option>EAN_8</option><option>QR_CODE</option></select></div><button class="btn primary" onclick="addCard()">Сохранить карту</button>');if(data.format)document.getElementById("format").value=data.format}
-async function addCard(){let name=document.getElementById("name").value.trim()||"Моя карта",code=document.getElementById("code").value.trim(),format=document.getElementById("format").value,file=document.getElementById("cardImage")&&document.getElementById("cardImage").files[0];if(!code)return alert("Введите код карты");let image="";if(file)image=await readImage(file);cards.unshift({id:String(Date.now()),name:name,code:code,format:format,image:image,color:colors[cards.length%colors.length]});save();closeModal()});save();closeModal()}
-function scanner(){openModal('<button class="close" onclick="closeModal()">×</button><h2>Сканирование скидочной карты</h2><div id="reader"></div><input id="scanFile" type="file" accept="image/*" capture="environment" style="display:none"><button class="btn secondary" onclick="document.getElementById(\'scanFile\').click()">Сканировать фото из галереи</button><p class="hint">Наведите камеру на весь штрихкод или QR-код. Если камера не распознаёт код, можно выбрать его фото.</p>');let s=new Html5Qrcode("reader",{formatsToSupport:[Html5QrcodeSupportedFormats.QR_CODE,Html5QrcodeSupportedFormats.CODE_128,Html5QrcodeSupportedFormats.CODE_39,Html5QrcodeSupportedFormats.EAN_13,Html5QrcodeSupportedFormats.EAN_8,Html5QrcodeSupportedFormats.UPC_A,Html5QrcodeSupportedFormats.UPC_E],useBarCodeDetectorIfSupported:false});let handled=false;function done(text,decodedResult){if(handled)return;handled=true;let raw=decodedResult&&decodedResult.result&&decodedResult.result.format&&decodedResult.result.format.formatName||"QR_CODE";let map={QR_CODE:"QR_CODE",EAN_13:"EAN_13",EAN_8:"EAN_8",CODE_128:"CODE_128",CODE_39:"CODE_128",UPC_A:"EAN_13",UPC_E:"EAN_8"};return s.stop().catch(function(){}).then(function(){manual({code:text,format:map[raw]||"CODE_128"})})}s.start({facingMode:{ideal:"environment"}},{fps:15,aspectRatio:1.7777778,disableFlip:true},done,function(){}).catch(function(){document.getElementById("reader").innerHTML='<p style="padding:30px;color:white;text-align:center">Не удалось запустить камеру. Проверьте HTTPS и разрешение камеры.</p>'});document.getElementById("scanFile").onchange=async function(e){let file=e.target.files[0];if(!file||handled)return;try{let result=await s.scanFile(file,true);done(result&&result.decodedText?result.decodedText:result,{result:{format:{formatName:"QR_CODE"}}})}catch(err){alert("Код на фото не распознан. Попробуйте фото крупнее и без бликов.")}e.target.value=""}}
-function openCard(id){let c=cards.find(function(x){return x.id===id});if(!c)return;openModal('<button class="close" onclick="closeModal()">×</button><div class="detail"><div class="brand">'+esc(c.name)+'</div><div class="codebox"><svg id="barcode"></svg><div class="codeText">'+esc(c.code)+'</div></div><button class="btn primary" onclick="manualEdit(\''+c.id+'\')">Изменить</button><button class="btn danger" onclick="delCard(\''+c.id+'\')">Удалить карту</button></div>');if(c.format==="QR_CODE"){document.getElementById("barcode").remove();let q=document.createElement("canvas");q.id="qr";document.querySelector(".codebox").prepend(q);try{QRCode.toCanvas(q,c.code,{width:230,margin:2},function(){})}catch(e){q.remove()}}else{try{JsBarcode("#barcode",c.code,{format:c.format==="EAN_13"?"ean13":c.format==="EAN_8"?"ean8":"CODE128",displayValue:false,height:90,margin:4})}catch(e){document.getElementById("barcode").outerHTML=""}}}
-function manualEdit(id){let c=cards.find(function(x){return x.id===id});openModal('<button class="close" onclick="openCard(\\''+id+'\\')">×</button><h2>Изменить скидочную карту</h2><input id="name" name="discount_name" autocomplete="off" value="'+esc(c.name)+'"><input id="code" name="discount_code" type="text" inputmode="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" value="'+esc(c.code)+'" style="margin-top:10px"><select id="format" style="margin-top:10px"><option value="CODE_128">Штрихкод — CODE 128</option><option value="EAN_13">Штрихкод — EAN-13</option><option value="EAN_8">Штрихкод — EAN-8</option><option value="QR_CODE">QR-код</option></select><label class="hint" style="display:block;margin-top:12px">Заменить фото карты<input id="cardImage" type="file" accept="image/*" style="width:100%;margin-top:6px"></label><button class="btn primary" onclick="updateCard(\\''+id+'\\')">Сохранить</button>');document.getElementById("format").value=c.format}
-async function updateCard(id){let c=cards.find(function(x){return x.id===id});c.name=document.getElementById("name").value.trim()||"Моя карта";c.code=document.getElementById("code").value.trim();c.format=document.getElementById("format").value;let file=document.getElementById("cardImage")&&document.getElementById("cardImage").files[0];if(file)c.image=await readImage(file);save();closeModal()}
-function delCard(id){if(confirm("Удалить эту карту?")){cards=cards.filter(function(c){return c.id!==id});save();closeModal()}}
-function exportData(){let blob=new Blob([JSON.stringify({version:1,cards:cards},null,2)],{type:"application/json"});let a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="CARD_backup.json";a.click();setTimeout(function(){URL.revokeObjectURL(a.href)},1000)}
-function importData(){document.getElementById("importFile").click()}
-function readImport(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=function(){try{let d=JSON.parse(r.result),list=Array.isArray(d)?d:d.cards;if(!Array.isArray(list))throw Error();cards=list.filter(function(c){return c&&c.code}).map(function(c){return{id:String(c.id||Date.now()+Math.random()),name:String(c.name||"Моя карта"),code:String(c.code),format:String(c.format||"CODE_128"),image:String(c.image||""),color:String(c.color||colors[0])}});save();closeModal();alert("Карты восстановлены: "+cards.length)}catch(x){alert("Не удалось прочитать резервную копию")}};r.readAsText(f);e.target.value=""}
-if("serviceWorker"in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js").catch(function(){})})}render();
+const KEY="card_wallet_v1";
+const colors=["#17181c","#3157d5","#16845b","#a35b17","#7b3db7","#c23b55"];
+let cards=[];
+try{
+  const raw=localStorage.getItem(KEY);
+  const parsed=raw?JSON.parse(raw):[];
+  cards=Array.isArray(parsed)?parsed:[];
+}catch(e){cards=[]}
+
+function esc(s){
+  return String(s==null?"":s).replace(/[&<>"']/g,function(m){
+    return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m];
+  });
+}
+function save(){
+  try{localStorage.setItem(KEY,JSON.stringify(cards));}
+  catch(e){alert("Не удалось сохранить карту в памяти браузера");}
+  render();
+}
+function readImage(file){
+  return new Promise(function(resolve,reject){
+    const r=new FileReader();
+    r.onload=function(){resolve(String(r.result||""));};
+    r.onerror=reject;
+    r.readAsDataURL(file);
+  });
+}
+function render(){
+  const search=document.getElementById("search");
+  const q=(search.value||"").toLowerCase().trim();
+  const list=cards.filter(function(c){
+    return String(c.name||"").toLowerCase().includes(q)||String(c.code||"").toLowerCase().includes(q);
+  });
+  document.getElementById("count").textContent=cards.length+" карт";
+  const out=document.getElementById("cards");
+  if(!list.length){
+    out.innerHTML='<div class="empty"><b>'+(q?"Ничего не найдено":"Кошелёк пока пуст")+'</b><span>'+(q?"Попробуйте другой запрос":"Добавьте первую карту кнопкой ＋")+'</span></div>';
+    return;
+  }
+  out.innerHTML=list.map(function(c){
+    const bg=c.image?'background-image:url("'+c.image+'");':'background:'+String(c.color||colors[0])+';';
+    return '<button class="card" style="'+bg+'" onclick="openCard('+JSON.stringify(String(c.id))+')"><strong>'+esc(c.name)+'</strong><small>'+esc(c.format)+'</small><span class="code">'+esc(c.code)+'</span></button>';
+  }).join("");
+}
+function openModal(html){
+  document.getElementById("sheet").innerHTML=html;
+  document.getElementById("modal").classList.add("open");
+}
+function closeModal(){document.getElementById("modal").classList.remove("open");}
+function addMenu(){
+  openModal('<button class="close" onclick="closeModal()">×</button><h2>Добавить карту</h2>'+
+    '<button class="btn primary" onclick="scanner()">▣ Сканировать штрихкод / QR</button>'+
+    '<button class="btn secondary" onclick="manual()">Ввести данные вручную</button>'+
+    '<button class="btn secondary" onclick="exportData()">Сохранить резервную копию</button>'+
+    '<button class="btn secondary" onclick="importData()">Восстановить из файла</button>'+
+    '<input id="importFile" type="file" accept="application/json,.json" style="display:none" onchange="readImport(event)">'+
+    '<p class="hint">Карта сохраняется локально в этом браузере. На iPhone камера работает через HTTPS после разрешения доступа.</p>');
+}
+function manual(data){
+  data=data||{};
+  openModal('<button class="close" onclick="addMenu()">×</button><h2>Новая скидочная карта</h2>'+
+    '<input id="name" name="discount_name" autocomplete="off" placeholder="Название карты" value="'+esc(data.name)+'">'+
+    '<div class="row"><input id="code" name="discount_code" type="text" inputmode="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Код штрихкода или QR-кода" value="'+esc(data.code)+'">'+
+    '<select id="format"><option value="CODE_128">Штрихкод — CODE 128</option><option value="EAN_13">Штрихкод — EAN-13</option><option value="EAN_8">Штрихкод — EAN-8</option><option value="QR_CODE">QR-код</option></select></div>'+
+    '<label class="hint" style="display:block;margin-top:12px">Фото карты<input id="cardImage" type="file" accept="image/*" style="width:100%;margin-top:6px"></label>'+
+    '<button class="btn primary" onclick="addCard()">Сохранить карту</button>');
+  if(data.format)document.getElementById("format").value=data.format;
+}
+async function addCard(){
+  const name=document.getElementById("name").value.trim()||"Моя карта";
+  const code=document.getElementById("code").value.trim();
+  const format=document.getElementById("format").value;
+  const file=document.getElementById("cardImage")&&document.getElementById("cardImage").files[0];
+  if(!code){alert("Введите код карты");return;}
+  let image="";
+  if(file)image=await readImage(file);
+  cards.unshift({id:String(Date.now()),name:name,code:code,format:format,image:image,color:colors[cards.length%colors.length]});
+  save();
+  closeModal();
+}
+function scanner(){
+  openModal('<button class="close" onclick="closeModal()">×</button><h2>Сканирование скидочной карты</h2>'+
+    '<div id="reader"></div>'+
+    '<input id="scanFile" type="file" accept="image/*" capture="environment" style="display:none">'+
+    '<button class="btn secondary" onclick="document.getElementById(\'scanFile\').click()">Сканировать фото из галереи</button>'+
+    '<p class="hint">Наведите камеру на весь штрихкод или QR-код. Если камера не распознаёт код, можно выбрать его фото.</p>');
+  let s;
+  try{
+    s=new Html5Qrcode("reader",{formatsToSupport:[
+      Html5QrcodeSupportedFormats.QR_CODE,
+      Html5QrcodeSupportedFormats.CODE_128,
+      Html5QrcodeSupportedFormats.CODE_39,
+      Html5QrcodeSupportedFormats.EAN_13,
+      Html5QrcodeSupportedFormats.EAN_8,
+      Html5QrcodeSupportedFormats.UPC_A,
+      Html5QrcodeSupportedFormats.UPC_E
+    ],useBarCodeDetectorIfSupported:false});
+  }catch(e){
+    document.getElementById("reader").innerHTML='<p style="padding:30px;color:white;text-align:center">Сканер недоступен. Проверьте загрузку библиотеки.</p>';
+    return;
+  }
+  let handled=false;
+  function done(text,decodedResult){
+    if(handled)return;
+    handled=true;
+    const raw=decodedResult&&decodedResult.result&&decodedResult.result.format&&decodedResult.result.format.formatName||"QR_CODE";
+    const map={QR_CODE:"QR_CODE",EAN_13:"EAN_13",EAN_8:"EAN_8",CODE_128:"CODE_128",CODE_39:"CODE_128",UPC_A:"EAN_13",UPC_E:"EAN_8"};
+    return s.stop().catch(function(){}).then(function(){manual({code:text,format:map[raw]||"CODE_128"});});
+  }
+  s.start({facingMode:{ideal:"environment"}},{fps:15,aspectRatio:1.7777778,disableFlip:true},done,function(){}).catch(function(){
+    document.getElementById("reader").innerHTML='<p style="padding:30px;color:white;text-align:center">Не удалось запустить камеру. Проверьте HTTPS и разрешение камеры.</p>';
+  });
+  document.getElementById("scanFile").onchange=async function(e){
+    const file=e.target.files[0];
+    if(!file||handled)return;
+    try{
+      const result=await s.scanFile(file,true);
+      done(result&&result.decodedText?result.decodedText:result,{result:{format:{formatName:"QR_CODE"}}});
+    }catch(err){
+      alert("Код на фото не распознан. Попробуйте фото крупнее и без бликов.");
+    }
+    e.target.value="";
+  };
+}
+function openCard(id){
+  const c=cards.find(function(x){return String(x.id)===String(id);});
+  if(!c)return;
+  openModal('<button class="close" onclick="closeModal()">×</button><div class="detail">'+
+    '<div class="brand">'+esc(c.name)+'</div>'+
+    '<div class="codebox"><svg id="barcode"></svg><div class="codeText">'+esc(c.code)+'</div></div>'+
+    '<button class="btn primary" onclick="manualEdit('+JSON.stringify(String(c.id))+')">Изменить</button>'+
+    '<button class="btn danger" onclick="delCard('+JSON.stringify(String(c.id))+')">Удалить карту</button></div>');
+  if(c.format==="QR_CODE"){
+    document.getElementById("barcode").remove();
+    const q=document.createElement("canvas");
+    q.id="qr";
+    document.querySelector(".codebox").prepend(q);
+    try{QRCode.toCanvas(q,c.code,{width:230,margin:2},function(){});}catch(e){q.remove();}
+  }else{
+    try{
+      JsBarcode("#barcode",c.code,{format:c.format==="EAN_13"?"ean13":c.format==="EAN_8"?"ean8":"CODE128",displayValue:false,height:90,margin:4});
+    }catch(e){document.getElementById("barcode").outerHTML="";}
+  }
+}
+function manualEdit(id){
+  const c=cards.find(function(x){return String(x.id)===String(id);});
+  if(!c)return;
+  openModal('<button class="close" onclick="openCard('+JSON.stringify(String(id))+')">×</button><h2>Изменить скидочную карту</h2>'+
+    '<input id="name" name="discount_name" autocomplete="off" value="'+esc(c.name)+'">'+
+    '<input id="code" name="discount_code" type="text" inputmode="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" value="'+esc(c.code)+'" style="margin-top:10px">'+
+    '<select id="format" style="margin-top:10px"><option value="CODE_128">Штрихкод — CODE 128</option><option value="EAN_13">Штрихкод — EAN-13</option><option value="EAN_8">Штрихкод — EAN-8</option><option value="QR_CODE">QR-код</option></select>'+
+    '<label class="hint" style="display:block;margin-top:12px">Заменить фото карты<input id="cardImage" type="file" accept="image/*" style="width:100%;margin-top:6px"></label>'+
+    '<button class="btn primary" onclick="updateCard('+JSON.stringify(String(id))+')">Сохранить</button>');
+  document.getElementById("format").value=c.format;
+}
+async function updateCard(id){
+  const c=cards.find(function(x){return String(x.id)===String(id);});
+  if(!c)return;
+  c.name=document.getElementById("name").value.trim()||"Моя карта";
+  c.code=document.getElementById("code").value.trim();
+  c.format=document.getElementById("format").value;
+  const file=document.getElementById("cardImage")&&document.getElementById("cardImage").files[0];
+  if(file)c.image=await readImage(file);
+  save();
+  closeModal();
+}
+function delCard(id){
+  if(confirm("Удалить эту карту?")){
+    cards=cards.filter(function(c){return String(c.id)!==String(id);});
+    save();
+    closeModal();
+  }
+}
+function exportData(){
+  const blob=new Blob([JSON.stringify({version:1,cards:cards},null,2)],{type:"application/json"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download="CARD_backup.json";
+  a.click();
+  setTimeout(function(){URL.revokeObjectURL(a.href);},1000);
+}
+function importData(){document.getElementById("importFile").click();}
+function readImport(e){
+  const f=e.target.files[0];
+  if(!f)return;
+  const r=new FileReader();
+  r.onload=function(){
+    try{
+      const d=JSON.parse(r.result);
+      const list=Array.isArray(d)?d:d.cards;
+      if(!Array.isArray(list))throw Error();
+      cards=list.filter(function(c){return c&&c.code;}).map(function(c){
+        return {id:String(c.id||Date.now()+Math.random()),name:String(c.name||"Моя карта"),code:String(c.code),format:String(c.format||"CODE_128"),image:String(c.image||""),color:String(c.color||colors[0])};
+      });
+      save();
+      closeModal();
+      alert("Карты восстановлены: "+cards.length);
+    }catch(x){alert("Не удалось прочитать резервную копию");}
+  };
+  r.readAsText(f);
+  e.target.value="";
+}
+if("serviceWorker" in navigator){
+  window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js").catch(function(){});});
+}
+render();
 </script>
 </body>
 </html>
