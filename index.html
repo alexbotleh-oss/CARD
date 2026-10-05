@@ -110,45 +110,77 @@ async function addCard(){
   closeModal();
 }
 function scanner(){
+  const formats=[
+    Html5QrcodeSupportedFormats.QR_CODE,
+    Html5QrcodeSupportedFormats.CODE_39,
+    Html5QrcodeSupportedFormats.CODE_93,
+    Html5QrcodeSupportedFormats.CODE_128,
+    Html5QrcodeSupportedFormats.EAN_13,
+    Html5QrcodeSupportedFormats.EAN_8,
+    Html5QrcodeSupportedFormats.UPC_A,
+    Html5QrcodeSupportedFormats.UPC_E,
+    Html5QrcodeSupportedFormats.ITF,
+    Html5QrcodeSupportedFormats.DATA_MATRIX,
+    Html5QrcodeSupportedFormats.PDF_417
+  ];
+  const config={formatsToSupport:formats,useBarCodeDetectorIfSupported:false};
   openModal('<button class="close" onclick="closeModal()">×</button><h2>Сканирование скидочной карты</h2>'+
     '<div id="reader"></div>'+
-    '<input id="scanFile" type="file" accept="image/*" capture="environment" style="display:none">'+
-    '<button class="btn secondary" onclick="document.getElementById(\'scanFile\').click()">Сканировать фото из галереи</button>'+
-    '<p class="hint">Наведите камеру на весь штрихкод или QR-код. Если камера не распознаёт код, можно выбрать его фото.</p>');
+    '<input id="scanFile" type="file" accept="image/*" style="display:none">'+
+    '<button class="btn secondary" onclick="document.getElementById(\\'scanFile\\').click()">Сканировать фото из галереи</button>'+
+    '<p class="hint">Можно выбрать фото штрихкода/QR из галереи — камера для этого не нужна.</p>');
   let s;
-  try{
-    s=new Html5Qrcode("reader",{formatsToSupport:[
-      Html5QrcodeSupportedFormats.QR_CODE,
-      Html5QrcodeSupportedFormats.CODE_128,
-      Html5QrcodeSupportedFormats.CODE_39,
-      Html5QrcodeSupportedFormats.EAN_13,
-      Html5QrcodeSupportedFormats.EAN_8,
-      Html5QrcodeSupportedFormats.UPC_A,
-      Html5QrcodeSupportedFormats.UPC_E
-    ],useBarCodeDetectorIfSupported:false});
-  }catch(e){
-    document.getElementById("reader").innerHTML='<p style="padding:30px;color:white;text-align:center">Сканер недоступен. Проверьте загрузку библиотеки.</p>';
-    return;
-  }
   let handled=false;
-  function done(text,decodedResult){
-    if(handled)return;
-    handled=true;
-    const raw=decodedResult&&decodedResult.result&&decodedResult.result.format&&decodedResult.result.format.formatName||"QR_CODE";
-    const map={QR_CODE:"QR_CODE",EAN_13:"EAN_13",EAN_8:"EAN_8",CODE_128:"CODE_128",CODE_39:"CODE_128",UPC_A:"EAN_13",UPC_E:"EAN_8"};
-    return s.stop().catch(function(){}).then(function(){manual({code:text,format:map[raw]||"CODE_128"});});
+  try{s=new Html5Qrcode("reader",config);}catch(e){s=null;}
+  function mapFormat(raw){
+    const map={QR_CODE:"QR_CODE",EAN_13:"EAN_13",EAN_8:"EAN_8",CODE_128:"CODE_128",CODE_39:"CODE_128",CODE_93:"CODE_128",UPC_A:"EAN_13",UPC_E:"EAN_8",ITF:"CODE_128",DATA_MATRIX:"QR_CODE",PDF_417:"CODE_128"};
+    return map[raw]||"CODE_128";
   }
-  s.start({facingMode:{ideal:"environment"}},{fps:15,aspectRatio:1.7777778,disableFlip:true},done,function(){}).catch(function(){
-    document.getElementById("reader").innerHTML='<p style="padding:30px;color:white;text-align:center">Не удалось запустить камеру. Проверьте HTTPS и разрешение камеры.</p>';
+  function finish(text,raw){
+    if(handled||!text)return;
+    handled=true;
+    if(s&&s.isScanning){return s.stop().catch(function(){}).then(function(){manual({code:String(text),format:mapFormat(raw)});});}
+    manual({code:String(text),format:mapFormat(raw)});
+  }
+  function startCamera(){
+    if(!s)return Promise.reject("Сканер недоступен");
+    const cameraConfig={fps:12,qrbox:{width:280,height:180},aspectRatio:1.7777778,disableFlip:false};
+    return s.start({facingMode:"environment"},cameraConfig,function(text,result){
+      const raw=result&&result.result&&result.result.format&&result.result.format.formatName||"QR_CODE";
+      finish(text,raw);
+    },function(){});
+  }
+  startCamera().catch(function(){
+    if(!s)return;
+    Html5Qrcode.getCameras().then(function(devices){
+      if(!devices||!devices.length)throw Error("camera");
+      const back=devices.find(function(d){return /back|rear|environment|задн/i.test(d.label||"");})||devices[devices.length-1];
+      return s.start(back.id,{fps:12,qrbox:{width:280,height:180},disableFlip:false},function(text,result){
+        const raw=result&&result.result&&result.result.format&&result.result.format.formatName||"QR_CODE";
+        finish(text,raw);
+      },function(){});
+    }).catch(function(){
+      const reader=document.getElementById("reader");
+      if(reader)reader.innerHTML='<p style="padding:30px;color:white;text-align:center">Камера недоступна. Фото из галереи всё равно можно сканировать.</p>';
+    });
   });
   document.getElementById("scanFile").onchange=async function(e){
     const file=e.target.files[0];
     if(!file||handled)return;
     try{
-      const result=await s.scanFile(file,true);
-      done(result&&result.decodedText?result.decodedText:result,{result:{format:{formatName:"QR_CODE"}}});
+      if(s&&s.isScanning)await s.stop();
+      const reader=document.getElementById("reader");
+      if(reader)reader.innerHTML="";
+      const fs=new Html5Qrcode("reader",config);
+      let result;
+      if(typeof fs.scanFileV2==="function")result=await fs.scanFileV2(file,true);
+      else result={decodedText:await fs.scanFile(file,true),result:{format:{formatName:"QR_CODE"}}};
+      const text=result&&result.decodedText;
+      const raw=result&&result.result&&result.result.format&&result.result.format.formatName||"QR_CODE";
+      if(!text)throw Error("empty");
+      finish(text,raw);
     }catch(err){
-      alert("Код на фото не распознан. Попробуйте фото крупнее и без бликов.");
+      alert("Не удалось распознать код на фото. Сфотографируйте код крупнее, ровно и без бликов.");
     }
     e.target.value="";
   };
