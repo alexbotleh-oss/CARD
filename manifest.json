@@ -1,0 +1,10 @@
+{
+  "name":"CARD — Мой кошелёк",
+  "short_name":"CARD",
+  "start_url":"./",
+  "display":"standalone",
+  "background_color":"#f6f7fb",
+  "theme_color":"#f6f7fb",
+  "lang":"ru",
+  "icons":[{"src":"icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}]
+}
