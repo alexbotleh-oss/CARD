@@ -225,6 +225,25 @@ h1{margin:0;font-size:28px}.sub{color:#737780;font-size:14px;margin-top:4px}.btn
 
 
 /* CARD111 card style editor v46 */
+/* CARD111 editor preview and split v47 */
+.editorPreviewWrap{display:flex;justify-content:center;margin:0 0 12px}
+.editorPreview{width:240px;min-height:140px;height:140px!important;flex:none;border-radius:18px}
+.editorPreview strong{font-size:18px!important}
+.editorTabs{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:0 0 12px;padding:4px;background:#f0f1f4;border-radius:14px}
+.editorTab{border:0;border-radius:10px;background:transparent;padding:10px 8px;font:inherit;font-weight:700;color:#737780}
+.editorTab.active{background:#fff;color:#17181c;box-shadow:0 1px 4px #0001}
+.editorPanel{display:none}.editorPanel.active{display:block}
+.editorPreviewHint{text-align:center;margin:-3px 0 12px}
+.editorAppearance .coverPicker{margin-top:0}
+.editorAppearance .coverGrid{grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}
+.editorAppearance .coverOption{min-height:70px;padding:8px 5px;text-align:center;font-size:11px;border-radius:12px}
+.editorAppearance .coverHint{margin-top:7px}
+.coverCategoryGrid{display:flex;gap:6px;overflow-x:auto;padding:2px 1px 5px;margin:7px 0 8px;scrollbar-width:none}
+.coverCategoryGrid::-webkit-scrollbar{display:none}
+.coverCategory{flex:0 0 auto;border:0;border-radius:10px;background:#f0f1f4;padding:8px 11px;font:inherit;font-size:12px}
+.coverCategory.active{background:#1677ff;color:#fff}
+@media(max-width:420px){.editorPreview{width:220px;min-height:128px;height:128px!important}.editorAppearance .coverGrid{grid-template-columns:repeat(4,minmax(0,1fr))}.editorAppearance .coverOption{min-height:64px;font-size:10px}}
+
 .card.title-hide strong{display:none!important}.card.title-top strong{top:12px!important;bottom:auto!important}
 .card.title-center strong{top:50%!important;bottom:auto!important;transform:translateY(-50%)!important}
 .card.title-bottom strong{top:auto!important;bottom:12px!important}
@@ -658,20 +677,80 @@ function openCard(id){
     }
   }
 }
+function editorCoverCategory(k){
+  const v=String(k||"").toUpperCase();
+  if(["MAGNIT","PYATEROCHKA","STOLICHKI","PEREKRESTOK","LENTA","VkusVill","OKEИ","OKEI","ASHAN","DIKSI","CHIZHIK"].indexOf(v)>=0)return "PRODUCTS";
+  if(["ANTEY"].indexOf(v)>=0)return "PHARMACY";
+  if(["DETMIR","KARI"].indexOf(v)>=0)return "OTHER";
+  if(["DNS","BRISTOL","K_B","RODINA_UDACHA"].indexOf(v)>=0)return "OTHER";
+  if(v==="CUSTOM"||v==="AUTO")return "OTHER";
+  return "OTHER";
+}
+function editorCoverCatalog(selected){
+  const cats=[["ALL","Все"],["PRODUCTS","Продукты"],["PHARMACY","Аптеки"],["OTHER","Другое"]];
+  return '<div class="coverCategoryGrid" id="coverCategoryGrid">'+cats.map(function(x,i){return '<button type="button" class="coverCategory '+(i===0?"active":"")+'" data-cover-category="'+x[0]+'">'+x[1]+'</button>';}).join("")+'</div>'+
+    '<div id="editorCoverGrid" class="coverGrid">'+coverOptions(selected)+'</div>';
+}
+function editorPreviewData(c){
+  const base=Object.assign({},c||{});
+  base.name=(document.getElementById("name")&&document.getElementById("name").value)||base.name||"Моя карта";
+  base.cover=(document.getElementById("cover")&&document.getElementById("cover").value)||base.cover||"AUTO";
+  base.style={
+    palette:(document.getElementById("cardPalette")&&document.getElementById("cardPalette").value)||"AUTO",
+    textColor:(document.getElementById("titleColor")&&document.getElementById("titleColor").value)||"WHITE",
+    position:(document.getElementById("titlePosition")&&document.getElementById("titlePosition").value)||"BOTTOM",
+    size:Math.max(14,Math.min(28,Number(document.getElementById("titleSize")&&document.getElementById("titleSize").value)||19)),
+    font:(document.getElementById("titleFont")&&document.getElementById("titleFont").value)||"SYSTEM"
+  };
+  return base;
+}
+function refreshEditorPreview(c){
+  const box=document.getElementById("editorPreview");
+  if(!box)return;
+  const p=editorPreviewData(c);
+  const mark=String(p.name||"?").trim().charAt(0).toUpperCase();
+  const logo=p.image?'<img class="cardLogo" src="'+esc(p.image)+'" alt="">':'<span class="cardLogoFallback">'+esc(mark)+'</span>';
+  box.className="card editorPreview "+coverClass(p)+" "+cardStyleClass(p);
+  box.setAttribute("style","--card-color:"+esc(String(p.color||colors[0]))+";"+esc(cardStyleInline(p)));
+  box.innerHTML=logo+'<strong>'+esc(p.name)+'</strong>';
+}
+function setEditorTab(tab){
+  document.querySelectorAll(".editorTab").forEach(function(b){b.classList.toggle("active",b.getAttribute("data-tab")===tab);});
+  document.querySelectorAll(".editorPanel").forEach(function(p){p.classList.toggle("active",p.getAttribute("data-panel")===tab);});
+}
+function bindEditorPreview(c){
+  const name=document.getElementById("name"),code=document.getElementById("code");
+  [name,code].forEach(function(el){if(el)el.addEventListener("input",function(){refreshEditorPreview(c);});});
+  ["cardPalette","titlePosition","titleColor","titleSize","titleFont"].forEach(function(id){const el=document.getElementById(id);if(el)el.addEventListener("input",function(){refreshEditorPreview(c);});el&&el.addEventListener("change",function(){refreshEditorPreview(c);});});
+  document.querySelectorAll(".editorTab").forEach(function(btn){btn.onclick=function(){setEditorTab(btn.getAttribute("data-tab"));};});
+  const grid=document.getElementById("coverGrid"),input=document.getElementById("cover");
+  if(grid&&input)grid.addEventListener("click",function(e){const b=e.target.closest(".coverOption");if(b)setTimeout(function(){refreshEditorPreview(c);},0);});
+  const cat=document.getElementById("coverCategoryGrid");
+  if(cat)cat.querySelectorAll(".coverCategory").forEach(function(btn){btn.onclick=function(){cat.querySelectorAll(".coverCategory").forEach(function(x){x.classList.remove("active");});btn.classList.add("active");const value=btn.getAttribute("data-cover-category");document.querySelectorAll("#editorCoverGrid .coverOption").forEach(function(x){const k=x.getAttribute("data-cover")||"AUTO";x.style.display=(value==="ALL"||editorCoverCategory(k)===value)?"":"none";});};});
+  refreshEditorPreview(c);
+}
 function manualEdit(id){
   const c=cards.find(function(x){return String(x.id)===String(id);});
   if(!c)return;
   openModal('<button class="close" id="editClose">×</button><h2>Изменить скидочную карту</h2>'+
-    '<input id="name" name="discount_name" autocomplete="off" value="'+esc(c.name)+'">'+
-    '<input id="code" name="discount_code" type="text" inputmode="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" value="'+esc(c.code)+'" style="margin-top:10px">'+
-    '<div class="formatPicker" style="margin-top:10px"><input id="format" type="hidden" value="'+esc(c.format||"CODE_128")+'"><button type="button" class="formatButton" onclick="toggleFormatMenu()">'+esc(formatLabel(c.format||"CODE_128"))+'</button><div id="formatMenu" class="formatMenu">'+
-    '<button type="button" class="formatOption" onclick="chooseFormat(\'CODE_128\',\'Штрихкод — CODE 128\')">Штрихкод — CODE 128</button>'+
-    '<button type="button" class="formatOption" onclick="chooseFormat(\'EAN_13\',\'Штрихкод — EAN-13\')">Штрихкод — EAN-13</button>'+
-    '<button type="button" class="formatOption" onclick="chooseFormat(\'EAN_8\',\'Штрихкод — EAN-8\')">Штрихкод — EAN-8</button>'+
-    '<button type="button" class="formatOption" onclick="chooseFormat(\'QR_CODE\',\'QR-код\')">QR-код</button></div></div>'+
-    '<div class="coverPicker"><div class="hint">Рубашка карты</div><input id="cover" type="hidden" value="'+esc(c.cover||"AUTO")+'"><div id="coverGrid" class="coverGrid">'+coverOptions(c.cover||"AUTO")+'</div><div class="coverHint">Авто — подбор по названию магазина.</div></div>'+styleEditor(c)+''+
-    '<label class="hint" style="display:block;margin-top:12px">Заменить фото карты<input id="cardImage" type="file" accept="image/*" style="width:100%;margin-top:6px"></label>'+
-    '<button type="button" class="btn secondary" id="rescanEdit">Пересканировать код</button>'+
+    '<div class="editorPreviewWrap"><div id="editorPreview" class="card editorPreview"></div></div>'+
+    '<div class="hint editorPreviewHint">Предпросмотр меняется сразу при редактировании</div>'+
+    '<div class="editorTabs"><button type="button" class="editorTab active" data-tab="data">Данные</button><button type="button" class="editorTab" data-tab="appearance">Оформление</button></div>'+
+    '<div class="editorPanel active" data-panel="data">'+
+      '<div class="hint" style="margin-bottom:6px">Название карты</div><input id="name" name="discount_name" autocomplete="off" value="'+esc(c.name)+'">'+
+      '<div class="hint" style="margin:12px 0 6px">Номер / код карты</div><input id="code" name="discount_code" type="text" inputmode="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" value="'+esc(c.code)+'">'+
+      '<div class="formatPicker" style="margin-top:10px"><input id="format" type="hidden" value="'+esc(c.format||"CODE_128")+'"><button type="button" class="formatButton" onclick="toggleFormatMenu()">'+esc(formatLabel(c.format||"CODE_128"))+'</button><div id="formatMenu" class="formatMenu">'+
+      '<button type="button" class="formatOption" onclick="chooseFormat(\'CODE_128\',\'Штрихкод — CODE 128\')">Штрихкод — CODE 128</button>'+
+      '<button type="button" class="formatOption" onclick="chooseFormat(\'EAN_13\',\'Штрихкод — EAN-13\')">Штрихкод — EAN-13</button>'+
+      '<button type="button" class="formatOption" onclick="chooseFormat(\'EAN_8\',\'Штрихкод — EAN-8\')">Штрихкод — EAN-8</button>'+
+      '<button type="button" class="formatOption" onclick="chooseFormat(\'QR_CODE\',\'QR-код\')">QR-код</button></div></div>'+
+      '<button type="button" class="btn secondary" id="rescanEdit">Пересканировать код</button>'+
+      '<label class="hint" style="display:block;margin-top:12px">Заменить фото карты<input id="cardImage" type="file" accept="image/*" style="width:100%;margin-top:6px"></label>'+
+    '</div>'+
+    '<div class="editorPanel editorAppearance" data-panel="appearance">'+
+      '<div class="coverPicker"><div class="hint">Выбор рубашки</div><input id="cover" type="hidden" value="'+esc(c.cover||"AUTO")+'">'+editorCoverCatalog(c.cover||"AUTO")+'<div class="coverHint">Авто — подбор по названию магазина.</div></div>'+
+      styleEditor(c)+
+    '</div>'+
     '<button type="button" class="btn primary" id="editSave">Сохранить</button>'+
     '<button type="button" class="btn secondary" id="editCancel">Отмена</button>');
   document.getElementById("editClose").onclick=function(){openCard(String(id));};
@@ -680,6 +759,7 @@ function manualEdit(id){
   document.getElementById("editCancel").onclick=closeModal;
   bindCoverPicker();
   bindStyleEditor();
+  bindEditorPreview(c);
 }
 function rescanEdit(id){
   scanner(function(data){
