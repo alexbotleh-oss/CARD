@@ -317,7 +317,7 @@ function styleEditor(c){
     '<div class="hint styleBlockTitle">Шрифт</div><input id="titleFont" type="hidden" value="'+esc(s.font)+'"><div id="fontGrid" class="styleGrid fontGrid">'+fontOptions(s.font)+'</div></div>';
 }
 function bindStyleEditor(){
-  function bindGrid(id,inputId,attr){const grid=document.getElementById(id),input=document.getElementById(inputId);if(!grid||!input)return;grid.querySelectorAll("button").forEach(function(btn){btn.onclick=function(){input.value=btn.getAttribute(attr)||"";grid.querySelectorAll("button").forEach(function(x){x.classList.remove("selected");});btn.classList.add("selected");};});}
+  function bindGrid(id,inputId,attr){const grid=document.getElementById(id),input=document.getElementById(inputId);if(!grid||!input)return;grid.querySelectorAll("button").forEach(function(btn){btn.onclick=function(){input.value=btn.getAttribute(attr)||"";grid.querySelectorAll("button").forEach(function(x){x.classList.remove("selected");});btn.classList.add("selected");if(typeof refreshEditorPreview==="function")refreshEditorPreview(window.__editorPreviewCard||{});};});}
   bindGrid("paletteGrid","cardPalette","data-palette");bindGrid("positionGrid","titlePosition","data-position");bindGrid("textColorGrid","titleColor","data-text-color");bindGrid("fontGrid","titleFont","data-font");
   const range=document.getElementById("titleSize"),out=document.getElementById("titleSizeValue");if(range&&out)range.oninput=function(){out.textContent=range.value+" px";};
 }
@@ -719,6 +719,7 @@ function setEditorTab(tab){
   document.querySelectorAll(".editorPanel").forEach(function(p){p.classList.toggle("active",p.getAttribute("data-panel")===tab);});
 }
 function bindEditorPreview(c){
+  window.__editorPreviewCard=c||{};
   const name=document.getElementById("name"),code=document.getElementById("code");
   [name,code].forEach(function(el){if(el)el.addEventListener("input",function(){refreshEditorPreview(c);});});
   ["cardPalette","titlePosition","titleColor","titleSize","titleFont"].forEach(function(id){const el=document.getElementById(id);if(el)el.addEventListener("input",function(){refreshEditorPreview(c);});el&&el.addEventListener("change",function(){refreshEditorPreview(c);});});
