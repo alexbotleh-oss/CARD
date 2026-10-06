@@ -30,13 +30,30 @@ h1{margin:0;font-size:28px}.sub{color:#737780;font-size:14px;margin-top:4px}.btn
 <div id="modal" class="overlay" onclick="if(event.target===this)closeModal()"><div class="sheet" id="sheet"></div></div>
 <script>
 const KEY="card_wallet_v1";
+const SAFE_KEY=KEY+"_safe_backup";
 const colors=["#17181c","#3157d5","#16845b","#a35b17","#7b3db7","#c23b55"];
 let cards=[];
+let storageState="missing";
+let storageError="";
 try{
   const raw=localStorage.getItem(KEY);
-  const parsed=raw?JSON.parse(raw):[];
-  cards=Array.isArray(parsed)?parsed:[];
-}catch(e){cards=[]}
+  if(raw===null){
+    cards=[];
+    storageState="missing";
+  }else{
+    const parsed=JSON.parse(raw);
+    if(!Array.isArray(parsed))throw new Error("локальная база имеет неверный формат");
+    cards=parsed;
+    storageState="ok";
+    if(raw && cards.length){
+      try{localStorage.setItem(SAFE_KEY,raw);}catch(e){}
+    }
+  }
+}catch(e){
+  storageState="error";
+  storageError=String(e&&e.message||e);
+  cards=[];
+}
 
 function esc(s){
   return String(s==null?"":s).replace(/[&<>"']/g,function(m){
@@ -44,9 +61,28 @@ function esc(s){
   });
 }
 function save(){
-  try{localStorage.setItem(KEY,JSON.stringify(cards));}
-  catch(e){alert("Не удалось сохранить карту в памяти браузера");}
+  try{
+    const current=localStorage.getItem(KEY);
+    if(current){
+      try{localStorage.setItem(SAFE_KEY,current);}catch(e){}
+    }
+    localStorage.setItem(KEY,JSON.stringify(cards));
+    storageState="ok";
+    storageError="";
+  }catch(e){alert("Не удалось сохранить карту в памяти браузера");}
   render();
+}
+function exportStorageRecovery(){
+  try{
+    const raw=localStorage.getItem(KEY);
+    if(!raw){alert("В локальной памяти нет данных для восстановления.");return;}
+    const blob=new Blob([raw],{type:"application/json"});
+    const a=document.createElement("a");
+    a.href=URL.createObjectURL(blob);
+    a.download="CARD_storage_recovery.json";
+    a.click();
+    setTimeout(function(){URL.revokeObjectURL(a.href);},1000);
+  }catch(e){alert("Не удалось выгрузить данные локальной памяти");}
 }
 function readImage(file){
   return new Promise(function(resolve,reject){
@@ -65,6 +101,10 @@ function render(){
   document.getElementById("count").textContent=cards.length+" карт";
   const out=document.getElementById("cards");
   if(!list.length){
+    if(!q && storageState==="error"){
+      out.innerHTML='<div class="empty"><b>Не удалось прочитать сохранённые карты</b><span>Данные не перезаписываются. Ошибка: '+esc(storageError)+'</span><button class="btn primary" onclick="exportStorageRecovery()">Выгрузить данные для восстановления</button></div>';
+      return;
+    }
     out.innerHTML='<div class="empty"><b>'+(q?"Ничего не найдено":"Кошелёк пока пуст")+'</b><span>'+(q?"Попробуйте другой запрос":"Добавьте первую карту кнопкой ＋")+'</span></div>';
     return;
   }
@@ -402,7 +442,7 @@ function readImport(e){
   e.target.value="";
 }
 if("serviceWorker" in navigator){
-  window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js?v=26").catch(function(){});});
+  window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js?v=29").catch(function(){});});
 }
 render();
 </script>
