@@ -255,16 +255,7 @@ h1{margin:0;font-size:28px}.sub{color:#737780;font-size:14px;margin-top:4px}.btn
 .textColorGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin-top:7px}.styleColorChoice{min-height:42px;border:2px solid #e2e3e8;border-radius:12px;background:#fff;padding:5px 3px;font:11px inherit;font-weight:700;color:#30333a}.styleColorChoice span{display:block;width:20px;height:20px;border-radius:50%;margin:0 auto 3px;border:1px solid #c9cbd0}.styleColorChoice b{font-weight:650}.styleColorChoice.selected{border-color:#1677ff;box-shadow:0 0 0 1px #1677ff inset}.style-color-white span{background:#fff}.style-color-black span{background:#17181c}.style-color-yellow span{background:#ffd43b}.style-color-red span{background:#e03131}.style-color-green span{background:#159447}.style-color-blue span{background:#1767d8}
 .styleRange{width:100%;margin-top:7px;accent-color:#1677ff}.fontGrid .styleOption{font-size:15px}
 
-
-.bottomNav{position:fixed;left:0;right:0;bottom:0;z-index:20;display:grid;grid-template-columns:repeat(3,1fr);gap:4px;padding:8px 10px calc(8px + env(safe-area-inset-bottom));background:#ffffffed;backdrop-filter:blur(14px);border-top:1px solid #e5e7eb}
-.bottomNavItem{border:0;background:transparent;border-radius:14px;padding:7px 4px 6px;font:inherit;font-size:12px;font-weight:700;color:#7a7e86;display:flex;flex-direction:column;align-items:center;gap:3px}
-.bottomNavItem .navIcon{font-size:20px;line-height:20px}
-.bottomNavItem.active{color:#1677ff;background:#f1f6ff}
-.app{padding-bottom:82px}
-.editorAdditional{padding-top:2px}
-.editorAdditional .additionalBlock{padding:14px;border:1px solid #e4e6eb;border-radius:16px;background:#fafbfc;margin-bottom:10px}
-.editorAdditional .additionalBlock b{display:block;margin-bottom:5px}
-@media(max-width:420px){.bottomNav{padding-left:8px;padding-right:8px}.bottomNavItem{font-size:11px}.bottomNavItem .navIcon{font-size:19px}}
+ 
 </style>
 </head>
 <body>
@@ -273,11 +264,7 @@ h1{margin:0;font-size:28px}.sub{color:#737780;font-size:14px;margin-top:4px}.btn
 <div class="search"><input id="search" placeholder="Поиск карты" oninput="render()"></div>
 <main id="cards" class="grid"></main>
 </div>
-<button class="fab" onclick="addMenu()">＋</button><nav class="bottomNav" aria-label="Навигация">
-<button type="button" class="bottomNavItem active" data-nav="wallet" onclick="setBottomNav('wallet')"><span class="navIcon">▣</span><span>Кошелёк</span></button>
-<button type="button" class="bottomNavItem" data-nav="scanner" onclick="setBottomNav('scanner')"><span class="navIcon">⌗</span><span>Сканер</span></button>
-<button type="button" class="bottomNavItem" data-nav="settings" onclick="setBottomNav('settings')"><span class="navIcon">⚙</span><span>Настройки</span></button>
-</nav>
+<button class="fab" onclick="addMenu()">＋</button>
 <div id="modal" class="overlay" onclick="if(event.target===this)closeModal()"><div class="sheet" id="sheet"></div></div>
 <script>
 const KEY="card_wallet_v1";
@@ -472,17 +459,6 @@ document.getElementById("cards").addEventListener("click",function(e){
   e.stopPropagation();
   openCard(card.getAttribute("data-id"));
 });
-function setBottomNav(tab){
-  document.querySelectorAll(".bottomNavItem").forEach(function(b){b.classList.toggle("active",b.getAttribute("data-nav")===tab);});
-  if(tab==="wallet"){window.scrollTo(0,0);return;}
-  if(tab==="scanner"){scanner(function(){setBottomNav("wallet");});return;}
-  if(tab==="settings"){
-    openModal('<button class="close" onclick="closeModal()">×</button><h2>Настройки</h2>'+
-      '<button type="button" class="btn secondary" onclick="exportData()">Сохранить резервную копию</button>'+
-      '<button type="button" class="btn secondary" onclick="importData()">Восстановить из файла</button>'+
-      '<p class="hint">Карты хранятся локально в этом браузере.</p>');
-  }
-}
 function openModal(html){
   document.getElementById("sheet").innerHTML=html;
   document.getElementById("modal").classList.add("open");
