@@ -223,6 +223,19 @@ h1{margin:0;font-size:28px}.sub{color:#737780;font-size:14px;margin-top:4px}.btn
   border-radius:50%!important;background:#c7192210!important;box-shadow:-70px 72px 0 8px #c7192209!important;
 }
 
+
+/* CARD111 card style editor v45 */
+.card.title-top strong{top:12px!important;bottom:auto!important}
+.card.title-center strong{top:50%!important;bottom:auto!important;transform:translateY(-50%)!important}
+.card.title-bottom strong{top:auto!important;bottom:12px!important}
+.card strong{color:var(--title-color,#fff)!important;font-size:var(--title-size,19px)!important;font-family:var(--title-font,system-ui,-apple-system,"Segoe UI",sans-serif)!important}
+.card.palette-red{background:linear-gradient(135deg,#ef3340,#b30f30)!important}.card.palette-blue{background:linear-gradient(135deg,#1767d8,#163c91)!important}.card.palette-green{background:linear-gradient(135deg,#0aa66d,#087557)!important}.card.palette-purple{background:linear-gradient(135deg,#7b3fe4,#45218b)!important}.card.palette-amber{background:linear-gradient(135deg,#f5bd2e,#c47708)!important}.card.palette-graphite{background:linear-gradient(135deg,#4a5058,#17181c)!important}.card.palette-light{background:linear-gradient(135deg,#fff,#e7e9ed)!important}
+.card.palette-red:before,.card.palette-blue:before,.card.palette-green:before,.card.palette-purple:before,.card.palette-amber:before,.card.palette-graphite:before,.card.palette-light:before{opacity:.28}.card.palette-light strong{background:#ffffffd9!important;text-shadow:none!important}
+.cardStylePicker{margin-top:14px;padding:14px;border:1px solid #e4e6eb;border-radius:18px;background:#fafbfc}.styleBlockTitle{margin-top:14px}.styleGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:7px}.styleOption{min-height:42px;border:2px solid #e2e3e8;border-radius:12px;background:#fff;padding:8px 10px;font:inherit;font-weight:700;color:#30333a}.styleOption.selected{border-color:#1677ff;box-shadow:0 0 0 1px #1677ff inset}
+.palette-choice-red{background:linear-gradient(135deg,#ef3340,#b30f30);color:#fff}.palette-choice-blue{background:linear-gradient(135deg,#1767d8,#163c91);color:#fff}.palette-choice-green{background:linear-gradient(135deg,#0aa66d,#087557);color:#fff}.palette-choice-purple{background:linear-gradient(135deg,#7b3fe4,#45218b);color:#fff}.palette-choice-amber{background:linear-gradient(135deg,#f5bd2e,#c47708);color:#17181c}.palette-choice-graphite{background:linear-gradient(135deg,#4a5058,#17181c);color:#fff}.palette-choice-light{background:linear-gradient(135deg,#fff,#e7e9ed);color:#17181c}
+.textColorGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin-top:7px}.styleColorChoice{min-height:42px;border:2px solid #e2e3e8;border-radius:12px;background:#fff;padding:5px 3px;font:11px inherit;font-weight:700;color:#30333a}.styleColorChoice span{display:block;width:20px;height:20px;border-radius:50%;margin:0 auto 3px;border:1px solid #c9cbd0}.styleColorChoice b{font-weight:650}.styleColorChoice.selected{border-color:#1677ff;box-shadow:0 0 0 1px #1677ff inset}.style-color-white span{background:#fff}.style-color-black span{background:#17181c}.style-color-yellow span{background:#ffd43b}.style-color-red span{background:#e03131}.style-color-green span{background:#159447}.style-color-blue span{background:#1767d8}
+.styleRange{width:100%;margin-top:7px;accent-color:#1677ff}.fontGrid .styleOption{font-size:15px}
+
 </style>
 </head>
 <body>
@@ -258,6 +271,36 @@ function coverForName(name){
   if(n.includes("бристоль"))return "BRISTOL";
   if(n.includes("красное белое")||n.includes("красное&белое")||n.includes("красное и белое"))return "K_B";
   return "CUSTOM";
+}
+
+const CARD_PALETTES={AUTO:"Фирменная",RED:"Красная",BLUE:"Синяя",GREEN:"Зелёная",PURPLE:"Фиолетовая",AMBER:"Янтарная",GRAPHITE:"Графитовая",LIGHT:"Светлая"};
+const CARD_TEXT_COLORS={WHITE:"#ffffff",BLACK:"#17181c",YELLOW:"#ffd43b",RED:"#e03131",GREEN:"#159447",BLUE:"#1767d8"};
+const CARD_TEXT_COLOR_LABELS={WHITE:"Белый",BLACK:"Чёрный",YELLOW:"Жёлтый",RED:"Красный",GREEN:"Зелёный",BLUE:"Синий"};
+const CARD_TEXT_POSITIONS={TOP:"Сверху",CENTER:"По центру",BOTTOM:"Снизу"};
+const CARD_FONTS={SYSTEM:'system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif',ARIAL:"Arial,Helvetica,sans-serif",TREBUCHET:'"Trebuchet MS",Arial,sans-serif',GEORGIA:'Georgia,"Times New Roman",serif',COURIER:'"Courier New",monospace'};
+const CARD_FONT_LABELS={SYSTEM:"Системный",ARIAL:"Arial",TREBUCHET:"Trebuchet",GEORGIA:"Georgia",COURIER:"Courier"};
+function cardStyle(c){
+  const s=(c&&c.style&&typeof c.style==="object")?c.style:{};
+  return {palette:CARD_PALETTES[s.palette]?s.palette:"AUTO",textColor:CARD_TEXT_COLORS[s.textColor]?s.textColor:"WHITE",position:CARD_TEXT_POSITIONS[s.position]?s.position:"BOTTOM",size:Math.max(14,Math.min(28,Number(s.size)||19)),font:CARD_FONTS[s.font]?s.font:"SYSTEM"};
+}
+function cardStyleClass(c){const s=cardStyle(c);return "palette-"+s.palette.toLowerCase()+" title-"+s.position.toLowerCase();}
+function cardStyleInline(c){const s=cardStyle(c);return "--title-color:"+CARD_TEXT_COLORS[s.textColor]+";--title-size:"+s.size+"px;--title-font:"+CARD_FONTS[s.font]+";"}
+function paletteOptions(selected){return Object.keys(CARD_PALETTES).map(function(k){return '<button type="button" class="styleOption paletteChoice palette-choice-'+k.toLowerCase()+(k===selected?" selected":"")+'" data-palette="'+k+'">'+esc(CARD_PALETTES[k])+'</button>';}).join("");}
+function textColorOptions(selected){return Object.keys(CARD_TEXT_COLORS).map(function(k){return '<button type="button" class="styleColorChoice style-color-'+k.toLowerCase()+(k===selected?" selected":"")+'" data-text-color="'+k+'" title="'+esc(CARD_TEXT_COLOR_LABELS[k])+'"><span></span><b>'+esc(CARD_TEXT_COLOR_LABELS[k])+'</b></button>';}).join("");}
+function positionOptions(selected){return Object.keys(CARD_TEXT_POSITIONS).map(function(k){return '<button type="button" class="styleOption positionChoice '+(k===selected?" selected":"")+'" data-position="'+k+'">'+esc(CARD_TEXT_POSITIONS[k])+'</button>';}).join("");}
+function fontOptions(selected){return Object.keys(CARD_FONTS).map(function(k){return '<button type="button" class="styleOption fontChoice '+(k===selected?" selected":"")+'" data-font="'+k+'" style="font-family:'+CARD_FONTS[k]+'">'+esc(CARD_FONT_LABELS[k])+'</button>';}).join("");}
+function styleEditor(c){
+  const s=cardStyle(c);
+  return '<div class="cardStylePicker"><div class="hint">Цветовая палитра</div><input id="cardPalette" type="hidden" value="'+esc(s.palette)+'"><div id="paletteGrid" class="styleGrid">'+paletteOptions(s.palette)+'</div>'+
+    '<div class="hint styleBlockTitle">Расположение названия</div><input id="titlePosition" type="hidden" value="'+esc(s.position)+'"><div id="positionGrid" class="styleGrid">'+positionOptions(s.position)+'</div>'+
+    '<div class="hint styleBlockTitle">Цвет текста</div><input id="titleColor" type="hidden" value="'+esc(s.textColor)+'"><div id="textColorGrid" class="textColorGrid">'+textColorOptions(s.textColor)+'</div>'+
+    '<div class="hint styleBlockTitle">Размер текста: <b id="titleSizeValue">'+s.size+' px</b></div><input id="titleSize" type="range" min="14" max="28" step="1" value="'+s.size+'" class="styleRange">'+
+    '<div class="hint styleBlockTitle">Шрифт</div><input id="titleFont" type="hidden" value="'+esc(s.font)+'"><div id="fontGrid" class="styleGrid fontGrid">'+fontOptions(s.font)+'</div></div>';
+}
+function bindStyleEditor(){
+  function bindGrid(id,inputId,attr){const grid=document.getElementById(id),input=document.getElementById(inputId);if(!grid||!input)return;grid.querySelectorAll("button").forEach(function(btn){btn.onclick=function(){input.value=btn.getAttribute(attr)||"";grid.querySelectorAll("button").forEach(function(x){x.classList.remove("selected");});btn.classList.add("selected");};});}
+  bindGrid("paletteGrid","cardPalette","data-palette");bindGrid("positionGrid","titlePosition","data-position");bindGrid("textColorGrid","titleColor","data-text-color");bindGrid("fontGrid","titleFont","data-font");
+  const range=document.getElementById("titleSize"),out=document.getElementById("titleSizeValue");if(range&&out)range.oninput=function(){out.textContent=range.value+" px";};
 }
 function coverForCard(c){const v=String(c.cover||"AUTO");return v==="AUTO"?coverForName(c.name):COVER_LABELS[v]?v:"CUSTOM";}
 function coverClass(c){return "cover-"+coverForCard(c).toLowerCase();}
@@ -352,7 +395,8 @@ function syncCardsFromStorage(){
         format:String(x.format||"CODE_128"),
         image:String(x.image||x.logo||""),
         color:String(x.color||colors[0]),
-        cover:String(x.cover||"AUTO")
+        cover:String(x.cover||"AUTO"),
+        style:(x.style&&typeof x.style==="object")?x.style:{}
       };
     });
     cards=normalized;
@@ -385,7 +429,7 @@ function render(){
     const color=String(c.color||colors[0]);
     const logo=c.image?'<img class="cardLogo" src="'+esc(c.image)+'" alt="">':'<span class="cardLogoFallback">'+esc(mark)+'</span>';
     const cover=coverForCard(c);
-    return '<button type="button" class="card '+esc(coverClass(c))+'" data-id="'+esc(String(c.id))+'" data-mark="" style="--card-color:'+esc(color)+'">'+logo+'<strong>'+esc(c.name)+'</strong></button>';
+    return '<button type="button" class="card '+esc(coverClass(c))+' '+esc(cardStyleClass(c))+'" data-id="'+esc(String(c.id))+'" data-mark="" style="--card-color:'+esc(color)+';'+esc(cardStyleInline(c))+'">'+logo+'<strong>'+esc(c.name)+'</strong></button>';
   }).join("");
 }
 document.getElementById("cards").addEventListener("click",function(e){
@@ -420,10 +464,11 @@ function manual(data){
     '<button type="button" class="formatOption" onclick="chooseFormat(\'EAN_13\',\'Штрихкод — EAN-13\')">Штрихкод — EAN-13</button>'+
     '<button type="button" class="formatOption" onclick="chooseFormat(\'EAN_8\',\'Штрихкод — EAN-8\')">Штрихкод — EAN-8</button>'+
     '<button type="button" class="formatOption" onclick="chooseFormat(\'QR_CODE\',\'QR-код\')">QR-код</button></div></div></div>'+
-    '<div class="coverPicker"><div class="hint">Рубашка карты</div><input id="cover" type="hidden" value="AUTO"><div id="coverGrid" class="coverGrid">'+coverOptions("AUTO")+'</div><div class="coverHint">Автоматически выберется знакомая рубашка по названию магазина. Её можно заменить вручную.</div></div>'+
+    '<div class="coverPicker"><div class="hint">Рубашка карты</div><input id="cover" type="hidden" value="AUTO"><div id="coverGrid" class="coverGrid">'+coverOptions("AUTO")+'</div><div class="coverHint">Автоматически выберется знакомая рубашка по названию магазина. Её можно заменить вручную.</div></div>'+styleEditor({style:{}})+''+
     '<label class="hint" style="display:block;margin-top:12px">Фото карты<input id="cardImage" type="file" accept="image/*" style="width:100%;margin-top:6px"></label>'+
     '<button class="btn primary" onclick="addCard()">Сохранить карту</button>');
   bindCoverPicker();
+  bindStyleEditor();
 }
 function formatLabel(v){return ({CODE_128:"Штрихкод — CODE 128",EAN_13:"Штрихкод — EAN-13",EAN_8:"Штрихкод — EAN-8",QR_CODE:"QR-код"})[v]||"Штрихкод — CODE 128";}
 function toggleFormatMenu(){const m=document.getElementById("formatMenu");if(m)m.classList.toggle("open");}
@@ -432,11 +477,13 @@ async function addCard(){
   const name=document.getElementById("name").value.trim()||"Моя карта";
   const code=document.getElementById("code").value.trim();
   const format=document.getElementById("format").value;
+  const cover=(document.getElementById("cover")&&document.getElementById("cover").value)||"AUTO";
+  const style={palette:(document.getElementById("cardPalette")&&document.getElementById("cardPalette").value)||"AUTO",textColor:(document.getElementById("titleColor")&&document.getElementById("titleColor").value)||"WHITE",position:(document.getElementById("titlePosition")&&document.getElementById("titlePosition").value)||"BOTTOM",size:Math.max(14,Math.min(28,Number(document.getElementById("titleSize")&&document.getElementById("titleSize").value)||19)),font:(document.getElementById("titleFont")&&document.getElementById("titleFont").value)||"SYSTEM"};
   const file=document.getElementById("cardImage")&&document.getElementById("cardImage").files[0];
   if(!code){alert("Введите код карты");return;}
   let image="";
   if(file)image=await readImage(file);
-  cards.unshift({id:String(Date.now()),name:name,code:code,format:format,image:image,color:colors[cards.length%colors.length],cover:cover});
+  cards.unshift({id:String(Date.now()),name:name,code:code,format:format,image:image,color:colors[cards.length%colors.length],cover:cover,style:style});
   save();
   closeModal();
 }
@@ -622,7 +669,7 @@ function manualEdit(id){
     '<button type="button" class="formatOption" onclick="chooseFormat(\'EAN_13\',\'Штрихкод — EAN-13\')">Штрихкод — EAN-13</button>'+
     '<button type="button" class="formatOption" onclick="chooseFormat(\'EAN_8\',\'Штрихкод — EAN-8\')">Штрихкод — EAN-8</button>'+
     '<button type="button" class="formatOption" onclick="chooseFormat(\'QR_CODE\',\'QR-код\')">QR-код</button></div></div>'+
-    '<div class="coverPicker"><div class="hint">Рубашка карты</div><input id="cover" type="hidden" value="'+esc(c.cover||"AUTO")+'"><div id="coverGrid" class="coverGrid">'+coverOptions(c.cover||"AUTO")+'</div><div class="coverHint">Авто — подбор по названию магазина.</div></div>'+
+    '<div class="coverPicker"><div class="hint">Рубашка карты</div><input id="cover" type="hidden" value="'+esc(c.cover||"AUTO")+'"><div id="coverGrid" class="coverGrid">'+coverOptions(c.cover||"AUTO")+'</div><div class="coverHint">Авто — подбор по названию магазина.</div></div>'+styleEditor(c)+''+
     '<label class="hint" style="display:block;margin-top:12px">Заменить фото карты<input id="cardImage" type="file" accept="image/*" style="width:100%;margin-top:6px"></label>'+
     '<button type="button" class="btn secondary" id="rescanEdit">Пересканировать код</button>'+
     '<button type="button" class="btn primary" id="editSave">Сохранить</button>'+
@@ -632,6 +679,7 @@ function manualEdit(id){
   document.getElementById("editSave").onclick=function(){updateCard(String(id));};
   document.getElementById("editCancel").onclick=closeModal;
   bindCoverPicker();
+  bindStyleEditor();
 }
 function rescanEdit(id){
   scanner(function(data){
@@ -653,12 +701,14 @@ async function updateCard(id){
   const newCode=document.getElementById("code").value.trim();
   const newFormat=document.getElementById("format").value;
   const newCover=document.getElementById("cover")&&document.getElementById("cover").value||"AUTO";
+  const newStyle={palette:(document.getElementById("cardPalette")&&document.getElementById("cardPalette").value)||"AUTO",textColor:(document.getElementById("titleColor")&&document.getElementById("titleColor").value)||"WHITE",position:(document.getElementById("titlePosition")&&document.getElementById("titlePosition").value)||"BOTTOM",size:Math.max(14,Math.min(28,Number(document.getElementById("titleSize")&&document.getElementById("titleSize").value)||19)),font:(document.getElementById("titleFont")&&document.getElementById("titleFont").value)||"SYSTEM"};
   if(!newCode){alert("Введите код карты");return;}
   if(!confirm("Сохранить изменения карты «"+newName+"»?"))return;
   c.name=newName;
   c.code=newCode;
   c.format=newFormat;
   c.cover=newCover;
+  c.style=newStyle;
   const file=document.getElementById("cardImage")&&document.getElementById("cardImage").files[0];
   if(file)c.image=await readImage(file);
   save();
@@ -691,7 +741,7 @@ function readImport(e){
       const list=Array.isArray(d)?d:d.cards;
       if(!Array.isArray(list))throw Error();
       cards=list.filter(function(c){return c&&c.code;}).map(function(c){
-        return {id:String(c.id||Date.now()+Math.random()),name:String(c.name||"Моя карта"),code:String(c.code),format:String(c.format||"CODE_128"),image:String(c.image||""),color:String(c.color||colors[0]),cover:String(c.cover||"AUTO")};
+        return {id:String(c.id||Date.now()+Math.random()),name:String(c.name||"Моя карта"),code:String(c.code),format:String(c.format||"CODE_128"),image:String(c.image||""),color:String(c.color||colors[0]),cover:String(c.cover||"AUTO"),style:(c.style&&typeof c.style==="object")?c.style:{}};
       });
       save();
       closeModal();
@@ -702,7 +752,7 @@ function readImport(e){
   e.target.value="";
 }
 if("serviceWorker" in navigator){
-  window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js?v=44").catch(function(){});});
+  window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js?v=45").catch(function(){});});
 }
 render();
 </script>
