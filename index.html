@@ -410,10 +410,10 @@ function manualEdit(id){
     '<input id="name" name="discount_name" autocomplete="off" value="'+esc(c.name)+'">'+
     '<input id="code" name="discount_code" type="text" inputmode="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" value="'+esc(c.code)+'" style="margin-top:10px">'+
     '<div class="formatPicker" style="margin-top:10px"><input id="format" type="hidden" value="'+esc(c.format||"CODE_128")+'"><button type="button" class="formatButton" onclick="toggleFormatMenu()">'+esc(formatLabel(c.format||"CODE_128"))+'</button><div id="formatMenu" class="formatMenu">'+
-    '<button type="button" class="formatOption" onclick="chooseFormat(\\'CODE_128\\',\\'Штрихкод — CODE 128\\')">Штрихкод — CODE 128</button>'+
-    '<button type="button" class="formatOption" onclick="chooseFormat(\\'EAN_13\\',\\'Штрихкод — EAN-13\\')">Штрихкод — EAN-13</button>'+
-    '<button type="button" class="formatOption" onclick="chooseFormat(\\'EAN_8\\',\\'Штрихкод — EAN-8\\')">Штрихкод — EAN-8</button>'+
-    '<button type="button" class="formatOption" onclick="chooseFormat(\\'QR_CODE\\',\\'QR-код\\')">QR-код</button></div></div>'+
+    '<button type="button" class="formatOption" onclick="chooseFormat(\'CODE_128\',\'Штрихкод — CODE 128\')">Штрихкод — CODE 128</button>'+
+    '<button type="button" class="formatOption" onclick="chooseFormat(\'EAN_13\',\'Штрихкод — EAN-13\')">Штрихкод — EAN-13</button>'+
+    '<button type="button" class="formatOption" onclick="chooseFormat(\'EAN_8\',\'Штрихкод — EAN-8\')">Штрихкод — EAN-8</button>'+
+    '<button type="button" class="formatOption" onclick="chooseFormat(\'QR_CODE\',\'QR-код\')">QR-код</button></div></div>'+
     '<label class="hint" style="display:block;margin-top:12px">Заменить фото карты<input id="cardImage" type="file" accept="image/*" style="width:100%;margin-top:6px"></label>'+
     '<button type="button" class="btn secondary" id="rescanEdit">Пересканировать код</button>'+
     '<button type="button" class="btn primary" id="editSave">Сохранить</button>'+
