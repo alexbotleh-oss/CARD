@@ -58,7 +58,7 @@ h1{margin:0;font-size:28px}.sub{color:#737780;font-size:14px;margin-top:4px}.btn
 @media(max-width:720px){.fab{bottom:88px}}
 @media(max-width:420px){.grid{gap:11px;padding:0 13px}.search{padding-left:13px;padding-right:13px}.card{min-height:112px;padding:12px}.card strong{font-size:20px;width:90%}}
 
-.editorPreviewWrap{position:sticky;top:0;z-index:6;display:flex;justify-content:center;align-items:center;min-height:158px;padding:8px 0 10px;background:#fff;flex:none;transform:translateZ(0);will-change:transform}.editorSheet{position:relative!important;display:flex!important;flex-direction:column!important;overflow:hidden!important;height:90vh!important;max-height:90vh!important}.editorSheet .editorPreviewWrap{position:relative!important;top:auto!important}.editorPreviewDock{position:absolute!important;left:0!important;right:0!important;top:0!important;z-index:100!important;height:158px!important;min-height:158px!important;display:flex!important;visibility:visible!important;opacity:1!important;background:#fff!important}.editorSheet .editorBodyScroll{min-height:0!important;height:100%!important;overflow-y:auto!important;overflow-x:hidden!important;flex:1 1 auto!important;padding-top:158px!important;padding-bottom:8px}.editorSheet .editorPreview{visibility:visible!important;opacity:1!important} .editorPreviewWrap .editorPreview{position:relative;transform:none!important}.editorPreview{width:240px;min-height:140px;height:140px!important;flex:none;border-radius:18px}
+.editorPreview{width:240px;min-height:140px;height:140px!important;flex:none;border-radius:18px}
 .editorPreview strong{font-size:18px!important}
 .editorTabs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:0 0 12px;padding:4px;background:#f0f1f4;border-radius:14px}
 .editorTab{border:0;border-radius:10px;background:transparent;padding:10px 8px;font:inherit;font-weight:700;color:#737780}
@@ -453,7 +453,7 @@ function openModal(html){
   document.getElementById("sheet").innerHTML=html;
   document.getElementById("modal").classList.add("open");
 }
-function closeModal(){const dock=document.getElementById("editorPreviewDock");if(dock)dock.remove();document.getElementById("modal").classList.remove("open");document.getElementById("sheet").classList.remove("editorSheet");}
+function closeModal(){document.getElementById("modal").classList.remove("open");}
 function showWallet(){
   document.querySelectorAll(".bottomNavItem").forEach((b,i)=>b.classList.toggle("active",i===0));
   closeModal();
@@ -752,9 +752,8 @@ function manualEdit(id){
   const c=cards.find(function(x){return String(x.id)===String(id);});
   if(!c)return;
   openModal('<button class="close" id="editClose">×</button><h2>Изменить карту</h2>'+
-    ''+
+    '<div class="editorPreviewWrap"><div id="editorPreview" class="card editorPreview"></div></div>'+
     '<div class="hint editorPreviewHint">Предпросмотр меняется сразу при редактировании</div>'+
-    '<div class="editorBodyScroll">'+
     '<div class="editorTabs"><button type="button" class="editorTab active" data-tab="data">Данные</button><button type="button" class="editorTab" data-tab="appearance">Оформление</button><button type="button" class="editorTab" data-tab="extra">Дополнительно</button></div>'+
     '<div class="editorPanel active editorDataPanel" data-panel="data">'+
       '<div class="editorSectionTitle">Основная информация</div>'+
@@ -780,13 +779,7 @@ function manualEdit(id){
       '<div class="hint">Резервные функции не изменяют текущую карту до подтверждения восстановления.</div>'+
     '</div>'+
     '<button type="button" class="btn primary" id="editSave">Сохранить</button>'+
-    '<button type="button" class="btn secondary" id="editCancel">Отмена</button></div>');
-  document.getElementById("sheet").classList.add("editorSheet");
-  const editorDock=document.createElement("div");
-  editorDock.id="editorPreviewDock";
-  editorDock.className="editorPreviewWrap editorPreviewDock";
-  editorDock.innerHTML='<div id="editorPreview" class="card editorPreview"></div>';
-  document.getElementById("modal").appendChild(editorDock);
+    '<button type="button" class="btn secondary" id="editCancel">Отмена</button>');
   document.getElementById("editClose").onclick=function(){openCard(String(id));};
   document.getElementById("rescanEdit").onclick=function(){rescanEdit(String(id));};
   document.getElementById("editSave").onclick=function(){updateCard(String(id));};
