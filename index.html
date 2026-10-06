@@ -406,18 +406,22 @@ function showCropper(file,reader,finish){
 function manualEdit(id){
   const c=cards.find(function(x){return String(x.id)===String(id);});
   if(!c)return;
-  openModal('<button class="close" onclick="openCard('+JSON.stringify(String(id))+')">×</button><h2>Изменить скидочную карту</h2>'+
+  openModal('<button class="close" id="editClose">×</button><h2>Изменить скидочную карту</h2>'+
     '<input id="name" name="discount_name" autocomplete="off" value="'+esc(c.name)+'">'+
     '<input id="code" name="discount_code" type="text" inputmode="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" value="'+esc(c.code)+'" style="margin-top:10px">'+
     '<div class="formatPicker" style="margin-top:10px"><input id="format" type="hidden" value="'+esc(c.format||"CODE_128")+'"><button type="button" class="formatButton" onclick="toggleFormatMenu()">'+esc(formatLabel(c.format||"CODE_128"))+'</button><div id="formatMenu" class="formatMenu">'+
-    '<button type="button" class="formatOption" onclick="chooseFormat(\'CODE_128\',\'Штрихкод — CODE 128\')">Штрихкод — CODE 128</button>'+
-    '<button type="button" class="formatOption" onclick="chooseFormat(\'EAN_13\',\'Штрихкод — EAN-13\')">Штрихкод — EAN-13</button>'+
-    '<button type="button" class="formatOption" onclick="chooseFormat(\'EAN_8\',\'Штрихкод — EAN-8\')">Штрихкод — EAN-8</button>'+
-    '<button type="button" class="formatOption" onclick="chooseFormat(\'QR_CODE\',\'QR-код\')">QR-код</button></div></div>'+
+    '<button type="button" class="formatOption" onclick="chooseFormat(\\'CODE_128\\',\\'Штрихкод — CODE 128\\')">Штрихкод — CODE 128</button>'+
+    '<button type="button" class="formatOption" onclick="chooseFormat(\\'EAN_13\\',\\'Штрихкод — EAN-13\\')">Штрихкод — EAN-13</button>'+
+    '<button type="button" class="formatOption" onclick="chooseFormat(\\'EAN_8\\',\\'Штрихкод — EAN-8\\')">Штрихкод — EAN-8</button>'+
+    '<button type="button" class="formatOption" onclick="chooseFormat(\\'QR_CODE\\',\\'QR-код\\')">QR-код</button></div></div>'+
     '<label class="hint" style="display:block;margin-top:12px">Заменить фото карты<input id="cardImage" type="file" accept="image/*" style="width:100%;margin-top:6px"></label>'+
-    '<button type="button" class="btn secondary" onclick="rescanEdit('+JSON.stringify(String(id))+')">Пересканировать код</button>'+
-    '<button class="btn primary" onclick="updateCard('+JSON.stringify(String(id))+')">Сохранить</button>'+
-    '<button class="btn secondary" onclick="closeModal()">Отмена</button>');
+    '<button type="button" class="btn secondary" id="rescanEdit">Пересканировать код</button>'+
+    '<button type="button" class="btn primary" id="editSave">Сохранить</button>'+
+    '<button type="button" class="btn secondary" id="editCancel">Отмена</button>');
+  document.getElementById("editClose").onclick=function(){openCard(String(id));};
+  document.getElementById("rescanEdit").onclick=function(){rescanEdit(String(id));};
+  document.getElementById("editSave").onclick=function(){updateCard(String(id));};
+  document.getElementById("editCancel").onclick=closeModal;
 }
 function rescanEdit(id){
   scanner(function(data){
