@@ -330,7 +330,7 @@ function coverOptions(selected){
 }
 function bindCoverPicker(){
   const input=document.getElementById("cover");
-  const grid=document.getElementById("coverGrid");
+  const grid=document.getElementById("coverGrid")||document.getElementById("editorCoverGrid");
   if(!grid)return;
   grid.querySelectorAll(".coverOption").forEach(function(btn){
     btn.onclick=function(){
