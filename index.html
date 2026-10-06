@@ -328,7 +328,7 @@ function showCropper(file,reader,finish){
     const q=document.createElement("canvas");
     q.id="qr";
     document.querySelector(".codebox").prepend(q);
-    try{QRCode.toCanvas(q,c.code,{width:230,margin:2},function(){});}catch(e){q.remove();}
+    try{QRCode.toCanvas(q,String(c.code),{width:230,margin:2},function(err){if(err){console.error("QR render:",err);q.remove();}});}catch(e){console.error("QR render:",e);q.remove();}
   }else{
     try{
       JsBarcode("#barcode",c.code,{format:c.format==="EAN_13"?"ean13":c.format==="EAN_8"?"ean8":"CODE128",displayValue:false,height:90,margin:4});
