@@ -7,36 +7,328 @@
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon.svg">
 <title>CARD — Мой кошелёк</title>
-<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script><script src="https://unpkg.com/@zxing/browser@0.2.1"></script>
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 <style>
 *{box-sizing:border-box}body{margin:0;background:#f6f7fb;color:#17181c;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
 .app{max-width:720px;margin:auto;min-height:100vh;padding-bottom:100px}header{padding:22px 18px 12px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:#f6f7fbf2;backdrop-filter:blur(15px);z-index:5}
-h1{margin:0;font-size:28px}.sub{color:#737780;font-size:14px;margin-top:4px}.btn{border:0;border-radius:14px;padding:14px;font-weight:650}.icon{width:44px;height:44px;background:#fff;border:1px solid #e6e7eb;font-size:24px}.search{padding:8px 18px 16px}.search input,.sheet input,.sheet select{width:100%;padding:13px;border:1px solid #e2e3e8;border-radius:13px;background:#fff}
-.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;padding:0 14px}.card{min-height:118px;position:relative;overflow:hidden;background:#fff;border:1px solid #e6e7eb;border-radius:18px;padding:13px;color:#17181c;text-align:left;display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 4px 14px #0000000b}.card strong,.card small,.card .code{position:relative;z-index:2;text-shadow:none}.card strong{font-size:16px;line-height:1.15;padding-right:34px}.card small{font-size:12px;color:#737780}.card:after{content:"";position:absolute;inset:0;background:linear-gradient(135deg,#ffffff00 55%,#f3f4f7 100%);z-index:0}.card:before{content:attr(data-mark);position:absolute;right:11px;top:11px;width:32px;height:32px;border-radius:10px;background:var(--card-color,#17181c);color:#fff;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;z-index:1}.code{font:11px monospace;letter-spacing:1.4px;color:#5f636b}.empty{grid-column:1/-1;text-align:center;color:#737780;padding:60px 20px}.empty b{display:block;color:#17181c;font-size:20px;margin-bottom:8px}
-.fab{position:fixed;right:20px;bottom:24px;width:60px;height:60px;border:0;border-radius:20px;background:#17181c;color:#fff;font-size:30px;z-index:10}.overlay{display:none;position:fixed;inset:0;background:#0008;z-index:20;align-items:flex-end}.overlay.open{display:flex}.sheet{width:100%;max-width:720px;margin:auto;background:#fff;border-radius:26px 26px 0 0;padding:18px;max-height:90vh;overflow:auto}.sheet h2{margin:2px 0 18px}.close{float:right;border:0;background:#f0f1f4;border-radius:12px;width:38px;height:38px;font-size:20px}.primary{width:100%;background:#17181c;color:#fff;margin-top:10px}.secondary{width:100%;background:#f0f1f4;margin-top:10px}.danger{width:100%;background:#fff0ef;color:#d92d20;margin-top:10px}.row{display:flex;gap:10px;margin-top:10px}.row>*{flex:1}.detail{text-align:center}.brand{font-size:25px;font-weight:750;margin:8px}.codebox{background:#fff;border:1px solid #e6e7eb;border-radius:20px;padding:20px;margin:10px 0}.codebox svg{max-width:100%}.codeText{font:18px monospace;letter-spacing:2px;word-break:break-all;margin-top:12px}.hint{font-size:13px;color:#737780;line-height:1.45}#reader{width:100%;overflow:hidden;border-radius:18px;background:#111}
+h1{margin:0;font-size:28px}.sub{color:#737780;font-size:14px;margin-top:4px}.btn{border:0;border-radius:14px;padding:14px;font-weight:650}.icon{width:44px;height:44px;background:#fff;border:1px solid #e6e7eb;font-size:24px}.addBtn{background:#17181c;color:#fff;padding:12px 16px;border-radius:14px;white-space:nowrap}.search{padding:8px 18px 16px}.search input,.sheet input{width:100%;padding:13px;border:1px solid #e2e3e8;border-radius:13px;background:#fff}.formatPicker{position:relative;flex:1}.formatButton{width:100%;padding:13px;border:1px solid #e2e3e8;border-radius:13px;background:#fff;color:#17181c;text-align:left;font:inherit}.formatMenu{display:none;position:absolute;left:0;right:0;top:calc(100% + 6px);z-index:50;background:#fff;border:1px solid #e2e3e8;border-radius:13px;box-shadow:0 10px 28px #0002;overflow:hidden}.formatMenu.open{display:block}.formatOption{display:block;width:100%;padding:13px 14px;border:0;border-bottom:1px solid #eee;background:#fff;color:#17181c;text-align:left;font:inherit}.formatOption:last-child{border-bottom:0}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;padding:0 14px}.card{min-height:118px;position:relative;overflow:hidden;background:linear-gradient(135deg,var(--card-color,#17181c) 0%,var(--card-color,#17181c) 58%,#00000066 100%);border:0;border-radius:18px;padding:13px;color:#fff;text-align:left;display:flex;flex-direction:column;justify-content:flex-end;box-shadow:0 7px 18px #00000018;isolation:isolate}.card strong{position:absolute;z-index:3;left:50%;top:50%;transform:translate(-50%,-50%);font-size:22px;line-height:1.12;padding:0;color:#fff;text-shadow:0 1px 2px #0008;text-align:center;width:88%}.card small,.card .code{display:none}.card:before{content:"";position:absolute;z-index:1;right:-22px;top:-30px;width:105px;height:105px;border-radius:50%;background:#ffffff20;box-shadow:-28px 34px 0 2px #ffffff12,38px 58px 0 -10px #ffffff10}.card:after{content:"";position:absolute;inset:0;z-index:2;background:linear-gradient(120deg,#ffffff18 0%,#ffffff00 42%,#00000018 100%);pointer-events:none}.cardLogo{width:42px;height:42px;object-fit:contain;border-radius:12px;background:#fff;border:0;display:block;margin-bottom:auto;position:relative;z-index:3;padding:3px}.cardLogoFallback{display:none}
+.card.cover-magnit{background:#d71939;box-shadow:inset 0 -24px 0 #b50f31,inset 0 0 0 1px #ffffff20}
+.card.cover-magnit:before{width:150px;height:150px;right:-30px;top:-52px;background:#ffffff16;box-shadow:-42px 54px 0 8px #ffffff10,30px 92px 0 -18px #ffffff12}
+.card.cover-pyaterochka{background:#e9322e}
+.card.cover-pyaterochka:before{right:-30px;top:-38px;width:210px;height:96px;border-radius:48% 0 48% 52%;background:#f6b323;box-shadow:-116px 66px 0 4px #159447,18px 70px 0 10px #f6b323}
+.card.cover-stolichki{background:#008f76}
+.card.cover-stolichki:before{right:-18px;top:-34px;width:150px;height:150px;border-radius:50%;background:#ffffff12;box-shadow:-52px 62px 0 10px #ffffff09}
+.card.cover-perekrestok{background:#0a8f52}
+.card.cover-perekrestok:before{width:170px;height:170px;right:-48px;top:-55px;border-radius:50%;background:#ffffff18;box-shadow:-55px 62px 0 10px #ffffff0d}
+.card.cover-lenta{background:#0b64ae}
+.card.cover-lenta:before{right:-26px;top:-40px;width:175px;height:110px;border-radius:0 0 80px 80px;background:#ffffff16;box-shadow:-72px 54px 0 8px #ffffff0c}
+.card.cover-vkusvill{background:#f6c928;color:#173b27}
+.card.cover-vkusvill:before{width:150px;height:150px;right:-38px;top:-46px;border-radius:50%;background:#ffffff22;box-shadow:-48px 58px 0 5px #ffffff14}
+.card.cover-okei{background:#00854a}
+.card.cover-okei:before{width:170px;height:170px;right:-52px;top:-54px;border-radius:50%;background:#ffffff14}
+.card.cover-ashan{background:#e30613}
+.card.cover-ashan:before{width:190px;height:190px;right:-70px;top:-66px;border-radius:50%;background:#ffffff12}
+.card.cover-diksi{background:#e31b23}
+.card.cover-diksi:before{width:180px;height:180px;right:-62px;top:-64px;border-radius:50%;background:#ffffff12}
+.card.cover-chizhik{background:#ffcc00;color:#17181c}
+.card.cover-chizhik:before{width:150px;height:150px;right:-38px;top:-48px;border-radius:50%;background:#ffffff22}
+.card.cover-antey{background:linear-gradient(145deg,#2160d9 0%,#1761e9 52%,#0a4fbe 100%)}
+.card.cover-antey:before{width:165px;height:165px;right:-55px;top:-62px;border-radius:50%;background:#ffffff15;box-shadow:-54px 62px 0 8px #ffffff0a}
+.card.cover-rodina_udacha{background:linear-gradient(145deg,#173d70 0%,#135b68 52%,#0e7357 100%)}
+.card.cover-rodina_udacha:before{width:180px;height:180px;right:-60px;top:-65px;border-radius:50%;background:#f6c64a20;box-shadow:-62px 65px 0 12px #ffffff0a}
+.card.cover-detmir{background:#9acb3c}
+.card.cover-detmir:before{width:190px;height:190px;right:-68px;top:-70px;border-radius:50%;background:#ffffff20;box-shadow:-62px 72px 0 10px #ffffff12}
+.card.cover-kari{background:#f7cf2f;color:#7c0a64}
+.card.cover-kari:before{width:190px;height:105px;right:-30px;top:-18px;border-radius:52% 0 52% 48%;background:#ffffff20;box-shadow:-72px 58px 0 10px #ffffff12}
+.card.cover-dns{background:#f39a16;color:#17181c}
+.card.cover-dns:before{width:120px;height:120px;right:-25px;top:-28px;border-radius:8px;background:#8e237b40;box-shadow:-70px 72px 0 -16px #52247d66,20px 88px 0 -10px #d72b2b66}
+.card.cover-bristol{background:#ef202b}
+.card.cover-bristol:before{width:210px;height:210px;right:-86px;top:-92px;border-radius:50%;background:#ffffff18;box-shadow:-72px 88px 0 -20px #ffffff12}
+.card.cover-k_b{background:#fff;box-shadow:inset 0 0 0 2px #d71920}
+.card.cover-k_b:before{width:210px;height:210px;right:-75px;top:-82px;border-radius:50%;background:#d7192018;box-shadow:-66px 78px 0 -20px #d7192018}
+.card.cover-custom{background:linear-gradient(135deg,#17181c 0%,#39404a 55%,#17181c 100%)}
+.card.cover-vkusvill strong,.card.cover-chizhik strong,.card.cover-dns strong{color:#17181c;text-shadow:0 1px 2px #fff8}
+.card.cover-k_b strong{color:#b30f18;text-shadow:none}
+.coverPicker{margin-top:12px}.coverGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:8px}.coverOption{border:2px solid #e2e3e8;border-radius:14px;padding:11px 10px;min-height:58px;text-align:left;font:inherit;font-weight:700;color:#fff;text-shadow:0 1px 2px #0008}.coverOption.selected{border-color:#17181c;box-shadow:0 0 0 2px #fff inset}.coverOption.cover-vkusvill,.coverOption.cover-chizhik{color:#17181c;text-shadow:none}.coverHint{font-size:12px;color:#737780;line-height:1.35}
+.code{font:10px monospace;letter-spacing:1.2px;color:#fff}.empty{grid-column:1/-1;text-align:center;color:#737780;padding:50px 20px}.empty b{display:block;color:#17181c;font-size:19px;margin-bottom:8px}.fab{display:none}
+.overlay{display:none;position:fixed;inset:0;background:#0008;z-index:20;align-items:flex-end}.overlay.open{display:flex}.sheet{width:100%;max-width:720px;margin:auto;background:#fff;border-radius:26px 26px 0 0;padding:18px;max-height:90vh;overflow:auto}.sheet h2{margin:2px 0 18px}.close{float:right;border:0;background:#f0f1f4;border-radius:12px;width:38px;height:38px;font-size:20px}.primary{width:100%;background:#17181c;color:#fff;margin-top:10px}.secondary{width:100%;background:#f0f1f4;margin-top:10px}.danger{width:100%;background:#fff0ef;color:#d92d20;margin-top:10px}.row{display:flex;gap:10px;margin-top:10px}.row>*{flex:1}.detail{text-align:center}.brand{font-size:25px;font-weight:750;margin:8px}.codebox{background:#fff;border:1px solid #e6e7eb;border-radius:20px;padding:20px;margin:10px 0}.codebox svg{max-width:100%}.codeText{font:18px monospace;letter-spacing:2px;word-break:break-all;margin-top:12px}.hint{font-size:13px;color:#737780;line-height:1.45}#reader{width:100%;height:min(48vh,430px);min-height:260px;overflow:hidden;border-radius:18px;background:#111;position:relative}#reader video{width:100%!important;height:100%!important;object-fit:cover!important}#reader__scan_region{width:100%!important;height:100%!important}#reader__scan_region img{display:none!important}.scanTools{display:flex;flex-direction:column;gap:10px;margin-top:10px}.cropWrap{position:relative;width:100%;height:min(58vh,520px);min-height:300px;background:#111;border-radius:18px;overflow:hidden;touch-action:none}.cropImage{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;user-select:none;-webkit-user-drag:none}.cropShade{position:absolute;inset:0;background:#0007;pointer-events:none}.cropBox{position:absolute;width:78%;height:150px;left:11%;top:calc(50% - 75px);border:4px solid #fff;box-shadow:0 0 0 9999px #0005;z-index:2;touch-action:none;cursor:move}.cropHint{font-size:13px;color:#737780;line-height:1.4;text-align:center;margin:0}.cropControls{display:flex;gap:8px}.cropControls button{flex:1;background:#f0f1f4;color:#17181c;border:0;border-radius:12px;padding:11px;font-weight:650}.cropZoomValue{text-align:center;font-size:12px;color:#737780;margin-top:-4px}.galleryPrimary{position:sticky;bottom:0;z-index:4}
 @media(max-width:720px){.fab{bottom:88px}}
-@media(max-width:420px){.grid{gap:11px;padding:0 13px}.search{padding-left:13px;padding-right:13px}.card{min-height:112px;padding:12px}.card strong{font-size:15px}}
+@media(max-width:420px){.grid{gap:11px;padding:0 13px}.search{padding-left:13px;padding-right:13px}.card{min-height:112px;padding:12px}.card strong{font-size:20px;width:90%}}
+
+.editorPreview{width:240px;min-height:140px;height:140px!important;flex:none;border-radius:18px}
+.editorPreview strong{font-size:18px!important}
+.editorTabs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:0 0 12px;padding:4px;background:#f0f1f4;border-radius:14px}
+.editorTab{border:0;border-radius:10px;background:transparent;padding:10px 8px;font:inherit;font-weight:700;color:#737780}
+.editorTab.active{background:#fff;color:#17181c;box-shadow:0 1px 4px #0001}
+.editorPanel{display:none}.editorPanel.active{display:block}
+.editorPreviewHint{text-align:center;margin:-3px 0 12px}
+.editorAppearance .coverPicker{margin-top:0}
+.editorAppearance .coverGrid{grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}
+.editorAppearance .coverOption{min-height:70px;padding:8px 5px;text-align:center;font-size:11px;border-radius:12px}
+.editorAppearance .coverHint{margin-top:7px}
+.coverCategoryGrid{display:flex;gap:6px;overflow-x:auto;padding:2px 1px 5px;margin:7px 0 8px;scrollbar-width:none}
+.coverCategoryGrid::-webkit-scrollbar{display:none}
+.coverCategory{flex:0 0 auto;border:0;border-radius:10px;background:#f0f1f4;padding:8px 11px;font:inherit;font-size:12px}
+.coverCategory.active{background:#1677ff;color:#fff}
+@media(max-width:420px){.editorPreview{width:220px;min-height:128px;height:128px!important}.editorAppearance .coverGrid{grid-template-columns:repeat(4,minmax(0,1fr))}.editorAppearance .coverOption{min-height:64px;font-size:10px}}
+
+.card.title-hide strong{display:none!important}.card.title-top strong{top:12px!important;bottom:auto!important}
+.card.title-center strong{top:50%!important;bottom:auto!important;transform:translateY(-50%)!important}
+.card.title-bottom strong{top:auto!important;bottom:12px!important}
+.card strong{color:var(--title-color,#fff)!important;font-size:var(--title-size,19px)!important;font-family:var(--title-font,system-ui,-apple-system,"Segoe UI",sans-serif)!important}
+.card.palette-red{background:linear-gradient(135deg,#ef3340,#b30f30)!important}.card.palette-blue{background:linear-gradient(135deg,#1767d8,#163c91)!important}.card.palette-green{background:linear-gradient(135deg,#0aa66d,#087557)!important}.card.palette-purple{background:linear-gradient(135deg,#7b3fe4,#45218b)!important}.card.palette-amber{background:linear-gradient(135deg,#f5bd2e,#c47708)!important}.card.palette-graphite{background:linear-gradient(135deg,#4a5058,#17181c)!important}.card.palette-light{background:linear-gradient(135deg,#fff,#e7e9ed)!important}
+.card.palette-red:before,.card.palette-blue:before,.card.palette-green:before,.card.palette-purple:before,.card.palette-amber:before,.card.palette-graphite:before,.card.palette-light:before{opacity:.28}.card.palette-light strong{background:#ffffffd9!important;text-shadow:none!important}
+.cardStylePicker{margin-top:14px;padding:14px;border:1px solid #e4e6eb;border-radius:18px;background:#fafbfc}.styleBlockTitle{margin-top:14px}.styleGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:7px}.styleOption{min-height:42px;border:2px solid #e2e3e8;border-radius:12px;background:#fff;padding:8px 10px;font:inherit;font-weight:700;color:#30333a}.styleOption.selected{border-color:#1677ff;box-shadow:0 0 0 1px #1677ff inset}
+.palette-choice-red{background:linear-gradient(135deg,#ef3340,#b30f30);color:#fff}.palette-choice-blue{background:linear-gradient(135deg,#1767d8,#163c91);color:#fff}.palette-choice-green{background:linear-gradient(135deg,#0aa66d,#087557);color:#fff}.palette-choice-purple{background:linear-gradient(135deg,#7b3fe4,#45218b);color:#fff}.palette-choice-amber{background:linear-gradient(135deg,#f5bd2e,#c47708);color:#17181c}.palette-choice-graphite{background:linear-gradient(135deg,#4a5058,#17181c);color:#fff}.palette-choice-light{background:linear-gradient(135deg,#fff,#e7e9ed);color:#17181c}
+.textColorGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin-top:7px}.styleColorChoice{min-height:42px;border:2px solid #e2e3e8;border-radius:12px;background:#fff;padding:5px 3px;font:11px inherit;font-weight:700;color:#30333a}.styleColorChoice span{display:block;width:20px;height:20px;border-radius:50%;margin:0 auto 3px;border:1px solid #c9cbd0}.styleColorChoice b{font-weight:650}.styleColorChoice.selected{border-color:#1677ff;box-shadow:0 0 0 1px #1677ff inset}.style-color-white span{background:#fff}.style-color-black span{background:#17181c}.style-color-yellow span{background:#ffd43b}.style-color-red span{background:#e03131}.style-color-green span{background:#159447}.style-color-blue span{background:#1767d8}
+.styleRange{width:100%;margin-top:7px;accent-color:#1677ff}.fontGrid .styleOption{font-size:15px}
+
+ 
+
+/* CARD111 constructed UI v49 — wallet proportions, clean titles, branded picker */
+.grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;padding:0 14px}
+.card{min-height:0!important;aspect-ratio:1.48/1!important;height:auto!important;border-radius:20px!important;padding:12px!important}
+.card strong{left:50%!important;top:auto!important;bottom:14px!important;transform:translateX(-50%)!important;width:calc(100% - 20px)!important;max-width:calc(100% - 20px)!important;padding:0!important;margin:0!important;border-radius:0!important;background:transparent!important;color:var(--title-color,#fff)!important;font-size:clamp(17px,var(--title-size,19px),23px)!important;font-family:var(--title-font,system-ui,-apple-system,"Segoe UI",sans-serif)!important;font-weight:750!important;line-height:1.08!important;white-space:normal!important;overflow-wrap:normal!important;word-break:normal!important;text-align:center!important;text-shadow:0 1px 3px #000a!important;box-sizing:border-box!important}
+.card.title-top strong{top:14px!important;bottom:auto!important;transform:translateX(-50%)!important}
+.card.title-center strong{top:50%!important;bottom:auto!important;transform:translate(-50%,-50%)!important}
+.card.title-bottom strong{top:auto!important;bottom:14px!important;transform:translateX(-50%)!important}
+.card.title-hide strong{display:none!important}
+.card.palette-light strong,.card.cover-pyaterochka strong,.card.cover-vkusvill strong,.card.cover-chizhik strong,.card.cover-dns strong{text-shadow:0 1px 2px #fff8!important}
+.coverOption{position:relative;overflow:hidden;min-height:66px!important;padding:10px 7px!important;border-radius:14px!important;text-align:center!important;font-size:12px!important;line-height:1.08!important;display:flex!important;align-items:center!important;justify-content:center!important;isolation:isolate}
+.coverOption:before,.coverOption:after{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none}
+.coverOption.cover-auto{background:linear-gradient(135deg,#f2f3f5,#ffffff)!important;color:#3a3d44!important}
+.coverOption.cover-magnit{background:#d71939!important;color:#fff!important}
+.coverOption.cover-magnit:before{width:95px;height:95px;left:-25px;top:-30px;border-radius:50%;background:#ffffff14;box-shadow:55px 38px 0 8px #ffffff10}
+.coverOption.cover-pyaterochka{background:#fff!important;color:#333!important;box-shadow:inset 0 0 0 2px #e1e3e7}
+.coverOption.cover-pyaterochka:before{width:18px;height:18px;right:10px;top:9px;border-radius:50%;background:#e32d35;box-shadow:-35px 22px 0 1px #f3b62b,12px 35px 0 2px #159447}
+.coverOption.cover-stolichki{background:#f5f8f7!important;color:#fff!important}
+.coverOption.cover-stolichki:before{width:82px;height:82px;left:-28px;top:-28px;border-radius:0 0 100% 0;background:#0aa58d}
+.coverOption.cover-perekrestok{background:#0a8f52!important;color:#fff!important}
+.coverOption.cover-lenta{background:#0b64ae!important;color:#fff!important}
+.coverOption.cover-vkusvill{background:#f6c928!important;color:#17181c!important}
+.coverOption.cover-okei{background:#00854a!important;color:#fff!important}
+.coverOption.cover-ashan{background:#e30613!important;color:#fff!important}
+.coverOption.cover-diksi{background:#e31b23!important;color:#fff!important}
+.coverOption.cover-chizhik{background:#ffcc00!important;color:#17181c!important}
+.coverOption.cover-antey{background:#1767d8!important;color:#fff!important}
+.coverOption.cover-rodina_udacha{background:linear-gradient(135deg,#214d73,#1d6b6a 55%,#187450)!important;color:#fff!important}
+.coverOption.cover-detmir{background:#e83b31!important;color:#fff!important}
+.coverOption.cover-kari{background:#252a31!important;color:#fff!important}
+.coverOption.cover-dns{background:#fff!important;color:#17181c!important;box-shadow:inset 0 0 0 2px #e1e3e7}
+.coverOption.cover-bristol{background:#d71920!important;color:#fff!important}
+.coverOption.cover-k_b{background:#fff!important;color:#b30f18!important;box-shadow:inset 0 0 0 2px #e1e3e7}
+.coverOption.cover-custom{background:linear-gradient(135deg,#252a31,#4b5563)!important;color:#fff!important}
+@media(max-width:420px){
+ .grid{gap:12px;padding:0 14px}
+ .card{aspect-ratio:1.43/1!important}
+ .card strong{width:calc(100% - 16px)!important;max-width:calc(100% - 16px)!important}
+ .coverOption{min-height:64px!important;font-size:11px!important}
+}
+
+/* CARD111 approved card artwork v48 — crisp CSS covers, no low-res raster backgrounds */
+.card{min-height:132px!important;border-radius:20px!important;padding:12px!important;box-shadow:0 8px 22px #00000018!important}
+.card strong{left:50%!important;top:auto!important;bottom:12px!important;transform:translateX(-50%)!important;width:auto!important;max-width:calc(100% - 24px)!important;padding:0!important;border-radius:0!important;background:transparent!important;color:var(--title-color,#fff)!important;font-size:var(--title-size,19px)!important;font-family:var(--title-font,system-ui,-apple-system,"Segoe UI",sans-serif)!important;line-height:1.08!important;white-space:normal!important;overflow-wrap:normal!important;word-break:normal!important;text-align:center!important;text-shadow:0 1px 3px #0009!important;box-sizing:border-box!important}
+.cardLogo{display:none!important}
+.card.cover-magnit{background:linear-gradient(135deg,#e51b3e 0%,#d71939 58%,#b80f31 100%)!important}
+.card.cover-magnit:before{width:190px;height:190px;right:-62px;top:-72px;border-radius:50%;background:#ffffff14;box-shadow:-92px 92px 0 -22px #ffffff12,38px 132px 0 -34px #ffffff0f}
+.card.cover-magnit:after{background:linear-gradient(135deg,transparent 0 43%,#ffffff12 43% 45%,transparent 45% 100%),linear-gradient(0deg,#00000014 0 18%,transparent 18% 100%)!important}
+.card.cover-pyaterochka{background:#fff!important;box-shadow:inset 0 0 0 2px #e4e5e8,0 8px 22px #00000018!important}
+.card.cover-pyaterochka:before{width:28px;height:28px;right:34px;top:26px;border-radius:50%;background:#e32d35;box-shadow:-92px 40px 0 2px #f3b62b,26px 78px 0 5px #159447,-42px 86px 0 -2px #e32d35}
+.card.cover-pyaterochka:after{background:linear-gradient(135deg,#ffffff00 0%,#ffffff00 60%,#f7f7f7 100%)!important}
+.card.cover-stolichki{background:#f7f9f8!important;box-shadow:inset 0 0 0 2px #e2e6e4,0 8px 22px #00000018!important}
+.card.cover-stolichki:before{width:170px;height:170px;left:-74px;top:-74px;border-radius:0 0 100% 0;background:#0aa58d;box-shadow:118px 112px 0 -64px #b7ddd5,168px 18px 0 -70px #b7ddd5}
+.card.cover-stolichki:after{background:radial-gradient(circle at 74% 26%,#cde8e2 0 7px,transparent 8px),radial-gradient(circle at 58% 64%,#dceeea 0 8px,transparent 9px)!important}
+.card.cover-antey{background:linear-gradient(135deg,#2879e8 0%,#1761d8 58%,#0e50b9 100%)!important}
+.card.cover-antey:before{width:210px;height:210px;right:-72px;top:-76px;border-radius:50%;background:#ffffff12;box-shadow:-110px 106px 0 -20px #ffffff0b}
+.card.cover-antey:after{background:linear-gradient(135deg,transparent 0 38%,#ffffff10 38% 40%,transparent 40% 100%)!important}
+.card.cover-rodina_udacha{background:linear-gradient(135deg,#214d73 0%,#1d6b6a 55%,#187450 100%)!important}
+.card.cover-rodina_udacha:before{width:170px;height:170px;right:-44px;top:-66px;border-radius:50%;background:#c7d66a40;box-shadow:-116px 110px 0 -34px #ffffff0d}
+.card.cover-custom{background-color:#252a31!important;background-size:cover!important;background-position:center!important;background-repeat:no-repeat!important}
+/* CARD111 visual alignment v50 — match supplied 3-screen sketch */
+header{padding:18px 36px 10px;align-items:center;background:#f6f7fbf5}
+.walletHead h1{font-size:28px;line-height:1.05;letter-spacing:-.7px}
+.walletHead .sub{font-size:14px;margin-top:5px}
+.addIcon{width:54px!important;height:54px!important;padding:0!important;border-radius:16px!important;background:#fff!important;color:#17181c!important;border:1px solid #e3e5e9!important;box-shadow:0 3px 12px #00000010!important;font-size:30px!important;font-weight:400!important}
+.search{padding:8px 36px 18px}.search input{height:48px;padding:0 16px;border-radius:15px;font-size:16px}
+.grid{gap:10px;padding:0 36px 28px}
+.card{aspect-ratio:1.27/1!important;border-radius:17px!important;padding:12px!important;box-shadow:0 5px 14px #00000012!important}
+.cardLogo{position:absolute!important;left:12px;top:12px;width:52px;height:52px;border-radius:14px!important;z-index:4!important}
+.card strong{left:12px!important;right:auto!important;top:auto!important;bottom:12px!important;transform:none!important;width:auto!important;max-width:calc(100% - 24px)!important;padding:6px 11px!important;border-radius:10px!important;font-size:15px!important;line-height:1.05!important;font-weight:750!important;text-align:left!important;background:#17202dcc!important;color:#fff!important;text-shadow:none!important;box-sizing:border-box!important}
+.card.title-top strong{top:12px!important;bottom:auto!important}
+.card.title-center strong{top:50%!important;bottom:auto!important;transform:translateY(-50%)!important}
+.card.title-hide strong{display:none!important}
+.card.titlebg-none strong{background:transparent!important}.card.titlebg-shadow strong{background:transparent!important;text-shadow:0 2px 5px #000!important}.card.titlebg-outline strong{background:transparent!important;border:2px solid currentColor;text-shadow:none!important}.card.titlebg-pill strong{background:#17202dcc!important}
+.brandArtwork{position:absolute;z-index:3;left:12px;right:12px;top:12px;bottom:44px;display:flex;align-items:center;justify-content:center;gap:7px;color:#fff;text-shadow:0 1px 3px #0008;pointer-events:none}
+.brandArtwork b{display:flex;align-items:center;justify-content:center;font-weight:900}
+.brandArtwork i{font-style:normal;font-weight:800;font-size:clamp(13px,2.7vw,20px);line-height:1.05}
+.brandArtwork.magnit b{width:54px;height:54px;background:#fff;color:#d71939;border-radius:8px;font-size:34px}.brandArtwork.magnit i{font-size:clamp(15px,3vw,22px)}
+.brandArtwork.pyat b{width:54px;height:54px;border-radius:50%;background:#fff;color:#e21d32;font-size:34px;box-shadow:0 0 0 5px #f6b323}.brandArtwork.stol{color:#d71939}.brandArtwork.stol b{width:54px;height:54px;border-radius:50%;background:#fff;color:#159447;font-size:42px}.brandArtwork.antey b{font-size:55px}.brandArtwork.rodina b{font-size:48px;color:#f6c64a}.brandArtwork.bristol b{font-size:42px}.brandArtwork.kb{color:#b30f18}.brandArtwork.lenta b{font-size:50px;color:#f6c64a}.brandArtwork.perek b{font-size:44px;color:#f6c64a}
+.brandArtwork.generic b{width:52px;height:52px;border-radius:14px;background:#fff;color:#17181c;font-size:30px}
+.editorDataPanel{background:#fff;border:1px solid #e5e7eb;border-radius:18px;padding:14px;margin-bottom:12px}
+.editorSectionTitle{font-size:16px;font-weight:800;margin-bottom:12px}.editorFieldLabel{font-size:13px;font-weight:700;color:#40434a;margin:11px 0 6px}
+.editorDataPanel input{margin:0}.editorCodePreview{padding:10px 8px 2px;display:flex;justify-content:center;align-items:center;min-height:88px}.editorCodePreview svg{width:min(100%,300px);height:auto}
+.editorAppearance{background:#fff;border:1px solid #e5e7eb;border-radius:18px;padding:14px}
+.editorPreviewWrap{display:flex;justify-content:center;margin:2px 0 2px}.editorPreview{width:230px!important;height:145px!important;aspect-ratio:auto!important}.editorPreview .brandArtwork{bottom:42px}.editorPreview strong{font-size:16px!important}
+.editorTabs{margin:12px 0;padding:4px;background:#eef0f4;border-radius:15px}
+.editorTab{padding:10px 8px;font-size:15px}
+.coverCategoryGrid{margin:7px 0 10px}.coverCategory{background:#f0f1f4}.coverCategory.active{background:#1677ff}
+.editorAppearance .coverGrid{grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.editorAppearance .coverOption{min-height:72px!important;border-radius:14px!important}
+.cardStylePicker{margin-top:14px;padding:14px;border:1px solid #e4e6eb;border-radius:18px;background:#fafbfc}
+.styleBlockTitle{margin-top:15px}
+.styleGrid{gap:8px}.styleOption{min-height:44px;border-radius:13px}
+@media(max-width:520px){header{padding-left:20px;padding-right:20px}.search{padding-left:20px;padding-right:20px}.grid{padding-left:20px;padding-right:20px}.card{aspect-ratio:1.2/1!important}.card strong{font-size:14px!important}.editorPreview{width:220px!important;height:138px!important}.editorAppearance .coverGrid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+/* Approved 3-screen visual contour */
+header{padding:18px 20px 10px;background:#f6f7fbf5}
+.walletHead h1{font-size:28px;line-height:1.06;letter-spacing:-.8px}
+.walletHead .sub{font-size:15px;margin-top:7px}
+.addBtn{min-width:136px;height:48px;padding:0 16px;border-radius:16px;background:#17181c;color:#fff;font-size:16px;font-weight:750;box-shadow:none}
+.search{padding:10px 20px 16px}.search input{height:48px;padding:0 16px;border-radius:15px;font-size:16px}
+.grid{gap:10px;padding:0 20px 92px}
+.card{aspect-ratio:1.18/1!important;min-height:0!important;border-radius:18px!important}
+.card strong{bottom:11px!important;left:11px!important;font-size:15px!important;padding:6px 10px!important;border-radius:10px!important;max-width:calc(100% - 22px)!important}
+.card.title-top strong{top:11px!important;bottom:auto!important}
+.card.title-center strong{top:50%!important;bottom:auto!important}
+.cardLogo{left:11px!important;top:11px!important;width:50px!important;height:50px!important}
+.bottomNav{position:fixed;left:50%;bottom:12px;transform:translateX(-50%);width:min(420px,calc(100% - 24px));height:70px;display:grid;grid-template-columns:repeat(3,1fr);gap:4px;padding:6px;background:#fff;border:1px solid #e4e6eb;border-radius:22px;box-shadow:0 8px 28px #00000018;z-index:20}
+.bottomNavItem{border:0;background:transparent;border-radius:16px;color:#737780;font:inherit;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:12px}
+.bottomNavItem span{font-size:23px;line-height:22px}.bottomNavItem.active{color:#1677ff;background:#f3f7ff}
+.bottomNavItem b{font-size:12px}
+.fab{display:none!important}
+.editorExtra{background:#fff;border:1px solid #e5e7eb;border-radius:18px;padding:14px;margin-bottom:12px}
+.editorExtra .btn{margin-bottom:9px}
+.editorExtra .hint{margin-top:4px}
+.editorTabs .editorTab{font-size:14px}
+@media(max-width:520px){.grid{padding-left:20px;padding-right:20px}.addBtn{min-width:136px}.bottomNav{bottom:10px}.card{aspect-ratio:1.18/1!important}}
 </style>
 </head>
 <body>
 <div class="app">
-<header><div><h1>Мой кошелёк</h1><div class="sub" id="count">0 карт</div></div><button class="icon" onclick="addMenu()">＋</button></header>
+<header><div class="walletHead"><h1>Мои карты<br>лояльности</h1><div class="sub" id="count">0 карт</div></div><button class="btn addBtn" onclick="addMenu()">Добавить карту</button></header>
 <div class="search"><input id="search" placeholder="Поиск карты" oninput="render()"></div>
 <main id="cards" class="grid"></main>
 </div>
-<button class="fab" onclick="addMenu()">＋</button>
+<nav class="bottomNav" aria-label="Навигация"><button class="bottomNavItem active" onclick="showWallet()"><span>▣</span><b>Кошелёк</b></button><button class="bottomNavItem" onclick="scanner()"><span>⌗</span><b>Сканер</b></button><button class="bottomNavItem" onclick="showSettings()"><span>⚙</span><b>Настройки</b></button></nav>
 <div id="modal" class="overlay" onclick="if(event.target===this)closeModal()"><div class="sheet" id="sheet"></div></div>
 <script>
 const KEY="card_wallet_v1";
+const SAFE_KEY=KEY+"_safe_backup";
 const colors=["#17181c","#3157d5","#16845b","#a35b17","#7b3db7","#c23b55"];
+const COVER_LABELS={AUTO:"Автоматически по магазину",MAGNIT:"Магнит",PYATEROCHKA:"Пятёрочка",STOLICHKI:"Столички",PEREKRESTOK:"Перекрёсток",LENTA:"Лента",VkusVill:"ВкусВилл",OKEI:"О'КЕЙ",ASHAN:"АШАН",DIKSI:"Дикси",CHIZHIK:"Чижик",ANTEY:"Аптека Антей",RODINA_UDACHA:"Родина / УДАЧА / Высшая лига",DETMIR:"Детский мир",KARI:"kari CLUB",DNS:"ДНС",BRISTOL:"Бристоль",K_B:"Красное & Белое",CUSTOM:"Свой вариант"};
+function coverForName(name){
+  const n=String(name||"").toLowerCase().replace(/ё/g,"е");
+  if(n.includes("магнит"))return "MAGNIT";
+  if(n.includes("пятероч")||n.includes("пятерка")||n.includes("5ка")||n.includes("5-ка"))return "PYATEROCHKA";
+  if(n.includes("столичк"))return "STOLICHKI";
+  if(n.includes("перекрест"))return "PEREKRESTOK";
+  if(n.includes("лента"))return "LENTA";
+  if(n.includes("вкусвилл"))return "VkusVill";
+  if(n.includes("окей")||n.includes("o'кей")||n.includes("o'kei"))return "OKEI";
+  if(n.includes("ашан"))return "ASHAN";
+  if(n.includes("дикси"))return "DIKSI";
+  if(n.includes("чижик"))return "CHIZHIK";
+  if(n.includes("антей")||n.includes("аптека антей"))return "ANTEY";
+  if(n.includes("родина")||n.includes("удача")||n.includes("высшая лига")||n.includes("лига гранд"))return "RODINA_UDACHA";
+  if(n.includes("детский мир")||n.includes("детскиймир"))return "DETMIR";
+  if(n.includes("kari")||n.includes("кари"))return "KARI";
+  if(n.includes("днс")||n.includes("dns"))return "DNS";
+  if(n.includes("бристоль"))return "BRISTOL";
+  if(n.includes("красное белое")||n.includes("красное&белое")||n.includes("красное и белое"))return "K_B";
+  return "CUSTOM";
+}
+
+const CARD_PALETTES={AUTO:"Фирменная",RED:"Красная",BLUE:"Синяя",GREEN:"Зелёная",PURPLE:"Фиолетовая",AMBER:"Янтарная",GRAPHITE:"Графитовая",LIGHT:"Светлая"};
+const CARD_TEXT_COLORS={WHITE:"#ffffff",BLACK:"#17181c",YELLOW:"#ffd43b",RED:"#e03131",GREEN:"#159447",BLUE:"#1767d8"};
+const CARD_TEXT_COLOR_LABELS={WHITE:"Белый",BLACK:"Чёрный",YELLOW:"Жёлтый",RED:"Красный",GREEN:"Зелёный",BLUE:"Синий"};
+const CARD_TEXT_POSITIONS={HIDE:"Не показывать",TOP:"Сверху",CENTER:"По центру",BOTTOM:"Снизу"};
+const CARD_TEXT_BACKGROUNDS={NONE:"Нет",PILL:"Плашка",SHADOW:"Тень",OUTLINE:"Контур"};
+const CARD_TEXT_BACKGROUND_LABELS={NONE:"Нет",PILL:"Плашка",SHADOW:"Тень",OUTLINE:"Контур"};
+const CARD_FONTS={SYSTEM:'system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif',ARIAL:"Arial,Helvetica,sans-serif",TREBUCHET:'"Trebuchet MS",Arial,sans-serif',GEORGIA:'Georgia,"Times New Roman",serif',COURIER:'"Courier New",monospace'};
+const CARD_FONT_LABELS={SYSTEM:"Системный",ARIAL:"Arial",TREBUCHET:"Trebuchet",GEORGIA:"Georgia",COURIER:"Courier"};
+function cardStyle(c){
+  const s=(c&&c.style&&typeof c.style==="object")?c.style:{};
+  return {palette:CARD_PALETTES[s.palette]?s.palette:"AUTO",textColor:CARD_TEXT_COLORS[s.textColor]?s.textColor:"WHITE",position:CARD_TEXT_POSITIONS[s.position]?s.position:"CENTER",background:CARD_TEXT_BACKGROUNDS[s.background]?s.background:"PILL",size:Math.max(14,Math.min(28,Number(s.size)||19)),font:CARD_FONTS[s.font]?s.font:"SYSTEM"};
+}
+function cardStyleClass(c){const s=cardStyle(c);return "palette-"+s.palette.toLowerCase()+" title-"+s.position.toLowerCase()+" titlebg-"+s.background.toLowerCase();}
+function cardStyleInline(c){const s=cardStyle(c);return "--title-color:"+CARD_TEXT_COLORS[s.textColor]+";--title-size:"+s.size+"px;--title-font:"+CARD_FONTS[s.font]+";"}
+function paletteOptions(selected){return Object.keys(CARD_PALETTES).map(function(k){return '<button type="button" class="styleOption paletteChoice palette-choice-'+k.toLowerCase()+(k===selected?" selected":"")+'" data-palette="'+k+'">'+esc(CARD_PALETTES[k])+'</button>';}).join("");}
+function textColorOptions(selected){return Object.keys(CARD_TEXT_COLORS).map(function(k){return '<button type="button" class="styleColorChoice style-color-'+k.toLowerCase()+(k===selected?" selected":"")+'" data-text-color="'+k+'" title="'+esc(CARD_TEXT_COLOR_LABELS[k])+'"><span></span><b>'+esc(CARD_TEXT_COLOR_LABELS[k])+'</b></button>';}).join("");}
+function positionOptions(selected){return Object.keys(CARD_TEXT_POSITIONS).map(function(k){return '<button type="button" class="styleOption positionChoice '+(k===selected?" selected":"")+'" data-position="'+k+'">'+esc(CARD_TEXT_POSITIONS[k])+'</button>';}).join("");}
+function fontOptions(selected){return Object.keys(CARD_FONTS).map(function(k){return '<button type="button" class="styleOption fontChoice '+(k===selected?" selected":"")+'" data-font="'+k+'" style="font-family:'+CARD_FONTS[k]+'">'+esc(CARD_FONT_LABELS[k])+'</button>';}).join("");}
+function backgroundOptions(selected){return Object.keys(CARD_TEXT_BACKGROUNDS).map(function(k){return '<button type="button" class="styleOption backgroundChoice '+(k===selected?" selected":"")+'" data-background="'+k+'">'+esc(CARD_TEXT_BACKGROUND_LABELS[k])+'</button>';}).join("");}
+function styleEditor(c){
+  const s=cardStyle(c);
+  return '<div class="cardStylePicker"><div class="hint">Цветовая палитра</div><input id="cardPalette" type="hidden" value="'+esc(s.palette)+'"><div id="paletteGrid" class="styleGrid">'+paletteOptions(s.palette)+'</div>'+
+    '<div class="hint styleBlockTitle">Расположение названия</div><input id="titlePosition" type="hidden" value="'+esc(s.position)+'"><div id="positionGrid" class="styleGrid">'+positionOptions(s.position)+'</div>'+
+    '<div class="hint styleBlockTitle">Стиль фона для названия</div><input id="titleBackground" type="hidden" value="'+esc(s.background)+'"><div id="backgroundGrid" class="styleGrid">'+backgroundOptions(s.background)+'</div>'+
+    '<div class="hint styleBlockTitle">Цвет текста</div><input id="titleColor" type="hidden" value="'+esc(s.textColor)+'"><div id="textColorGrid" class="textColorGrid">'+textColorOptions(s.textColor)+'</div>'+
+    '<div class="hint styleBlockTitle">Размер текста: <b id="titleSizeValue">'+s.size+' px</b></div><input id="titleSize" type="range" min="14" max="28" step="1" value="'+s.size+'" class="styleRange">'+
+    '<div class="hint styleBlockTitle">Шрифт</div><input id="titleFont" type="hidden" value="'+esc(s.font)+'"><div id="fontGrid" class="styleGrid fontGrid">'+fontOptions(s.font)+'</div></div>';
+}
+function bindStyleEditor(){
+  function bindGrid(id,inputId,attr){const grid=document.getElementById(id),input=document.getElementById(inputId);if(!grid||!input)return;grid.querySelectorAll("button").forEach(function(btn){btn.onclick=function(){input.value=btn.getAttribute(attr)||"";grid.querySelectorAll("button").forEach(function(x){x.classList.remove("selected");});btn.classList.add("selected");if(typeof refreshEditorPreview==="function")refreshEditorPreview(window.__editorPreviewCard||{});};});}
+  bindGrid("paletteGrid","cardPalette","data-palette");bindGrid("positionGrid","titlePosition","data-position");bindGrid("backgroundGrid","titleBackground","data-background");bindGrid("textColorGrid","titleColor","data-text-color");bindGrid("fontGrid","titleFont","data-font");
+  const range=document.getElementById("titleSize"),out=document.getElementById("titleSizeValue");if(range&&out)range.oninput=function(){out.textContent=range.value+" px";};
+}
+function brandMarkup(cover,name){
+  const n=esc(name||"");
+  const map={
+    MAGNIT:'<span class="brandArtwork magnit"><b>М</b><i>Магнит</i></span>',
+    PYATEROCHKA:'<span class="brandArtwork pyat"><b>5</b><i>Пятёрочка</i></span>',
+    STOLICHKI:'<span class="brandArtwork stol"><b>+</b><i>Столички</i></span>',
+    ANTEY:'<span class="brandArtwork antey"><b>+</b><i>Аптека Антей</i></span>',
+    RODINA_UDACHA:'<span class="brandArtwork rodina"><b>V</b><i>Родина</i></span>',
+    BRISTOL:'<span class="brandArtwork bristol"><b>B</b><i>Бристоль</i></span>',
+    K_B:'<span class="brandArtwork kb"><b>K&amp;Б</b><i>Красное &amp; Белое</i></span>',
+    LENTA:'<span class="brandArtwork lenta"><b>2</b><i>Лента</i></span>',
+    PEREKRESTOK:'<span class="brandArtwork perek"><b>•</b><i>Перекрёсток</i></span>'
+  };
+  return map[cover]||'<span class="brandArtwork generic"><b>'+n.charAt(0)+'</b></span>';
+}
+function coverForCard(c){const v=String(c.cover||"AUTO");return v==="AUTO"?coverForName(c.name):COVER_LABELS[v]?v:"CUSTOM";}
+function coverClass(c){return "cover-"+coverForCard(c).toLowerCase();}
+function coverOptions(selected){
+  return Object.keys(COVER_LABELS).map(function(k){
+    return '<button type="button" class="coverOption '+("cover-"+k.toLowerCase())+(k===selected?" selected":"")+'" data-cover="'+k+'">'+esc(COVER_LABELS[k])+'</button>';
+  }).join("");
+}
+function bindCoverPicker(){
+  const input=document.getElementById("cover");
+  const grid=document.getElementById("coverGrid")||document.getElementById("editorCoverGrid");
+  if(!grid)return;
+  grid.querySelectorAll(".coverOption").forEach(function(btn){
+    btn.onclick=function(){
+      if(input)input.value=btn.getAttribute("data-cover")||"AUTO";
+      grid.querySelectorAll(".coverOption").forEach(function(x){x.classList.remove("selected");});
+      btn.classList.add("selected");
+    };
+  });
+}
 let cards=[];
+let storageState="missing";
+let storageError="";
 try{
   const raw=localStorage.getItem(KEY);
-  const parsed=raw?JSON.parse(raw):[];
-  cards=Array.isArray(parsed)?parsed:[];
-}catch(e){cards=[]}
+  if(raw===null){
+    cards=[];
+    storageState="missing";
+  }else{
+    const parsed=JSON.parse(raw);
+    if(!Array.isArray(parsed))throw new Error("локальная база имеет неверный формат");
+    cards=parsed;
+    storageState="ok";
+    if(raw && cards.length){
+      try{localStorage.setItem(SAFE_KEY,raw);}catch(e){}
+    }
+  }
+}catch(e){
+  storageState="error";
+  storageError=String(e&&e.message||e);
+  cards=[];
+}
 
 function esc(s){
   return String(s==null?"":s).replace(/[&<>"']/g,function(m){
@@ -44,9 +336,28 @@ function esc(s){
   });
 }
 function save(){
-  try{localStorage.setItem(KEY,JSON.stringify(cards));}
-  catch(e){alert("Не удалось сохранить карту в памяти браузера");}
+  try{
+    const current=localStorage.getItem(KEY);
+    if(current){
+      try{localStorage.setItem(SAFE_KEY,current);}catch(e){}
+    }
+    localStorage.setItem(KEY,JSON.stringify(cards));
+    storageState="ok";
+    storageError="";
+  }catch(e){alert("Не удалось сохранить карту в памяти браузера");}
   render();
+}
+function exportStorageRecovery(){
+  try{
+    const raw=localStorage.getItem(KEY);
+    if(!raw){alert("В локальной памяти нет данных для восстановления.");return;}
+    const blob=new Blob([raw],{type:"application/json"});
+    const a=document.createElement("a");
+    a.href=URL.createObjectURL(blob);
+    a.download="CARD_storage_recovery.json";
+    a.click();
+    setTimeout(function(){URL.revokeObjectURL(a.href);},1000);
+  }catch(e){alert("Не удалось выгрузить данные локальной памяти");}
 }
 function readImage(file){
   return new Promise(function(resolve,reject){
@@ -56,7 +367,34 @@ function readImage(file){
     r.readAsDataURL(file);
   });
 }
+function syncCardsFromStorage(){
+  try{
+    const raw=localStorage.getItem(KEY);
+    if(!raw)return false;
+    const parsed=JSON.parse(raw);
+    if(!Array.isArray(parsed))return false;
+    const normalized=parsed.filter(function(x){return x&&typeof x==="object"&&(x.code||x.barcode||x.number||x.cardNumber);}).map(function(x){
+      return {
+        id:String(x.id||Date.now()+Math.random()),
+        name:String(x.name||x.title||"Моя карта"),
+        code:String(x.code||x.barcode||x.number||x.cardNumber),
+        format:String(x.format||"CODE_128"),
+        image:String(x.image||x.logo||""),
+        color:String(x.color||colors[0]),
+        cover:String(x.cover||"AUTO"),
+        style:(x.style&&typeof x.style==="object")?x.style:{}
+      };
+    });
+    cards=normalized;
+    storageState="ok";
+    storageError="";
+    return true;
+  }catch(e){
+    return false;
+  }
+}
 function render(){
+  if(!cards.length)syncCardsFromStorage();
   const search=document.getElementById("search");
   const q=(search.value||"").toLowerCase().trim();
   const list=cards.filter(function(c){
@@ -65,21 +403,44 @@ function render(){
   document.getElementById("count").textContent=cards.length+" карт";
   const out=document.getElementById("cards");
   if(!list.length){
-    out.innerHTML='<div class="empty"><b>'+(q?"Ничего не найдено":"Кошелёк пока пуст")+'</b><span>'+(q?"Попробуйте другой запрос":"Добавьте первую карту кнопкой ＋")+'</span></div>';
+    if(!q && storageState==="error"){
+      out.innerHTML='<div class="empty"><b>Не удалось прочитать сохранённые карты</b><span>Данные не перезаписываются. Ошибка: '+esc(storageError)+'</span><button class="btn primary" onclick="exportStorageRecovery()">Выгрузить данные для восстановления</button></div>';
+      return;
+    }
+    out.innerHTML='<div class="empty"><b>'+(q?"Ничего не найдено":"Кошелёк пока пуст")+'</b><span>'+(q?"Попробуйте другой запрос":"Добавьте первую карту кнопкой «Добавить карту»")+'</span></div>';
     return;
   }
   out.innerHTML=list.map(function(c){
-    const bg=c.image?'background-image:url("'+c.image+'");':'background:#fff;';
     const mark=String(c.name||"?").trim().charAt(0).toUpperCase();
     const color=String(c.color||colors[0]);
-    return '<button class="card" data-mark="'+esc(mark)+'" style="'+bg+';--card-color:'+esc(color)+'" onclick="openCard('+JSON.stringify(String(c.id))+')"><strong>'+esc(c.name)+'</strong><small>'+esc(c.format)+'</small><span class="code">'+esc(c.code)+'</span></button>';
+    const cover=coverForCard(c);
+    const logo=c.image?'<img class="cardLogo" src="'+esc(c.image)+'" alt="">':brandMarkup(cover,c.name);
+    return '<button type="button" class="card '+esc(coverClass(c))+' '+esc(cardStyleClass(c))+'" data-id="'+esc(String(c.id))+'" data-mark="" style="--card-color:'+esc(color)+';'+esc(cardStyleInline(c))+(cover==="CUSTOM"&&c.image?"background-image:url(&quot;"+esc(c.image)+"&quot;);":"")+'">'+logo+'<strong>'+esc(c.name)+'</strong></button>';
   }).join("");
 }
+document.getElementById("cards").addEventListener("click",function(e){
+  const card=e.target.closest(".card");
+  if(!card)return;
+  e.preventDefault();
+  e.stopPropagation();
+  openCard(card.getAttribute("data-id"));
+});
 function openModal(html){
   document.getElementById("sheet").innerHTML=html;
   document.getElementById("modal").classList.add("open");
 }
 function closeModal(){document.getElementById("modal").classList.remove("open");}
+function showWallet(){
+  document.querySelectorAll(".bottomNavItem").forEach((b,i)=>b.classList.toggle("active",i===0));
+  closeModal();
+}
+function showSettings(){
+  document.querySelectorAll(".bottomNavItem").forEach((b,i)=>b.classList.toggle("active",i===2));
+  openModal('<button class="close" onclick="closeModal()">×</button><h2>Настройки</h2>'+
+    '<button class="btn primary" onclick="exportData()">Сохранить резервную копию</button>'+
+    '<button class="btn secondary" onclick="importData()">Восстановить из файла</button>'+
+    '<p class="hint">Карты и настройки хранятся локально на устройстве.</p>');
+}
 function addMenu(){
   openModal('<button class="close" onclick="closeModal()">×</button><h2>Добавить карту</h2>'+
     '<button class="btn primary" onclick="scanner()">▣ Сканировать штрихкод / QR</button>'+
@@ -91,145 +452,362 @@ function addMenu(){
 }
 function manual(data){
   data=data||{};
+  const fmt=data.format||"CODE_128";
   openModal('<button class="close" onclick="addMenu()">×</button><h2>Новая скидочная карта</h2>'+
     '<input id="name" name="discount_name" autocomplete="off" placeholder="Название карты" value="'+esc(data.name)+'">'+
     '<div class="row"><input id="code" name="discount_code" type="text" inputmode="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Код штрихкода или QR-кода" value="'+esc(data.code)+'">'+
-    '<select id="format"><option value="CODE_128">Штрихкод — CODE 128</option><option value="EAN_13">Штрихкод — EAN-13</option><option value="EAN_8">Штрихкод — EAN-8</option><option value="QR_CODE">QR-код</option></select></div>'+
+    '<div class="formatPicker"><input id="format" type="hidden" value="'+esc(fmt)+'"><button type="button" class="formatButton" onclick="toggleFormatMenu()">'+esc(formatLabel(fmt))+'</button><div id="formatMenu" class="formatMenu">'+
+    '<button type="button" class="formatOption" onclick="chooseFormat(\'CODE_128\',\'Штрихкод — CODE 128\')">Штрихкод — CODE 128</button>'+
+    '<button type="button" class="formatOption" onclick="chooseFormat(\'EAN_13\',\'Штрихкод — EAN-13\')">Штрихкод — EAN-13</button>'+
+    '<button type="button" class="formatOption" onclick="chooseFormat(\'EAN_8\',\'Штрихкод — EAN-8\')">Штрихкод — EAN-8</button>'+
+    '<button type="button" class="formatOption" onclick="chooseFormat(\'QR_CODE\',\'QR-код\')">QR-код</button></div></div></div>'+
+    '<div class="coverPicker"><div class="hint">Рубашка карты</div><input id="cover" type="hidden" value="AUTO"><div id="coverGrid" class="coverGrid">'+coverOptions("AUTO")+'</div><div class="coverHint">Автоматически выберется знакомая рубашка по названию магазина. Её можно заменить вручную.</div></div>'+styleEditor({style:{}})+''+
     '<label class="hint" style="display:block;margin-top:12px">Фото карты<input id="cardImage" type="file" accept="image/*" style="width:100%;margin-top:6px"></label>'+
     '<button class="btn primary" onclick="addCard()">Сохранить карту</button>');
-  if(data.format)document.getElementById("format").value=data.format;
+  bindCoverPicker();
+  bindStyleEditor();
 }
+function formatLabel(v){return ({CODE_128:"Штрихкод — CODE 128",EAN_13:"Штрихкод — EAN-13",EAN_8:"Штрихкод — EAN-8",QR_CODE:"QR-код"})[v]||"Штрихкод — CODE 128";}
+function toggleFormatMenu(){const m=document.getElementById("formatMenu");if(m)m.classList.toggle("open");}
+function chooseFormat(v,label){const f=document.getElementById("format");const btn=document.querySelector(".formatButton");const m=document.getElementById("formatMenu");if(f)f.value=v;if(btn)btn.textContent=label;if(m)m.classList.remove("open");if(typeof refreshEditorCodePreview==="function")refreshEditorCodePreview(window.__editorPreviewCard||{});}
 async function addCard(){
   const name=document.getElementById("name").value.trim()||"Моя карта";
   const code=document.getElementById("code").value.trim();
   const format=document.getElementById("format").value;
+  const cover=(document.getElementById("cover")&&document.getElementById("cover").value)||"AUTO";
+  const style={palette:(document.getElementById("cardPalette")&&document.getElementById("cardPalette").value)||"AUTO",textColor:(document.getElementById("titleColor")&&document.getElementById("titleColor").value)||"WHITE",position:(document.getElementById("titlePosition")&&document.getElementById("titlePosition").value)||"CENTER",size:Math.max(14,Math.min(28,Number(document.getElementById("titleSize")&&document.getElementById("titleSize").value)||19)),font:(document.getElementById("titleFont")&&document.getElementById("titleFont").value)||"SYSTEM"};
   const file=document.getElementById("cardImage")&&document.getElementById("cardImage").files[0];
   if(!code){alert("Введите код карты");return;}
   let image="";
   if(file)image=await readImage(file);
-  cards.unshift({id:String(Date.now()),name:name,code:code,format:format,image:image,color:colors[cards.length%colors.length]});
+  cards.unshift({id:String(Date.now()),name:name,code:code,format:format,image:image,color:colors[cards.length%colors.length],cover:cover,style:style});
   save();
   closeModal();
 }
-function scanner(){
-  const formats=[
-    Html5QrcodeSupportedFormats.QR_CODE,
-    Html5QrcodeSupportedFormats.CODE_128,
-    Html5QrcodeSupportedFormats.EAN_13,
-    Html5QrcodeSupportedFormats.EAN_8,
-    Html5QrcodeSupportedFormats.UPC_A,
-    Html5QrcodeSupportedFormats.UPC_E
-  ];
-  const config={formatsToSupport:formats,useBarCodeDetectorIfSupported:false};
-  openModal('<button class="close" onclick="closeModal()">×</button><h2>Сканирование скидочной карты</h2>'+
-    '<div id="reader"></div>'+
-    '<input id="scanFile" type="file" accept="image/*" style="display:none">'+
-    '<button class="btn secondary" onclick="document.getElementById(\'scanFile\').click()">Сканировать фото из галереи</button>'+
-    '<p class="hint">Можно выбрать фото штрихкода/QR из галереи — камера для этого не нужна.</p>');
-  let s;
-  let handled=false;
-  try{s=new Html5Qrcode("reader",config);}catch(e){s=null;}
-  function mapFormat(raw){
-    const map={QR_CODE:"QR_CODE",EAN_13:"EAN_13",EAN_8:"EAN_8",CODE_128:"CODE_128",CODE_39:"CODE_128",CODE_93:"CODE_128",UPC_A:"EAN_13",UPC_E:"EAN_8",ITF:"CODE_128",DATA_MATRIX:"QR_CODE",PDF_417:"CODE_128"};
-    return map[raw]||"CODE_128";
-  }
-  function finish(text,raw){
-    if(handled||!text)return;
-    handled=true;
-    if(s&&s.isScanning){return s.stop().catch(function(){}).then(function(){manual({code:String(text),format:mapFormat(raw)});});}
-    manual({code:String(text),format:mapFormat(raw)});
-  }
-  function startCamera(){
-    if(!s)return Promise.reject("Сканер недоступен");
-    const cameraConfig={fps:12,qrbox:{width:280,height:180},aspectRatio:1.7777778,disableFlip:false};
-    return s.start({facingMode:"environment"},cameraConfig,function(text,result){
-      const raw=result&&result.result&&result.result.format&&result.result.format.formatName||"QR_CODE";
-      finish(text,raw);
-    },function(){});
-  }
-  startCamera().catch(function(){
-    if(!s)return;
-    Html5Qrcode.getCameras().then(function(devices){
-      if(!devices||!devices.length)throw Error("camera");
-      const back=devices.find(function(d){return /back|rear|environment|задн/i.test(d.label||"");})||devices[devices.length-1];
-      return s.start(back.id,{fps:12,qrbox:{width:280,height:180},disableFlip:false},function(text,result){
-        const raw=result&&result.result&&result.result.format&&result.result.format.formatName||"QR_CODE";
-        finish(text,raw);
-      },function(){});
-    }).catch(function(){
-      const reader=document.getElementById("reader");
-      if(reader)reader.innerHTML='<p style="padding:30px;color:white;text-align:center">Камера недоступна. Фото из галереи всё равно можно сканировать.</p>';
-    });
-  });
-  document.getElementById("scanFile").onchange=async function(e){
-    const file=e.target.files[0];
-    if(!file||handled)return;
-    try{
-      if(s&&s.isScanning)await s.stop();
-      const reader=document.getElementById("reader");
-      if(reader)reader.innerHTML="";
-      const fs=new Html5Qrcode("reader",config);
-      let result;
-      if(typeof fs.scanFileV2==="function")result=await fs.scanFileV2(file,true);
-      else result={decodedText:await fs.scanFile(file,true),result:{format:{formatName:"QR_CODE"}}};
-      const text=result&&result.decodedText;
-      const raw=result&&result.result&&result.result.format&&result.result.format.formatName||"QR_CODE";
-      if(!text)throw Error("empty");
-      finish(text,raw);
-    }catch(err){
-      alert("Не удалось распознать код на фото. Сфотографируйте код крупнее, ровно и без бликов.");
+function scanner(onResult){
+  openModal('<button class="close" onclick="closeModal()">×</button><h2>Сканирование скидочной карты</h2><div id="reader"></div><div class="scanTools"><button class="btn primary galleryPrimary" onclick="document.getElementById(\'scanFile\').click()">▣ Сканировать фото из галереи</button><input id="scanFile" type="file" accept="image/*" style="display:none"><p class="hint">Наведите камеру на QR/штрихкод — распознавание происходит автоматически.</p></div>');
+  let controls=null,handled=false,reader=null,detector=null,raf=0,video=null,lastKey="",stableHits=0;
+  const formats=["qr_code","code_128","ean_13","ean_8","upc_a","upc_e"];
+  function mapFormat(raw){const s=String(raw||"").toUpperCase();if(s.indexOf("QR")>=0)return "QR_CODE";if(s.indexOf("DATA_MATRIX")>=0)return "DATA_MATRIX";if(s.indexOf("EAN_13")>=0)return "EAN_13";if(s.indexOf("EAN_8")>=0)return "EAN_8";if(s.indexOf("CODE_128")>=0)return "CODE_128";if(s.indexOf("CODE_39")>=0)return "CODE_39";if(s.indexOf("CODE_93")>=0)return "CODE_93";if(s.indexOf("UPC_A")>=0)return "UPC_A";if(s.indexOf("UPC_E")>=0)return "UPC_E";if(s.indexOf("ITF")>=0)return "ITF";if(s.indexOf("PDF_417")>=0||s.indexOf("PDF417")>=0)return "PDF417";return "CODE_128";}
+  function cleanup(){if(raf)cancelAnimationFrame(raf);try{if(controls)controls.stop();}catch(e){}try{if(reader&&reader.reset)reader.reset();}catch(e){}try{if(video&&video.srcObject){video.srcObject.getTracks().forEach(function(t){t.stop();});video.srcObject=null;}}catch(e){}}
+  function finish(text,raw){if(handled||!text)return;const code=String(text).trim();if(!code)return;const format=mapFormat(raw),key=format+"|"+code;if(key!==lastKey){lastKey=key;stableHits=1;return;}stableHits++;if(stableHits<2)return;handled=true;cleanup();closeModal();const resultData={code:code,format:format};setTimeout(function(){if(typeof onResult==="function")onResult(resultData);else manual(resultData);},100);}
+  async function nativeLoop(){if(!detector||!video||handled)return;try{const found=await detector.detect(video);if(found&&found.length)finish(found[0].rawValue,found[0].format);else{lastKey="";stableHits=0;}}catch(e){}if(!handled)raf=requestAnimationFrame(nativeLoop);}
+  const readerBox=document.getElementById("reader");video=document.createElement("video");video.setAttribute("playsinline","");video.setAttribute("autoplay","");video.setAttribute("muted","");video.muted=true;video.style.width="100%";video.style.height="100%";video.style.objectFit="cover";readerBox.appendChild(video);
+  navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:"environment"},width:{ideal:1280,max:1280},height:{ideal:720,max:720},focusMode:"continuous"},audio:false}).then(function(stream){video.srcObject=stream;return video.play();}).then(function(){if("BarcodeDetector" in window){return BarcodeDetector.getSupportedFormats().then(function(supported){const use=formats.filter(function(x){return supported.indexOf(x)>=0;});if(use.length)detector=new BarcodeDetector({formats:use});if(detector)nativeLoop();else throw Error("BarcodeDetector unavailable");});}throw Error("BarcodeDetector unavailable");}).catch(function(){try{reader=new ZXingBrowser.BrowserMultiFormatReader();}catch(e){reader=null;}if(!reader){readerBox.innerHTML='<p style="padding:30px;color:white;text-align:center">Камера недоступна. Можно выбрать фото из галереи.</p>';return;}reader.decodeFromVideoElement(video,function(result){if(result){const text=result.getText?result.getText():result.text;const fmt=result.getBarcodeFormat?result.getBarcodeFormat():"CODE_128";finish(text,fmt);}}).then(function(c){controls=c;}).catch(function(){});});
+  document.getElementById("scanFile").onchange=async function(e){const file=e.target.files[0];if(!file||handled)return;try{cleanup();await decodeGalleryFile(file,reader,finish);}catch(err){alert("Код не найден. Увеличьте фото, переместите рамку на код и попробуйте снова.");}e.target.value="";};
+}
+async function decodeGalleryFile(file,reader,finish){
+  const url=URL.createObjectURL(file);
+  try{
+    const img=new Image();
+    img.src=url;
+    await new Promise(function(resolve,reject){img.onload=resolve;img.onerror=reject;});
+    if("BarcodeDetector" in window){
+      try{
+        const supported=await BarcodeDetector.getSupportedFormats();
+        const detector=new BarcodeDetector({formats:supported});
+        const found=await detector.detect(img);
+        if(found&&found.length){finish(found[0].rawValue,found[0].format);return;}
+      }catch(e){}
     }
-    e.target.value="";
+    if(reader){
+      try{
+        const result=await reader.decodeFromImageElement(img);
+        if(result){
+          finish(result.getText?result.getText():result.text,result.getBarcodeFormat?result.getBarcodeFormat():"QR_CODE");
+          return;
+        }
+      }catch(e){}
+    }
+    showCropper(file,reader,finish);
+  }finally{
+    setTimeout(function(){URL.revokeObjectURL(url);},1000);
+  }
+}
+
+function showCropper(file,reader,finish){
+  const readerBox=document.getElementById("reader");
+  if(!readerBox)return;
+  const url=URL.createObjectURL(file);
+  readerBox.innerHTML='<div class="cropWrap" id="cropWrap"><img id="cropImage" class="cropImage" alt=""><div class="cropBox" id="cropBox"></div></div>'+
+    '<div class="cropControls"><button type="button" id="zoomOut">−</button><button type="button" id="zoomReset">100%</button><button type="button" id="zoomIn">+</button></div>'+
+    '<div class="cropZoomValue" id="zoomValue">Масштаб 100%</div>'+
+    '<p class="cropHint">Увеличивайте фото двумя пальцами и двигайте его под рамкой. Рамку тоже можно перетащить.</p>'+
+    '<button class="btn primary" id="cropScan">Распознать выбранную область</button><button class="btn secondary" id="cropBack">Назад к камере</button>';
+  const img=document.getElementById("cropImage"),box=document.getElementById("cropBox");
+  img.src=url;
+  let drag=false,sx=0,sy=0,sl=0,st=0;
+  box.addEventListener("pointerdown",function(e){e.preventDefault();drag=true;sx=e.clientX;sy=e.clientY;const r=box.getBoundingClientRect();sl=r.left;st=r.top;try{box.setPointerCapture(e.pointerId);}catch(x){}});
+  box.addEventListener("pointermove",function(e){if(!drag)return;e.preventDefault();const w=document.getElementById("cropWrap").getBoundingClientRect();let x=sl+e.clientX-sx-w.left,y=st+e.clientY-sy-w.top;x=Math.max(0,Math.min(x,w.width-box.offsetWidth));y=Math.max(0,Math.min(y,w.height-box.offsetHeight));box.style.left=x+"px";box.style.top=y+"px";});
+  ["pointerup","pointercancel"].forEach(function(ev){box.addEventListener(ev,function(){drag=false;});});
+  let scale=1,tx=0,ty=0,pinch=false,pStart=1,sStart=1;
+  function apply(){img.style.transform="translate("+tx+"px,"+ty+"px) scale("+scale+")";document.getElementById("zoomValue").textContent="Масштаб "+Math.round(scale*100)+"%";document.getElementById("zoomReset").textContent=Math.round(scale*100)+"%";}
+  function clamp(){const w=document.getElementById("cropWrap");tx=Math.max(-(w.clientWidth*(scale-1))/2,Math.min((w.clientWidth*(scale-1))/2,tx));ty=Math.max(-(w.clientHeight*(scale-1))/2,Math.min((w.clientHeight*(scale-1))/2,ty));}
+  function setScale(v){scale=Math.max(1,Math.min(5,v));clamp();apply();}
+  document.getElementById("zoomIn").onclick=function(){setScale(scale+.25);};
+  document.getElementById("zoomOut").onclick=function(){setScale(scale-.25);};
+  document.getElementById("zoomReset").onclick=function(){scale=1;tx=0;ty=0;apply();};
+  img.addEventListener("touchstart",function(e){if(e.touches.length===2){e.preventDefault();pinch=true;const dx=e.touches[0].clientX-e.touches[1].clientX,dy=e.touches[0].clientY-e.touches[1].clientY;pStart=Math.hypot(dx,dy);sStart=scale;}},{passive:false});
+  img.addEventListener("touchmove",function(e){if(!pinch||e.touches.length!==2)return;e.preventDefault();const dx=e.touches[0].clientX-e.touches[1].clientX,dy=e.touches[0].clientY-e.touches[1].clientY;scale=Math.max(1,Math.min(5,sStart*(Math.hypot(dx,dy)/pStart)));clamp();apply();},{passive:false});
+  img.addEventListener("touchend",function(e){if(e.touches.length<2)pinch=false;});
+  document.getElementById("cropBack").onclick=function(){URL.revokeObjectURL(url);scanner();};
+  document.getElementById("cropScan").onclick=async function(){
+    const btn=this;btn.disabled=true;btn.textContent="Распознавание…";
+    try{
+      const br=box.getBoundingClientRect(),ir=img.getBoundingClientRect(),nw=img.naturalWidth,nh=img.naturalHeight;
+      const sx=Math.max(0,(br.left-ir.left)/ir.width*nw),sy=Math.max(0,(br.top-ir.top)/ir.height*nh);
+      const sw=Math.min(nw-sx,br.width/ir.width*nw),sh=Math.min(nh-sy,br.height/ir.height*nh);
+      const canvas=document.createElement("canvas");canvas.width=Math.max(1,Math.round(sw));canvas.height=Math.max(1,Math.round(sh));
+      canvas.getContext("2d").drawImage(img,sx,sy,sw,sh,0,0,canvas.width,canvas.height);
+      const dataUrl=canvas.toDataURL("image/png");
+      if("BarcodeDetector" in window){
+        try{
+          const ci=new Image();ci.src=dataUrl;await new Promise(function(r,j){ci.onload=r;ci.onerror=j;});
+          const detector=new BarcodeDetector({formats:await BarcodeDetector.getSupportedFormats()});
+          const found=await detector.detect(ci);
+          if(found&&found.length){finish(found[0].rawValue,found[0].format);return;}
+        }catch(e){}
+      }
+      if(reader){
+        const ci=new Image();ci.src=dataUrl;await new Promise(function(r,j){ci.onload=r;ci.onerror=j;});
+        const result=await reader.decodeFromImageElement(ci);
+        if(result){finish(result.getText?result.getText():result.text,result.getBarcodeFormat?result.getBarcodeFormat():"QR_CODE");return;}
+      }
+      throw Error("not-found");
+    }catch(e){
+      btn.disabled=false;btn.textContent="Распознать выбранную область";
+      alert("Код не найден в этой области. Увеличьте фото или передвиньте рамку точно на QR/штрихкод.");
+    }
   };
+}function normalizeFormat(value){
+  const s=String(value||"").toUpperCase().replace(/[\s-]+/g,"_");
+  if(s==="QR"||s==="QRCODE"||s==="QR_CODE")return "QR_CODE";
+  if(s==="EAN13"||s==="EAN_13")return "EAN_13";
+  if(s==="EAN8"||s==="EAN_8")return "EAN_8";
+  if(s==="CODE128"||s==="CODE_128")return "CODE_128";
+  if(s==="CODE39"||s==="CODE_39")return "CODE_39";
+  if(s==="CODE93"||s==="CODE_93")return "CODE_93";
+  if(s==="UPC_A"||s==="UPCA")return "UPC_A";
+  if(s==="UPC_E"||s==="UPCE")return "UPC_E";
+  if(s==="ITF")return "ITF";
+  if(s==="DATA_MATRIX"||s==="DATAMATRIX")return "DATA_MATRIX";
+  if(s==="PDF417"||s==="PDF_417")return "PDF417";
+  return s||"CODE_128";
 }
 function openCard(id){
   const c=cards.find(function(x){return String(x.id)===String(id);});
   if(!c)return;
-  openModal('<button class="close" onclick="closeModal()">×</button><div class="detail">'+
+  openModal('<button class="close" id="cardClose">×</button><div class="detail">'+
     '<div class="brand">'+esc(c.name)+'</div>'+
-    '<div class="codebox"><svg id="barcode"></svg><div class="codeText">'+esc(c.code)+'</div></div>'+
-    '<button class="btn primary" onclick="manualEdit('+JSON.stringify(String(c.id))+')">Изменить</button>'+
-    '<button class="btn danger" onclick="delCard('+JSON.stringify(String(c.id))+')">Удалить карту</button></div>');
-  if(c.format==="QR_CODE"){
-    document.getElementById("barcode").remove();
-    const q=document.createElement("canvas");
+    '<div class="codebox"><svg id="barcode"></svg></div>'+
+    '<div class="codeText" id="cardCodeText"></div>'+
+    '<button type="button" class="btn primary" id="cardEdit">Изменить карту</button>'+
+    '<button type="button" class="btn danger" id="cardDelete">Удалить карту</button></div>');
+  document.getElementById("cardClose").onclick=closeModal;
+  document.getElementById("cardEdit").onclick=function(){manualEdit(String(c.id));};
+  document.getElementById("cardDelete").onclick=function(){delCard(String(c.id));};
+
+  const storedFormat=normalizeFormat(c.format||c.barcodeFormat||c.type||"CODE_128");
+  const codeText=document.getElementById("cardCodeText");
+  if(codeText){
+    codeText.textContent=String(c.code||"");
+    if(storedFormat==="QR_CODE")codeText.style.display="none";
+  }
+  const box=document.querySelector(".codebox");
+
+  if(storedFormat==="QR_CODE"){
+    const old=document.getElementById("barcode");
+    if(old)old.remove();
+    const q=document.createElement("div");
     q.id="qr";
-    document.querySelector(".codebox").prepend(q);
-    try{QRCode.toCanvas(q,c.code,{width:230,margin:2},function(){});}catch(e){q.remove();}
+    q.style.cssText="display:flex;justify-content:center;align-items:center;min-height:230px";
+    box.prepend(q);
+    try{
+      if(typeof QRCode!=="undefined"&&typeof QRCode==="function"){
+        new QRCode(q,{
+          text:String(c.code),
+          width:230,
+          height:230,
+          correctLevel:(QRCode.CorrectLevel&&QRCode.CorrectLevel.M)||2
+        });
+      }else{
+        q.innerHTML='<div class="hint">Модуль генерации QR-кода недоступен.</div>';
+      }
+    }catch(e){
+      console.error("QR render:",e);
+      q.innerHTML='<div class="hint">Не удалось построить QR-код из сохранённого значения.</div>';
+    }
   }else{
     try{
-      JsBarcode("#barcode",c.code,{format:c.format==="EAN_13"?"ean13":c.format==="EAN_8"?"ean8":"CODE128",displayValue:false,height:90,margin:4});
-    }catch(e){document.getElementById("barcode").outerHTML="";}
+      JsBarcode("#barcode",String(c.code),{
+        format:storedFormat==="EAN_13"?"ean13":
+               storedFormat==="EAN_8"?"ean8":
+               storedFormat==="CODE_39"?"CODE39":
+               storedFormat==="ITF"?"ITF":
+               storedFormat==="UPC_A"?"upc":
+               storedFormat==="UPC_E"?"upce":"CODE128",
+        displayValue:false,height:90,margin:4
+      });
+    }catch(e){
+      console.error("Barcode render:",storedFormat,e);
+      const el=document.getElementById("barcode");
+      if(el)el.outerHTML='<div class="hint">Не удалось построить штрихкод для сохранённого формата.</div>';
+    }
   }
+}
+function editorCoverCategory(k){
+  const v=String(k||"").toUpperCase();
+  if(["MAGNIT","PYATEROCHKA","STOLICHKI","PEREKRESTOK","LENTA","VKUSVILL","OKEИ","OKEI","ASHAN","DIKSI","CHIZHIK"].indexOf(v)>=0)return "PRODUCTS";
+  if(["ANTEY"].indexOf(v)>=0)return "PHARMACY";
+  if(["DETMIR","KARI"].indexOf(v)>=0)return "OTHER";
+  if(["DNS","BRISTOL","K_B","RODINA_UDACHA"].indexOf(v)>=0)return "OTHER";
+  if(v==="CUSTOM"||v==="AUTO")return "OTHER";
+  return "OTHER";
+}
+function editorCoverCatalog(selected){
+  const cats=[["ALL","Все"],["PRODUCTS","Продукты"],["PHARMACY","Аптеки"],["OTHER","Другое"]];
+  return '<div class="coverCategoryGrid" id="coverCategoryGrid">'+cats.map(function(x,i){return '<button type="button" class="coverCategory '+(i===0?"active":"")+'" data-cover-category="'+x[0]+'">'+x[1]+'</button>';}).join("")+'</div>'+
+    '<div id="editorCoverGrid" class="coverGrid">'+coverOptions(selected)+'</div>';
+}
+function editorPreviewData(c){
+  const base=Object.assign({},c||{});
+  base.name=(document.getElementById("name")&&document.getElementById("name").value)||base.name||"Моя карта";
+  base.cover=(document.getElementById("cover")&&document.getElementById("cover").value)||base.cover||"AUTO";
+  base.style={
+    palette:(document.getElementById("cardPalette")&&document.getElementById("cardPalette").value)||"AUTO",
+    textColor:(document.getElementById("titleColor")&&document.getElementById("titleColor").value)||"WHITE",
+    position:(document.getElementById("titlePosition")&&document.getElementById("titlePosition").value)||"BOTTOM",
+    background:(document.getElementById("titleBackground")&&document.getElementById("titleBackground").value)||"PILL",
+    size:Math.max(14,Math.min(28,Number(document.getElementById("titleSize")&&document.getElementById("titleSize").value)||19)),
+    font:(document.getElementById("titleFont")&&document.getElementById("titleFont").value)||"SYSTEM"
+  };
+  return base;
+}
+function refreshEditorPreview(c){
+  const box=document.getElementById("editorPreview");
+  if(!box)return;
+  const p=editorPreviewData(c);
+  const cover=coverForCard(p);
+  const logo=p.image?'<img class="cardLogo" src="'+esc(p.image)+'" alt="">':brandMarkup(cover,p.name);
+  box.className="card editorPreview "+coverClass(p)+" "+cardStyleClass(p);
+  box.setAttribute("style","--card-color:"+esc(String(p.color||colors[0]))+";"+esc(cardStyleInline(p)));
+  box.innerHTML=logo+'<strong>'+esc(p.name)+'</strong>';
+}
+function setEditorTab(tab){
+  document.querySelectorAll(".editorTab").forEach(function(b){b.classList.toggle("active",b.getAttribute("data-tab")===tab);});
+  document.querySelectorAll(".editorPanel").forEach(function(p){p.classList.toggle("active",p.getAttribute("data-panel")===tab);});
+}
+function bindEditorPreview(c){
+  window.__editorPreviewCard=c||{};
+  const name=document.getElementById("name"),code=document.getElementById("code");
+  [name,code].forEach(function(el){if(el)el.addEventListener("input",function(){refreshEditorPreview(c);if(el===code)refreshEditorCodePreview(c);});});
+  ["cardPalette","titlePosition","titleBackground","titleColor","titleSize","titleFont"].forEach(function(id){const el=document.getElementById(id);if(el)el.addEventListener("input",function(){refreshEditorPreview(c);});el&&el.addEventListener("change",function(){refreshEditorPreview(c);});});
+  document.querySelectorAll(".editorTab").forEach(function(btn){btn.onclick=function(){setEditorTab(btn.getAttribute("data-tab"));};});
+  const grid=document.getElementById("editorCoverGrid")||document.getElementById("coverGrid"),input=document.getElementById("cover");
+  if(grid&&input)grid.addEventListener("click",function(e){const b=e.target.closest(".coverOption");if(b)setTimeout(function(){refreshEditorPreview(c);},0);});
+  const cat=document.getElementById("coverCategoryGrid");
+  if(cat)cat.querySelectorAll(".coverCategory").forEach(function(btn){btn.onclick=function(){cat.querySelectorAll(".coverCategory").forEach(function(x){x.classList.remove("active");});btn.classList.add("active");const value=btn.getAttribute("data-cover-category");document.querySelectorAll("#editorCoverGrid .coverOption").forEach(function(x){const k=x.getAttribute("data-cover")||"AUTO";x.style.display=(value==="ALL"||editorCoverCategory(k)===value)?"":"none";});};});
+  refreshEditorPreview(c);
 }
 function manualEdit(id){
   const c=cards.find(function(x){return String(x.id)===String(id);});
   if(!c)return;
-  openModal('<button class="close" onclick="openCard('+JSON.stringify(String(id))+')">×</button><h2>Изменить скидочную карту</h2>'+
-    '<input id="name" name="discount_name" autocomplete="off" value="'+esc(c.name)+'">'+
-    '<input id="code" name="discount_code" type="text" inputmode="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" value="'+esc(c.code)+'" style="margin-top:10px">'+
-    '<select id="format" style="margin-top:10px"><option value="CODE_128">Штрихкод — CODE 128</option><option value="EAN_13">Штрихкод — EAN-13</option><option value="EAN_8">Штрихкод — EAN-8</option><option value="QR_CODE">QR-код</option></select>'+
-    '<label class="hint" style="display:block;margin-top:12px">Заменить фото карты<input id="cardImage" type="file" accept="image/*" style="width:100%;margin-top:6px"></label>'+
-    '<button class="btn primary" onclick="updateCard('+JSON.stringify(String(id))+')">Сохранить</button>');
-  document.getElementById("format").value=c.format;
+  openModal('<button class="close" id="editClose">×</button><h2>Изменить карту</h2>'+
+    '<div class="editorPreviewWrap"><div id="editorPreview" class="card editorPreview"></div></div>'+
+    '<div class="hint editorPreviewHint">Предпросмотр меняется сразу при редактировании</div>'+
+    '<div class="editorTabs"><button type="button" class="editorTab active" data-tab="data">Данные</button><button type="button" class="editorTab" data-tab="appearance">Оформление</button><button type="button" class="editorTab" data-tab="extra">Дополнительно</button></div>'+
+    '<div class="editorPanel active editorDataPanel" data-panel="data">'+
+      '<div class="editorSectionTitle">Основная информация</div>'+
+      '<div class="editorFieldLabel">Название карты</div><input id="name" name="discount_name" autocomplete="off" value="'+esc(c.name)+'">'+
+      '<div class="editorFieldLabel">Номер / код карты</div><input id="code" name="discount_code" type="text" inputmode="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" value="'+esc(c.code)+'">'+
+      '<div class="formatPicker" style="margin-top:10px"><input id="format" type="hidden" value="'+esc(c.format||"CODE_128")+'"><button type="button" class="formatButton" onclick="toggleFormatMenu()">'+esc(formatLabel(c.format||"CODE_128"))+'</button><div id="formatMenu" class="formatMenu">'+
+      '<button type="button" class="formatOption" onclick="chooseFormat(\'CODE_128\',\'Штрихкод — CODE 128\')">Штрихкод — CODE 128</button>'+
+      '<button type="button" class="formatOption" onclick="chooseFormat(\'EAN_13\',\'Штрихкод — EAN-13\')">Штрихкод — EAN-13</button>'+
+      '<button type="button" class="formatOption" onclick="chooseFormat(\'EAN_8\',\'Штрихкод — EAN-8\')">Штрихкод — EAN-8</button>'+
+      '<button type="button" class="formatOption" onclick="chooseFormat(\'QR_CODE\',\'QR-код\')">QR-код</button></div></div>'+
+      '<div class="editorCodePreview"><svg id="editorBarcode"></svg></div>'+
+      '<button type="button" class="btn secondary" id="rescanEdit">Пересканировать код</button>'+
+      '<label class="hint" style="display:block;margin-top:12px">Заменить фото карты<input id="cardImage" type="file" accept="image/*" style="width:100%;margin-top:6px"></label>'+
+    '</div>'+
+    '<div class="editorPanel editorAppearance" data-panel="appearance">'+
+      '<div class="coverPicker"><div class="hint">Выбор рубашки</div><input id="cover" type="hidden" value="'+esc(c.cover||"AUTO")+'">'+editorCoverCatalog(c.cover||"AUTO")+'<div class="coverHint">Авто — подбор по названию магазина.</div></div>'+
+      styleEditor(c)+
+    '</div>'+
+    '<div class="editorPanel editorExtra" data-panel="extra">'+
+      '<div class="editorSectionTitle">Дополнительно</div>'+
+      '<button type="button" class="btn secondary" onclick="exportData()">Сохранить резервную копию</button>'+
+      '<button type="button" class="btn secondary" onclick="importData()">Восстановить из файла</button>'+
+      '<div class="hint">Резервные функции не изменяют текущую карту до подтверждения восстановления.</div>'+
+    '</div>'+
+    '<button type="button" class="btn primary" id="editSave">Сохранить</button>'+
+    '<button type="button" class="btn secondary" id="editCancel">Отмена</button>');
+  document.getElementById("editClose").onclick=function(){openCard(String(id));};
+  document.getElementById("rescanEdit").onclick=function(){rescanEdit(String(id));};
+  document.getElementById("editSave").onclick=function(){updateCard(String(id));};
+  document.getElementById("editCancel").onclick=closeModal;
+  bindCoverPicker();
+  bindStyleEditor();
+  bindEditorPreview(c);
+  refreshEditorCodePreview(c);
+}
+function refreshEditorCodePreview(c){
+  const el=document.getElementById("editorBarcode"), code=document.getElementById("code"), fmt=document.getElementById("format");
+  if(!el)return;
+  const value=String(code&&code.value||c&&c.code||"");
+  const format=normalizeFormat(fmt&&fmt.value||c&&c.format||"CODE_128");
+  if(format==="QR_CODE"){
+    el.style.display="none";
+    return;
+  }
+  el.style.display="";
+  try{
+    JsBarcode(el,value,{
+      format:format==="EAN_13"?"ean13":format==="EAN_8"?"ean8":format==="CODE_39"?"CODE39":format==="ITF"?"ITF":format==="UPC_A"?"upc":format==="UPC_E"?"upce":"CODE128",
+      displayValue:true,height:64,width:2,margin:4,fontSize:12
+    });
+  }catch(e){el.innerHTML="";}
+}
+function rescanEdit(id){
+  scanner(function(data){
+    const c=cards.find(function(x){return String(x.id)===String(id);});
+    if(!c)return;
+    manualEdit(id);
+    const code=document.getElementById("code");
+    const format=document.getElementById("format");
+    if(code)code.value=data.code;
+    if(format)format.value=data.format;
+    const btn=document.querySelector(".formatButton");
+    if(btn)btn.textContent=formatLabel(data.format);
+    refreshEditorCodePreview(c);
+  });
 }
 async function updateCard(id){
   const c=cards.find(function(x){return String(x.id)===String(id);});
   if(!c)return;
-  c.name=document.getElementById("name").value.trim()||"Моя карта";
-  c.code=document.getElementById("code").value.trim();
-  c.format=document.getElementById("format").value;
+  const newName=document.getElementById("name").value.trim()||"Моя карта";
+  const newCode=document.getElementById("code").value.trim();
+  const newFormat=document.getElementById("format").value;
+  const newCover=document.getElementById("cover")&&document.getElementById("cover").value||"AUTO";
+  const newStyle={palette:(document.getElementById("cardPalette")&&document.getElementById("cardPalette").value)||"AUTO",textColor:(document.getElementById("titleColor")&&document.getElementById("titleColor").value)||"WHITE",position:(document.getElementById("titlePosition")&&document.getElementById("titlePosition").value)||"BOTTOM",background:(document.getElementById("titleBackground")&&document.getElementById("titleBackground").value)||"PILL",size:Math.max(14,Math.min(28,Number(document.getElementById("titleSize")&&document.getElementById("titleSize").value)||19)),font:(document.getElementById("titleFont")&&document.getElementById("titleFont").value)||"SYSTEM"};
+  if(!newCode){alert("Введите код карты");return;}
+  if(!confirm("Сохранить изменения карты «"+newName+"»?"))return;
+  c.name=newName;
+  c.code=newCode;
+  c.format=newFormat;
+  c.cover=newCover;
+  c.style=newStyle;
   const file=document.getElementById("cardImage")&&document.getElementById("cardImage").files[0];
   if(file)c.image=await readImage(file);
   save();
   closeModal();
 }
 function delCard(id){
-  if(confirm("Удалить эту карту?")){
-    cards=cards.filter(function(c){return String(c.id)!==String(id);});
-    save();
-    closeModal();
-  }
+  const c=cards.find(function(x){return String(x.id)===String(id);});
+  if(!c)return;
+  if(!confirm("Удалить карту «"+String(c.name||"Моя карта")+"»?\n\nЭто действие нельзя отменить."))return;
+  cards=cards.filter(function(c){return String(c.id)!==String(id);});
+  save();
+  closeModal();
 }
 function exportData(){
   const blob=new Blob([JSON.stringify({version:1,cards:cards},null,2)],{type:"application/json"});
@@ -250,7 +828,7 @@ function readImport(e){
       const list=Array.isArray(d)?d:d.cards;
       if(!Array.isArray(list))throw Error();
       cards=list.filter(function(c){return c&&c.code;}).map(function(c){
-        return {id:String(c.id||Date.now()+Math.random()),name:String(c.name||"Моя карта"),code:String(c.code),format:String(c.format||"CODE_128"),image:String(c.image||""),color:String(c.color||colors[0])};
+        return {id:String(c.id||Date.now()+Math.random()),name:String(c.name||"Моя карта"),code:String(c.code),format:String(c.format||"CODE_128"),image:String(c.image||""),color:String(c.color||colors[0]),cover:String(c.cover||"AUTO"),style:(c.style&&typeof c.style==="object")?c.style:{}};
       });
       save();
       closeModal();
@@ -261,9 +839,25 @@ function readImport(e){
   e.target.value="";
 }
 if("serviceWorker" in navigator){
-  window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js").catch(function(){});});
+  window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js?v=50").catch(function(){});});
 }
 render();
+</script>
+<script>
+(function(){
+function candidates(){var out=[];function scan(s,k){for(var i=0;i<s.length;i++){var key=s.key(i),o=null;try{o=JSON.parse(s.getItem(key));}catch(e){}var a=Array.isArray(o)?o:(o&&Array.isArray(o.cards)?o.cards:null);if(!Array.isArray(a)||!a.length)continue;var cards=a.filter(function(x){return x&&typeof x==="object"&&(x.code||x.barcode||x.number||x.cardNumber);});if(cards.length)out.push({s:s,k:k,key:key,cards:cards});}}try{scan(localStorage,"localStorage");}catch(e){}try{scan(sessionStorage,"sessionStorage");}catch(e){}return out;}
+function recover(){var f=candidates(),m=document.getElementById("modal"),sh=document.getElementById("sheet");if(!f.length){alert("Старых данных в localStorage/sessionStorage этого адреса не найдено.");return;}var h='<button class="close" onclick="location.reload()">×</button><h2>Найдены сохранённые данные</h2>';f.forEach(function(x,i){h+='<button class="btn primary" data-r="'+i+'">'+x.k+": "+x.key+" — "+x.cards.length+" карт</button>";});sh.innerHTML=h;m.classList.add("open");f.forEach(function(x,i){sh.querySelector('[data-r="'+i+'"]').onclick=function(){var a=x.cards.map(function(c){return{id:String(c.id||Date.now()+Math.random()),name:String(c.name||c.title||"Моя карта"),code:String(c.code||c.barcode||c.number||c.cardNumber),format:String(c.format||"CODE_128"),image:String(c.image||c.logo||""),color:String(c.color||"#17181c"),cover:String(c.cover||"AUTO")};});try{
+  localStorage.setItem("card_wallet_v1",JSON.stringify(a));
+  cards=a;
+  storageState="ok";
+  storageError="";
+  m.classList.remove("open");
+  render();
+  alert("Карты восстановлены: "+a.length);
+}catch(e){alert("Не удалось восстановить: "+e);}};});}
+function fallback(){var m=document.getElementById("modal"),sh=document.getElementById("sheet");sh.innerHTML='<button class="close" onclick="location.reload()">×</button><h2>Добавить карту</h2><input id="fbn" placeholder="Название карты"><input id="fbc" placeholder="Код карты" style="margin-top:10px"><button class="btn primary" id="fbs">Сохранить карту</button><button class="btn secondary" id="fbr">Поиск старых карт в памяти</button>';m.classList.add("open");document.getElementById("fbs").onclick=function(){var n=(document.getElementById("fbn").value||"Моя карта").trim(),code=(document.getElementById("fbc").value||"").trim();if(!code){alert("Введите код карты");return;}var a=[];try{a=JSON.parse(localStorage.getItem("card_wallet_v1")||"[]");if(!Array.isArray(a))a=[];}catch(e){}a.unshift({id:String(Date.now()),name:n,code:code,format:"CODE_128",image:"",color:"#17181c"});localStorage.setItem("card_wallet_v1",JSON.stringify(a));location.reload();};document.getElementById("fbr").onclick=recover;}
+window.CARD111Recovery={scan:recover};window.addEventListener("load",function(){var b=document.querySelector("header button.icon");if(b)b.addEventListener("click",function(){if(typeof window.addMenu==="function")return;fallback();});if(typeof window.addMenu!=="function")window.addMenu=fallback;var ce=document.getElementById("cards");if(ce&&ce.children.length===1&&/пуст/i.test(ce.textContent)){var p=document.createElement("button");p.className="btn secondary";p.textContent="Поиск старых карт в памяти";p.style.marginTop="14px";p.onclick=recover;var e=ce.querySelector(".empty");if(e)e.appendChild(p);}});
+})();
 </script>
 </body>
 </html>
