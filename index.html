@@ -679,7 +679,7 @@ function openCard(id){
 }
 function editorCoverCategory(k){
   const v=String(k||"").toUpperCase();
-  if(["MAGNIT","PYATEROCHKA","STOLICHKI","PEREKRESTOK","LENTA","VkusVill","OKEИ","OKEI","ASHAN","DIKSI","CHIZHIK"].indexOf(v)>=0)return "PRODUCTS";
+  if(["MAGNIT","PYATEROCHKA","STOLICHKI","PEREKRESTOK","LENTA","VKUSVILL","OKEИ","OKEI","ASHAN","DIKSI","CHIZHIK"].indexOf(v)>=0)return "PRODUCTS";
   if(["ANTEY"].indexOf(v)>=0)return "PHARMACY";
   if(["DETMIR","KARI"].indexOf(v)>=0)return "OTHER";
   if(["DNS","BRISTOL","K_B","RODINA_UDACHA"].indexOf(v)>=0)return "OTHER";
@@ -724,7 +724,7 @@ function bindEditorPreview(c){
   [name,code].forEach(function(el){if(el)el.addEventListener("input",function(){refreshEditorPreview(c);});});
   ["cardPalette","titlePosition","titleColor","titleSize","titleFont"].forEach(function(id){const el=document.getElementById(id);if(el)el.addEventListener("input",function(){refreshEditorPreview(c);});el&&el.addEventListener("change",function(){refreshEditorPreview(c);});});
   document.querySelectorAll(".editorTab").forEach(function(btn){btn.onclick=function(){setEditorTab(btn.getAttribute("data-tab"));};});
-  const grid=document.getElementById("coverGrid"),input=document.getElementById("cover");
+  const grid=document.getElementById("editorCoverGrid")||document.getElementById("coverGrid"),input=document.getElementById("cover");
   if(grid&&input)grid.addEventListener("click",function(e){const b=e.target.closest(".coverOption");if(b)setTimeout(function(){refreshEditorPreview(c);},0);});
   const cat=document.getElementById("coverCategoryGrid");
   if(cat)cat.querySelectorAll(".coverCategory").forEach(function(btn){btn.onclick=function(){cat.querySelectorAll(".coverCategory").forEach(function(x){x.classList.remove("active");});btn.classList.add("active");const value=btn.getAttribute("data-cover-category");document.querySelectorAll("#editorCoverGrid .coverOption").forEach(function(x){const k=x.getAttribute("data-cover")||"AUTO";x.style.display=(value==="ALL"||editorCoverCategory(k)===value)?"":"none";});};});
