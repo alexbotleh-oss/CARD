@@ -153,7 +153,8 @@ function syncCardsFromStorage(){
         code:String(x.code||x.barcode||x.number||x.cardNumber),
         format:String(x.format||"CODE_128"),
         image:String(x.image||x.logo||""),
-        color:String(x.color||colors[0])
+        color:String(x.color||colors[0]),
+        cover:String(x.cover||"AUTO")
       };
     });
     cards=normalized;
@@ -453,11 +454,13 @@ async function updateCard(id){
   const newName=document.getElementById("name").value.trim()||"Моя карта";
   const newCode=document.getElementById("code").value.trim();
   const newFormat=document.getElementById("format").value;
+  const newCover=document.getElementById("cover")&&document.getElementById("cover").value||"AUTO";
   if(!newCode){alert("Введите код карты");return;}
   if(!confirm("Сохранить изменения карты «"+newName+"»?"))return;
   c.name=newName;
   c.code=newCode;
   c.format=newFormat;
+  c.cover=newCover;
   const file=document.getElementById("cardImage")&&document.getElementById("cardImage").files[0];
   if(file)c.image=await readImage(file);
   save();
@@ -508,7 +511,7 @@ render();
 <script>
 (function(){
 function candidates(){var out=[];function scan(s,k){for(var i=0;i<s.length;i++){var key=s.key(i),o=null;try{o=JSON.parse(s.getItem(key));}catch(e){}var a=Array.isArray(o)?o:(o&&Array.isArray(o.cards)?o.cards:null);if(!Array.isArray(a)||!a.length)continue;var cards=a.filter(function(x){return x&&typeof x==="object"&&(x.code||x.barcode||x.number||x.cardNumber);});if(cards.length)out.push({s:s,k:k,key:key,cards:cards});}}try{scan(localStorage,"localStorage");}catch(e){}try{scan(sessionStorage,"sessionStorage");}catch(e){}return out;}
-function recover(){var f=candidates(),m=document.getElementById("modal"),sh=document.getElementById("sheet");if(!f.length){alert("Старых данных в localStorage/sessionStorage этого адреса не найдено.");return;}var h='<button class="close" onclick="location.reload()">×</button><h2>Найдены сохранённые данные</h2>';f.forEach(function(x,i){h+='<button class="btn primary" data-r="'+i+'">'+x.k+": "+x.key+" — "+x.cards.length+" карт</button>";});sh.innerHTML=h;m.classList.add("open");f.forEach(function(x,i){sh.querySelector('[data-r="'+i+'"]').onclick=function(){var a=x.cards.map(function(c){return{id:String(c.id||Date.now()+Math.random()),name:String(c.name||c.title||"Моя карта"),code:String(c.code||c.barcode||c.number||c.cardNumber),format:String(c.format||"CODE_128"),image:String(c.image||c.logo||""),color:String(c.color||"#17181c")};});try{
+function recover(){var f=candidates(),m=document.getElementById("modal"),sh=document.getElementById("sheet");if(!f.length){alert("Старых данных в localStorage/sessionStorage этого адреса не найдено.");return;}var h='<button class="close" onclick="location.reload()">×</button><h2>Найдены сохранённые данные</h2>';f.forEach(function(x,i){h+='<button class="btn primary" data-r="'+i+'">'+x.k+": "+x.key+" — "+x.cards.length+" карт</button>";});sh.innerHTML=h;m.classList.add("open");f.forEach(function(x,i){sh.querySelector('[data-r="'+i+'"]').onclick=function(){var a=x.cards.map(function(c){return{id:String(c.id||Date.now()+Math.random()),name:String(c.name||c.title||"Моя карта"),code:String(c.code||c.barcode||c.number||c.cardNumber),format:String(c.format||"CODE_128"),image:String(c.image||c.logo||""),color:String(c.color||"#17181c"),cover:String(c.cover||"AUTO")};});try{
   localStorage.setItem("card_wallet_v1",JSON.stringify(a));
   cards=a;
   storageState="ok";
