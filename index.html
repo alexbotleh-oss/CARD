@@ -306,6 +306,7 @@ function openCard(id){
   openModal('<button class="close" id="cardClose">×</button><div class="detail">'+
     '<div class="brand">'+esc(c.name)+'</div>'+
     '<div class="codebox"><svg id="barcode"></svg></div>'+
+    '<div class="codeText" id="cardCodeText"></div>'+
     '<button type="button" class="btn primary" id="cardEdit">Изменить карту</button>'+
     '<button type="button" class="btn danger" id="cardDelete">Удалить карту</button></div>');
   document.getElementById("cardClose").onclick=closeModal;
@@ -313,6 +314,8 @@ function openCard(id){
   document.getElementById("cardDelete").onclick=function(){delCard(String(c.id));};
 
   const storedFormat=normalizeFormat(c.format||c.barcodeFormat||c.type||"CODE_128");
+  const codeText=document.getElementById("cardCodeText");
+  if(codeText)codeText.textContent=String(c.code||"");
   const box=document.querySelector(".codebox");
 
   if(storedFormat==="QR_CODE"){
