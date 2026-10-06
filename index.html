@@ -160,7 +160,7 @@ header{padding:18px 36px 10px;align-items:center;background:#f6f7fbf5}
 .card.title-top strong{top:12px!important;bottom:auto!important}
 .card.title-center strong{top:50%!important;bottom:auto!important;transform:translateY(-50%)!important}
 .card.title-hide strong{display:none!important}
-.card.titlebg-none strong{background:transparent!important}.card.titlebg-shadow strong{background:transparent!important;text-shadow:0 2px 5px #000!important}.card.titlebg-outline strong{background:transparent!important;border:2px solid currentColor;text-shadow:none!important}.card.titlebg-pill strong{background:#17202dcc!important}
+.card.titlebg-none strong{background:transparent!important}.card.titlebg-shadow strong{background:transparent!important;text-shadow:0 2px 5px #000!important}.card.titlebg-outline strong{background:transparent!important;border:2px solid currentColor;text-shadow:none!important}.card.titlebg-pill strong{background:transparent!important}
 .brandArtwork{position:absolute;z-index:3;left:12px;right:12px;top:12px;bottom:44px;display:flex;align-items:center;justify-content:center;gap:7px;color:#fff;text-shadow:0 1px 3px #0008;pointer-events:none}
 .brandArtwork b{display:flex;align-items:center;justify-content:center;font-weight:900}
 .brandArtwork i{font-style:normal;font-weight:800;font-size:clamp(13px,2.7vw,20px);line-height:1.05}
@@ -171,7 +171,7 @@ header{padding:18px 36px 10px;align-items:center;background:#f6f7fbf5}
 .editorSectionTitle{font-size:16px;font-weight:800;margin-bottom:12px}.editorFieldLabel{font-size:13px;font-weight:700;color:#40434a;margin:11px 0 6px}
 .editorDataPanel input{margin:0}.editorCodePreview{padding:10px 8px 2px;display:flex;justify-content:center;align-items:center;min-height:88px}.editorCodePreview svg{width:min(100%,300px);height:auto}
 .editorAppearance{background:#fff;border:1px solid #e5e7eb;border-radius:18px;padding:14px}
-.editorPreviewWrap{display:flex;justify-content:center;margin:2px 0 2px}.editorPreview{width:230px!important;height:145px!important;aspect-ratio:auto!important}.editorPreview .brandArtwork{bottom:42px}.editorPreview strong{font-size:16px!important}
+.editorPreviewWrap{display:flex;justify-content:center;margin:2px -18px 8px;padding:4px 0 8px;position:sticky;top:-1px;z-index:8;background:#fff}.editorPreview{width:210px!important;height:126px!important;aspect-ratio:auto!important}.editorPreview .brandArtwork{bottom:38px}.editorPreview strong{font-size:15px!important}
 .editorTabs{margin:12px 0;padding:4px;background:#eef0f4;border-radius:15px}
 .editorTab{padding:10px 8px;font-size:15px}
 .coverCategoryGrid{margin:7px 0 10px}.coverCategory{background:#f0f1f4}.coverCategory.active{background:#1677ff}
@@ -180,7 +180,7 @@ header{padding:18px 36px 10px;align-items:center;background:#f6f7fbf5}
 .cardStylePicker{margin-top:14px;padding:14px;border:1px solid #e4e6eb;border-radius:18px;background:#fafbfc}
 .styleBlockTitle{margin-top:15px}
 .styleGrid{gap:8px}.styleOption{min-height:44px;border-radius:13px}
-@media(max-width:520px){header{padding-left:20px;padding-right:20px}.search{padding-left:20px;padding-right:20px}.grid{padding-left:20px;padding-right:20px}.card{aspect-ratio:1.2/1!important}.card strong{font-size:14px!important}.editorPreview{width:220px!important;height:138px!important}.editorAppearance .coverGrid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media(max-width:520px){header{padding-left:20px;padding-right:20px}.search{padding-left:20px;padding-right:20px}.grid{padding-left:20px;padding-right:20px}.card{aspect-ratio:1.32/1!important}.card strong{font-size:14px!important}.editorPreview{width:200px!important;height:120px!important}.editorAppearance .coverGrid{grid-template-columns:repeat(4,minmax(0,1fr))}}
 /* Approved 3-screen visual contour */
 header{padding:18px 20px 10px;background:#f6f7fbf5}
 .walletHead h1{font-size:28px;line-height:1.06;letter-spacing:-.8px}
@@ -188,7 +188,7 @@ header{padding:18px 20px 10px;background:#f6f7fbf5}
 .addBtn{min-width:136px;height:48px;padding:0 16px;border-radius:16px;background:#17181c;color:#fff;font-size:16px;font-weight:750;box-shadow:none}
 .search{padding:10px 20px 16px}.search input{height:48px;padding:0 16px;border-radius:15px;font-size:16px}
 .grid{gap:10px;padding:0 20px 92px}
-.card{aspect-ratio:1.18/1!important;min-height:0!important;border-radius:18px!important}
+.card{aspect-ratio:1.32/1!important;min-height:0!important;border-radius:18px!important}
 .card strong{bottom:11px!important;left:11px!important;font-size:15px!important;padding:6px 10px!important;border-radius:10px!important;max-width:calc(100% - 22px)!important}
 .card.title-top strong{top:11px!important;bottom:auto!important}
 .card.title-center strong{top:50%!important;bottom:auto!important}
@@ -202,7 +202,7 @@ header{padding:18px 20px 10px;background:#f6f7fbf5}
 .editorExtra .btn{margin-bottom:9px}
 .editorExtra .hint{margin-top:4px}
 .editorTabs .editorTab{font-size:14px}
-@media(max-width:520px){.grid{padding-left:20px;padding-right:20px}.addBtn{min-width:136px}.bottomNav{bottom:10px}.card{aspect-ratio:1.18/1!important}}
+@media(max-width:520px){.grid{padding-left:20px;padding-right:20px}.addBtn{min-width:136px}.bottomNav{bottom:10px}.card{aspect-ratio:1.32/1!important}}
 </style>
 </head>
 <body>
@@ -250,7 +250,7 @@ const CARD_FONTS={SYSTEM:'system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",
 const CARD_FONT_LABELS={SYSTEM:"Системный",ARIAL:"Arial",TREBUCHET:"Trebuchet",GEORGIA:"Georgia",COURIER:"Courier"};
 function cardStyle(c){
   const s=(c&&c.style&&typeof c.style==="object")?c.style:{};
-  return {palette:CARD_PALETTES[s.palette]?s.palette:"AUTO",textColor:CARD_TEXT_COLORS[s.textColor]?s.textColor:"WHITE",position:CARD_TEXT_POSITIONS[s.position]?s.position:"CENTER",background:CARD_TEXT_BACKGROUNDS[s.background]?s.background:"PILL",size:Math.max(14,Math.min(28,Number(s.size)||19)),font:CARD_FONTS[s.font]?s.font:"SYSTEM"};
+  return {palette:CARD_PALETTES[s.palette]?s.palette:"AUTO",textColor:CARD_TEXT_COLORS[s.textColor]?s.textColor:"WHITE",position:CARD_TEXT_POSITIONS[s.position]?s.position:"CENTER",background:CARD_TEXT_BACKGROUNDS[s.background]?s.background:"NONE",size:Math.max(14,Math.min(28,Number(s.size)||19)),font:CARD_FONTS[s.font]?s.font:"SYSTEM"};
 }
 function cardStyleClass(c){const s=cardStyle(c);return "palette-"+s.palette.toLowerCase()+" title-"+s.position.toLowerCase()+" titlebg-"+s.background.toLowerCase();}
 function cardStyleInline(c){const s=cardStyle(c);return "--title-color:"+CARD_TEXT_COLORS[s.textColor]+";--title-size:"+s.size+"px;--title-font:"+CARD_FONTS[s.font]+";"}
