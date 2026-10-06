@@ -147,11 +147,45 @@ h1{margin:0;font-size:28px}.sub{color:#737780;font-size:14px;margin-top:4px}.btn
 .card.cover-rodina_udacha{background:linear-gradient(135deg,#214d73 0%,#1d6b6a 55%,#187450 100%)!important}
 .card.cover-rodina_udacha:before{width:170px;height:170px;right:-44px;top:-66px;border-radius:50%;background:#c7d66a40;box-shadow:-116px 110px 0 -34px #ffffff0d}
 .card.cover-custom{background-color:#252a31!important;background-size:cover!important;background-position:center!important;background-repeat:no-repeat!important}
+/* CARD111 visual alignment v50 — match supplied 3-screen sketch */
+header{padding:18px 36px 10px;align-items:center;background:#f6f7fbf5}
+.walletHead h1{font-size:28px;line-height:1.05;letter-spacing:-.7px}
+.walletHead .sub{font-size:14px;margin-top:5px}
+.addIcon{width:54px!important;height:54px!important;padding:0!important;border-radius:16px!important;background:#fff!important;color:#17181c!important;border:1px solid #e3e5e9!important;box-shadow:0 3px 12px #00000010!important;font-size:30px!important;font-weight:400!important}
+.search{padding:8px 36px 18px}.search input{height:48px;padding:0 16px;border-radius:15px;font-size:16px}
+.grid{gap:10px;padding:0 36px 28px}
+.card{aspect-ratio:1.27/1!important;border-radius:17px!important;padding:12px!important;box-shadow:0 5px 14px #00000012!important}
+.cardLogo{position:absolute!important;left:12px;top:12px;width:52px;height:52px;border-radius:14px!important;z-index:4!important}
+.card strong{left:12px!important;right:auto!important;top:auto!important;bottom:12px!important;transform:none!important;width:auto!important;max-width:calc(100% - 24px)!important;padding:6px 11px!important;border-radius:10px!important;font-size:15px!important;line-height:1.05!important;font-weight:750!important;text-align:left!important;background:#17202dcc!important;color:#fff!important;text-shadow:none!important;box-sizing:border-box!important}
+.card.title-top strong{top:12px!important;bottom:auto!important}
+.card.title-center strong{top:50%!important;bottom:auto!important;transform:translateY(-50%)!important}
+.card.title-hide strong{display:none!important}
+.card.titlebg-none strong{background:transparent!important}.card.titlebg-shadow strong{background:transparent!important;text-shadow:0 2px 5px #000!important}.card.titlebg-outline strong{background:transparent!important;border:2px solid currentColor;text-shadow:none!important}.card.titlebg-pill strong{background:#17202dcc!important}
+.brandArtwork{position:absolute;z-index:3;left:12px;right:12px;top:12px;bottom:44px;display:flex;align-items:center;justify-content:center;gap:7px;color:#fff;text-shadow:0 1px 3px #0008;pointer-events:none}
+.brandArtwork b{display:flex;align-items:center;justify-content:center;font-weight:900}
+.brandArtwork i{font-style:normal;font-weight:800;font-size:clamp(13px,2.7vw,20px);line-height:1.05}
+.brandArtwork.magnit b{width:54px;height:54px;background:#fff;color:#d71939;border-radius:8px;font-size:34px}.brandArtwork.magnit i{font-size:clamp(15px,3vw,22px)}
+.brandArtwork.pyat b{width:54px;height:54px;border-radius:50%;background:#fff;color:#e21d32;font-size:34px;box-shadow:0 0 0 5px #f6b323}.brandArtwork.stol{color:#d71939}.brandArtwork.stol b{width:54px;height:54px;border-radius:50%;background:#fff;color:#159447;font-size:42px}.brandArtwork.antey b{font-size:55px}.brandArtwork.rodina b{font-size:48px;color:#f6c64a}.brandArtwork.bristol b{font-size:42px}.brandArtwork.kb{color:#b30f18}.brandArtwork.lenta b{font-size:50px;color:#f6c64a}.brandArtwork.perek b{font-size:44px;color:#f6c64a}
+.brandArtwork.generic b{width:52px;height:52px;border-radius:14px;background:#fff;color:#17181c;font-size:30px}
+.editorDataPanel{background:#fff;border:1px solid #e5e7eb;border-radius:18px;padding:14px;margin-bottom:12px}
+.editorSectionTitle{font-size:16px;font-weight:800;margin-bottom:12px}.editorFieldLabel{font-size:13px;font-weight:700;color:#40434a;margin:11px 0 6px}
+.editorDataPanel input{margin:0}.editorCodePreview{padding:10px 8px 2px;display:flex;justify-content:center;align-items:center;min-height:88px}.editorCodePreview svg{width:min(100%,300px);height:auto}
+.editorAppearance{background:#fff;border:1px solid #e5e7eb;border-radius:18px;padding:14px}
+.editorPreviewWrap{display:flex;justify-content:center;margin:2px 0 2px}.editorPreview{width:230px!important;height:145px!important;aspect-ratio:auto!important}.editorPreview .brandArtwork{bottom:42px}.editorPreview strong{font-size:16px!important}
+.editorTabs{margin:12px 0;padding:4px;background:#eef0f4;border-radius:15px}
+.editorTab{padding:10px 8px;font-size:15px}
+.coverCategoryGrid{margin:7px 0 10px}.coverCategory{background:#f0f1f4}.coverCategory.active{background:#1677ff}
+.editorAppearance .coverGrid{grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.editorAppearance .coverOption{min-height:72px!important;border-radius:14px!important}
+.cardStylePicker{margin-top:14px;padding:14px;border:1px solid #e4e6eb;border-radius:18px;background:#fafbfc}
+.styleBlockTitle{margin-top:15px}
+.styleGrid{gap:8px}.styleOption{min-height:44px;border-radius:13px}
+@media(max-width:520px){header{padding-left:20px;padding-right:20px}.search{padding-left:20px;padding-right:20px}.grid{padding-left:20px;padding-right:20px}.card{aspect-ratio:1.2/1!important}.card strong{font-size:14px!important}.editorPreview{width:220px!important;height:138px!important}.editorAppearance .coverGrid{grid-template-columns:repeat(4,minmax(0,1fr))}}
 </style>
 </head>
 <body>
 <div class="app">
-<header><div><h1>Мои карты лояльности</h1><div class="sub" id="count">0 карт</div></div><button class="btn addBtn" onclick="addMenu()">Добавить карту</button></header>
+<header><div class="walletHead"><h1>Мой кошелёк</h1><div class="sub" id="count">0 карт</div></div><button class="icon addIcon" aria-label="Добавить карту" onclick="addMenu()">＋</button></header>
 <div class="search"><input id="search" placeholder="Поиск карты" oninput="render()"></div>
 <main id="cards" class="grid"></main>
 </div>
@@ -188,30 +222,49 @@ const CARD_PALETTES={AUTO:"Фирменная",RED:"Красная",BLUE:"Син
 const CARD_TEXT_COLORS={WHITE:"#ffffff",BLACK:"#17181c",YELLOW:"#ffd43b",RED:"#e03131",GREEN:"#159447",BLUE:"#1767d8"};
 const CARD_TEXT_COLOR_LABELS={WHITE:"Белый",BLACK:"Чёрный",YELLOW:"Жёлтый",RED:"Красный",GREEN:"Зелёный",BLUE:"Синий"};
 const CARD_TEXT_POSITIONS={HIDE:"Не показывать",TOP:"Сверху",CENTER:"По центру",BOTTOM:"Снизу"};
+const CARD_TEXT_BACKGROUNDS={NONE:"Нет",PILL:"Плашка",SHADOW:"Тень",OUTLINE:"Контур"};
+const CARD_TEXT_BACKGROUND_LABELS={NONE:"Нет",PILL:"Плашка",SHADOW:"Тень",OUTLINE:"Контур"};
 const CARD_FONTS={SYSTEM:'system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif',ARIAL:"Arial,Helvetica,sans-serif",TREBUCHET:'"Trebuchet MS",Arial,sans-serif',GEORGIA:'Georgia,"Times New Roman",serif',COURIER:'"Courier New",monospace'};
 const CARD_FONT_LABELS={SYSTEM:"Системный",ARIAL:"Arial",TREBUCHET:"Trebuchet",GEORGIA:"Georgia",COURIER:"Courier"};
 function cardStyle(c){
   const s=(c&&c.style&&typeof c.style==="object")?c.style:{};
-  return {palette:CARD_PALETTES[s.palette]?s.palette:"AUTO",textColor:CARD_TEXT_COLORS[s.textColor]?s.textColor:"WHITE",position:CARD_TEXT_POSITIONS[s.position]?s.position:"CENTER",size:Math.max(14,Math.min(28,Number(s.size)||19)),font:CARD_FONTS[s.font]?s.font:"SYSTEM"};
+  return {palette:CARD_PALETTES[s.palette]?s.palette:"AUTO",textColor:CARD_TEXT_COLORS[s.textColor]?s.textColor:"WHITE",position:CARD_TEXT_POSITIONS[s.position]?s.position:"CENTER",background:CARD_TEXT_BACKGROUNDS[s.background]?s.background:"PILL",size:Math.max(14,Math.min(28,Number(s.size)||19)),font:CARD_FONTS[s.font]?s.font:"SYSTEM"};
 }
-function cardStyleClass(c){const s=cardStyle(c);return "palette-"+s.palette.toLowerCase()+" title-"+s.position.toLowerCase();}
+function cardStyleClass(c){const s=cardStyle(c);return "palette-"+s.palette.toLowerCase()+" title-"+s.position.toLowerCase()+" titlebg-"+s.background.toLowerCase();}
 function cardStyleInline(c){const s=cardStyle(c);return "--title-color:"+CARD_TEXT_COLORS[s.textColor]+";--title-size:"+s.size+"px;--title-font:"+CARD_FONTS[s.font]+";"}
 function paletteOptions(selected){return Object.keys(CARD_PALETTES).map(function(k){return '<button type="button" class="styleOption paletteChoice palette-choice-'+k.toLowerCase()+(k===selected?" selected":"")+'" data-palette="'+k+'">'+esc(CARD_PALETTES[k])+'</button>';}).join("");}
 function textColorOptions(selected){return Object.keys(CARD_TEXT_COLORS).map(function(k){return '<button type="button" class="styleColorChoice style-color-'+k.toLowerCase()+(k===selected?" selected":"")+'" data-text-color="'+k+'" title="'+esc(CARD_TEXT_COLOR_LABELS[k])+'"><span></span><b>'+esc(CARD_TEXT_COLOR_LABELS[k])+'</b></button>';}).join("");}
 function positionOptions(selected){return Object.keys(CARD_TEXT_POSITIONS).map(function(k){return '<button type="button" class="styleOption positionChoice '+(k===selected?" selected":"")+'" data-position="'+k+'">'+esc(CARD_TEXT_POSITIONS[k])+'</button>';}).join("");}
 function fontOptions(selected){return Object.keys(CARD_FONTS).map(function(k){return '<button type="button" class="styleOption fontChoice '+(k===selected?" selected":"")+'" data-font="'+k+'" style="font-family:'+CARD_FONTS[k]+'">'+esc(CARD_FONT_LABELS[k])+'</button>';}).join("");}
+function backgroundOptions(selected){return Object.keys(CARD_TEXT_BACKGROUNDS).map(function(k){return '<button type="button" class="styleOption backgroundChoice '+(k===selected?" selected":"")+'" data-background="'+k+'">'+esc(CARD_TEXT_BACKGROUND_LABELS[k])+'</button>';}).join("");}
 function styleEditor(c){
   const s=cardStyle(c);
   return '<div class="cardStylePicker"><div class="hint">Цветовая палитра</div><input id="cardPalette" type="hidden" value="'+esc(s.palette)+'"><div id="paletteGrid" class="styleGrid">'+paletteOptions(s.palette)+'</div>'+
     '<div class="hint styleBlockTitle">Расположение названия</div><input id="titlePosition" type="hidden" value="'+esc(s.position)+'"><div id="positionGrid" class="styleGrid">'+positionOptions(s.position)+'</div>'+
+    '<div class="hint styleBlockTitle">Стиль фона для названия</div><input id="titleBackground" type="hidden" value="'+esc(s.background)+'"><div id="backgroundGrid" class="styleGrid">'+backgroundOptions(s.background)+'</div>'+
     '<div class="hint styleBlockTitle">Цвет текста</div><input id="titleColor" type="hidden" value="'+esc(s.textColor)+'"><div id="textColorGrid" class="textColorGrid">'+textColorOptions(s.textColor)+'</div>'+
     '<div class="hint styleBlockTitle">Размер текста: <b id="titleSizeValue">'+s.size+' px</b></div><input id="titleSize" type="range" min="14" max="28" step="1" value="'+s.size+'" class="styleRange">'+
     '<div class="hint styleBlockTitle">Шрифт</div><input id="titleFont" type="hidden" value="'+esc(s.font)+'"><div id="fontGrid" class="styleGrid fontGrid">'+fontOptions(s.font)+'</div></div>';
 }
 function bindStyleEditor(){
   function bindGrid(id,inputId,attr){const grid=document.getElementById(id),input=document.getElementById(inputId);if(!grid||!input)return;grid.querySelectorAll("button").forEach(function(btn){btn.onclick=function(){input.value=btn.getAttribute(attr)||"";grid.querySelectorAll("button").forEach(function(x){x.classList.remove("selected");});btn.classList.add("selected");if(typeof refreshEditorPreview==="function")refreshEditorPreview(window.__editorPreviewCard||{});};});}
-  bindGrid("paletteGrid","cardPalette","data-palette");bindGrid("positionGrid","titlePosition","data-position");bindGrid("textColorGrid","titleColor","data-text-color");bindGrid("fontGrid","titleFont","data-font");
+  bindGrid("paletteGrid","cardPalette","data-palette");bindGrid("positionGrid","titlePosition","data-position");bindGrid("backgroundGrid","titleBackground","data-background");bindGrid("textColorGrid","titleColor","data-text-color");bindGrid("fontGrid","titleFont","data-font");
   const range=document.getElementById("titleSize"),out=document.getElementById("titleSizeValue");if(range&&out)range.oninput=function(){out.textContent=range.value+" px";};
+}
+function brandMarkup(cover,name){
+  const n=esc(name||"");
+  const map={
+    MAGNIT:'<span class="brandArtwork magnit"><b>М</b><i>Магнит</i></span>',
+    PYATEROCHKA:'<span class="brandArtwork pyat"><b>5</b><i>Пятёрочка</i></span>',
+    STOLICHKI:'<span class="brandArtwork stol"><b>+</b><i>Столички</i></span>',
+    ANTEY:'<span class="brandArtwork antey"><b>+</b><i>Аптека Антей</i></span>',
+    RODINA_UDACHA:'<span class="brandArtwork rodina"><b>V</b><i>Родина</i></span>',
+    BRISTOL:'<span class="brandArtwork bristol"><b>B</b><i>Бристоль</i></span>',
+    K_B:'<span class="brandArtwork kb"><b>K&amp;Б</b><i>Красное &amp; Белое</i></span>',
+    LENTA:'<span class="brandArtwork lenta"><b>2</b><i>Лента</i></span>',
+    PEREKRESTOK:'<span class="brandArtwork perek"><b>•</b><i>Перекрёсток</i></span>'
+  };
+  return map[cover]||'<span class="brandArtwork generic"><b>'+n.charAt(0)+'</b></span>';
 }
 function coverForCard(c){const v=String(c.cover||"AUTO");return v==="AUTO"?coverForName(c.name):COVER_LABELS[v]?v:"CUSTOM";}
 function coverClass(c){return "cover-"+coverForCard(c).toLowerCase();}
@@ -338,8 +391,8 @@ function render(){
   out.innerHTML=list.map(function(c){
     const mark=String(c.name||"?").trim().charAt(0).toUpperCase();
     const color=String(c.color||colors[0]);
-    const logo=c.image?'<img class="cardLogo" src="'+esc(c.image)+'" alt="">':'<span class="cardLogoFallback">'+esc(mark)+'</span>';
     const cover=coverForCard(c);
+    const logo=c.image?'<img class="cardLogo" src="'+esc(c.image)+'" alt="">':brandMarkup(cover,c.name);
     return '<button type="button" class="card '+esc(coverClass(c))+' '+esc(cardStyleClass(c))+'" data-id="'+esc(String(c.id))+'" data-mark="" style="--card-color:'+esc(color)+';'+esc(cardStyleInline(c))+(cover==="CUSTOM"&&c.image?"background-image:url(&quot;"+esc(c.image)+"&quot;);":"")+'">'+logo+'<strong>'+esc(c.name)+'</strong></button>';
   }).join("");
 }
@@ -591,6 +644,7 @@ function editorPreviewData(c){
     palette:(document.getElementById("cardPalette")&&document.getElementById("cardPalette").value)||"AUTO",
     textColor:(document.getElementById("titleColor")&&document.getElementById("titleColor").value)||"WHITE",
     position:(document.getElementById("titlePosition")&&document.getElementById("titlePosition").value)||"BOTTOM",
+    background:(document.getElementById("titleBackground")&&document.getElementById("titleBackground").value)||"PILL",
     size:Math.max(14,Math.min(28,Number(document.getElementById("titleSize")&&document.getElementById("titleSize").value)||19)),
     font:(document.getElementById("titleFont")&&document.getElementById("titleFont").value)||"SYSTEM"
   };
@@ -600,8 +654,8 @@ function refreshEditorPreview(c){
   const box=document.getElementById("editorPreview");
   if(!box)return;
   const p=editorPreviewData(c);
-  const mark=String(p.name||"?").trim().charAt(0).toUpperCase();
-  const logo=p.image?'<img class="cardLogo" src="'+esc(p.image)+'" alt="">':'<span class="cardLogoFallback">'+esc(mark)+'</span>';
+  const cover=coverForCard(p);
+  const logo=p.image?'<img class="cardLogo" src="'+esc(p.image)+'" alt="">':brandMarkup(cover,p.name);
   box.className="card editorPreview "+coverClass(p)+" "+cardStyleClass(p);
   box.setAttribute("style","--card-color:"+esc(String(p.color||colors[0]))+";"+esc(cardStyleInline(p)));
   box.innerHTML=logo+'<strong>'+esc(p.name)+'</strong>';
@@ -613,8 +667,8 @@ function setEditorTab(tab){
 function bindEditorPreview(c){
   window.__editorPreviewCard=c||{};
   const name=document.getElementById("name"),code=document.getElementById("code");
-  [name,code].forEach(function(el){if(el)el.addEventListener("input",function(){refreshEditorPreview(c);});});
-  ["cardPalette","titlePosition","titleColor","titleSize","titleFont"].forEach(function(id){const el=document.getElementById(id);if(el)el.addEventListener("input",function(){refreshEditorPreview(c);});el&&el.addEventListener("change",function(){refreshEditorPreview(c);});});
+  [name,code].forEach(function(el){if(el)el.addEventListener("input",function(){refreshEditorPreview(c);if(el===code)refreshEditorCodePreview(c);});});
+  ["cardPalette","titlePosition","titleBackground","titleColor","titleSize","titleFont"].forEach(function(id){const el=document.getElementById(id);if(el)el.addEventListener("input",function(){refreshEditorPreview(c);});el&&el.addEventListener("change",function(){refreshEditorPreview(c);});});
   document.querySelectorAll(".editorTab").forEach(function(btn){btn.onclick=function(){setEditorTab(btn.getAttribute("data-tab"));};});
   const grid=document.getElementById("editorCoverGrid")||document.getElementById("coverGrid"),input=document.getElementById("cover");
   if(grid&&input)grid.addEventListener("click",function(e){const b=e.target.closest(".coverOption");if(b)setTimeout(function(){refreshEditorPreview(c);},0);});
@@ -629,14 +683,16 @@ function manualEdit(id){
     '<div class="editorPreviewWrap"><div id="editorPreview" class="card editorPreview"></div></div>'+
     '<div class="hint editorPreviewHint">Предпросмотр меняется сразу при редактировании</div>'+
     '<div class="editorTabs"><button type="button" class="editorTab active" data-tab="data">Данные</button><button type="button" class="editorTab" data-tab="appearance">Оформление</button></div>'+
-    '<div class="editorPanel active" data-panel="data">'+
-      '<div class="hint" style="margin-bottom:6px">Название карты</div><input id="name" name="discount_name" autocomplete="off" value="'+esc(c.name)+'">'+
-      '<div class="hint" style="margin:12px 0 6px">Номер / код карты</div><input id="code" name="discount_code" type="text" inputmode="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" value="'+esc(c.code)+'">'+
+    '<div class="editorPanel active editorDataPanel" data-panel="data">'+
+      '<div class="editorSectionTitle">Основная информация</div>'+
+      '<div class="editorFieldLabel">Название карты</div><input id="name" name="discount_name" autocomplete="off" value="'+esc(c.name)+'">'+
+      '<div class="editorFieldLabel">Номер / код карты</div><input id="code" name="discount_code" type="text" inputmode="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" value="'+esc(c.code)+'">'+
       '<div class="formatPicker" style="margin-top:10px"><input id="format" type="hidden" value="'+esc(c.format||"CODE_128")+'"><button type="button" class="formatButton" onclick="toggleFormatMenu()">'+esc(formatLabel(c.format||"CODE_128"))+'</button><div id="formatMenu" class="formatMenu">'+
       '<button type="button" class="formatOption" onclick="chooseFormat(\'CODE_128\',\'Штрихкод — CODE 128\')">Штрихкод — CODE 128</button>'+
       '<button type="button" class="formatOption" onclick="chooseFormat(\'EAN_13\',\'Штрихкод — EAN-13\')">Штрихкод — EAN-13</button>'+
       '<button type="button" class="formatOption" onclick="chooseFormat(\'EAN_8\',\'Штрихкод — EAN-8\')">Штрихкод — EAN-8</button>'+
       '<button type="button" class="formatOption" onclick="chooseFormat(\'QR_CODE\',\'QR-код\')">QR-код</button></div></div>'+
+      '<div class="editorCodePreview"><svg id="editorBarcode"></svg></div>'+
       '<button type="button" class="btn secondary" id="rescanEdit">Пересканировать код</button>'+
       '<label class="hint" style="display:block;margin-top:12px">Заменить фото карты<input id="cardImage" type="file" accept="image/*" style="width:100%;margin-top:6px"></label>'+
     '</div>'+
@@ -653,6 +709,24 @@ function manualEdit(id){
   bindCoverPicker();
   bindStyleEditor();
   bindEditorPreview(c);
+  refreshEditorCodePreview(c);
+}
+function refreshEditorCodePreview(c){
+  const el=document.getElementById("editorBarcode"), code=document.getElementById("code"), fmt=document.getElementById("format");
+  if(!el)return;
+  const value=String(code&&code.value||c&&c.code||"");
+  const format=normalizeFormat(fmt&&fmt.value||c&&c.format||"CODE_128");
+  if(format==="QR_CODE"){
+    el.style.display="none";
+    return;
+  }
+  el.style.display="";
+  try{
+    JsBarcode(el,value,{
+      format:format==="EAN_13"?"ean13":format==="EAN_8"?"ean8":format==="CODE_39"?"CODE39":format==="ITF"?"ITF":format==="UPC_A"?"upc":format==="UPC_E"?"upce":"CODE128",
+      displayValue:true,height:64,width:2,margin:4,fontSize:12
+    });
+  }catch(e){el.innerHTML="";}
 }
 function rescanEdit(id){
   scanner(function(data){
@@ -665,6 +739,7 @@ function rescanEdit(id){
     if(format)format.value=data.format;
     const btn=document.querySelector(".formatButton");
     if(btn)btn.textContent=formatLabel(data.format);
+    refreshEditorCodePreview(c);
   });
 }
 async function updateCard(id){
@@ -674,7 +749,7 @@ async function updateCard(id){
   const newCode=document.getElementById("code").value.trim();
   const newFormat=document.getElementById("format").value;
   const newCover=document.getElementById("cover")&&document.getElementById("cover").value||"AUTO";
-  const newStyle={palette:(document.getElementById("cardPalette")&&document.getElementById("cardPalette").value)||"AUTO",textColor:(document.getElementById("titleColor")&&document.getElementById("titleColor").value)||"WHITE",position:(document.getElementById("titlePosition")&&document.getElementById("titlePosition").value)||"BOTTOM",size:Math.max(14,Math.min(28,Number(document.getElementById("titleSize")&&document.getElementById("titleSize").value)||19)),font:(document.getElementById("titleFont")&&document.getElementById("titleFont").value)||"SYSTEM"};
+  const newStyle={palette:(document.getElementById("cardPalette")&&document.getElementById("cardPalette").value)||"AUTO",textColor:(document.getElementById("titleColor")&&document.getElementById("titleColor").value)||"WHITE",position:(document.getElementById("titlePosition")&&document.getElementById("titlePosition").value)||"BOTTOM",background:(document.getElementById("titleBackground")&&document.getElementById("titleBackground").value)||"PILL",size:Math.max(14,Math.min(28,Number(document.getElementById("titleSize")&&document.getElementById("titleSize").value)||19)),font:(document.getElementById("titleFont")&&document.getElementById("titleFont").value)||"SYSTEM"};
   if(!newCode){alert("Введите код карты");return;}
   if(!confirm("Сохранить изменения карты «"+newName+"»?"))return;
   c.name=newName;
