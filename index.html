@@ -502,7 +502,7 @@ function recover(){var f=candidates(),m=document.getElementById("modal"),sh=docu
   cards=a;
   storageState="ok";
   storageError="";
-  closeModal();
+  m.classList.remove("open");
   render();
   alert("Карты восстановлены: "+a.length);
 }catch(e){alert("Не удалось восстановить: "+e);}};});}
