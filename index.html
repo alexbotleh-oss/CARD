@@ -7,7 +7,7 @@
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon.svg">
 <title>CARD — Мой кошелёк</title>
-<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script><script src="https://unpkg.com/@zxing/browser@0.2.1"></script><script src="https://unpkg.com/@zxing/library@0.23.0/umd/index.min.js"></script>
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script><script src="https://unpkg.com/@zxing/browser@0.2.1"></script>
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js"></script>
 <style>
@@ -322,22 +322,13 @@ function showCropper(file,reader,finish){
     '<button class="btn danger" onclick="delCard('+JSON.stringify(String(c.id))+')">Удалить карту</button></div>');
   const codeValue=String(c.code||"");
   const storedFormat=String(c.format||"").toUpperCase();
-  const looksLikeQr=storedFormat==="QR_CODE" || (/[A-Z]/i.test(codeValue) && !/^\d{8,14}$/.test(codeValue));
+  const looksLikeQr=storedFormat==="QR_CODE" || (/[A-Z]/i.test(codeValue) && !/^\\d{8,14}$/.test(codeValue));
   if(looksLikeQr){
     document.getElementById("barcode").remove();
-    const box=document.querySelector(".codebox");
-    let rendered=false;
-    try{
-      if(window.ZXing&&ZXing.BrowserQRCodeSvgWriter){
-        const writer=new ZXing.BrowserQRCodeSvgWriter();
-        const svg=writer.write(String(c.code),230,230);
-        svg.id="qr";svg.style.maxWidth="100%";box.prepend(svg);rendered=true;
-      }
-    }catch(e){}
-    if(!rendered){
-      const q=document.createElement("canvas");q.id="qr";box.prepend(q);
-      try{QRCode.toCanvas(q,String(c.code),{width:230,margin:2},function(err){if(err){q.remove();}});}catch(e){q.remove();}
-    }
+    const q=document.createElement("canvas");
+    q.id="qr";
+    document.querySelector(".codebox").prepend(q);
+    try{QRCode.toCanvas(q,c.code,{width:230,margin:2},function(){});}catch(e){q.remove();}
   }else{
     try{
       JsBarcode("#barcode",c.code,{format:c.format==="EAN_13"?"ean13":c.format==="EAN_8"?"ean8":"CODE128",displayValue:false,height:90,margin:4});
