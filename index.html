@@ -191,110 +191,17 @@ async function addCard(){
   closeModal();
 }
 function scanner(onResult){
-  openModal('<button class="close" onclick="closeModal()">×</button><h2>Сканирование скидочной карты</h2>'+
-    '<div id="reader"></div>'+
-    '<div class="scanTools">'+
-    '<button class="btn primary galleryPrimary" onclick="document.getElementById(\'scanFile\').click()">▣ Сканировать фото из галереи</button>'+
-    '<input id="scanFile" type="file" accept="image/*" style="display:none">'+
-    '<p class="hint">Наведите камеру на QR/штрихкод — распознавание происходит автоматически.</p></div>');
-  let controls=null,handled=false,reader=null,detector=null,raf=0,video=null;
+  openModal('<button class="close" onclick="closeModal()">×</button><h2>Сканирование скидочной карты</h2><div id="reader"></div><div class="scanTools"><button class="btn primary galleryPrimary" onclick="document.getElementById(\'scanFile\').click()">▣ Сканировать фото из галереи</button><input id="scanFile" type="file" accept="image/*" style="display:none"><p class="hint">Наведите камеру на QR/штрихкод — распознавание происходит автоматически.</p></div>');
+  let controls=null,handled=false,reader=null,detector=null,raf=0,video=null,lastKey="",stableHits=0;
   const formats=["qr_code","code_128","code_39","code_93","ean_13","ean_8","upc_a","upc_e","itf","data_matrix","pdf417"];
-
-  function mapFormat(raw){
-    const s=String(raw||"").toUpperCase();
-    if(s.indexOf("QR")>=0||s.indexOf("DATA_MATRIX")>=0)return "QR_CODE";
-    if(s.indexOf("EAN_13")>=0)return "EAN_13";
-    if(s.indexOf("EAN_8")>=0)return "EAN_8";
-    if(s.indexOf("CODE_128")>=0)return "CODE_128";
-    if(s.indexOf("CODE_39")>=0||s.indexOf("CODE_93")>=0)return "CODE_128";
-    if(s.indexOf("UPC_A")>=0)return "EAN_13";
-    if(s.indexOf("UPC_E")>=0)return "EAN_8";
-    return "CODE_128";
-  }
-  function finish(text,raw){
-    if(handled||!text)return;
-    handled=true;
-    if(raf)cancelAnimationFrame(raf);
-    try{if(controls)controls.stop();}catch(e){}
-    try{if(reader&&reader.reset)reader.reset();}catch(e){}
-    try{if(video&&video.srcObject){video.srcObject.getTracks().forEach(function(t){t.stop();});video.srcObject=null;}}catch(e){}
-    closeModal();
-    const resultData={code:String(text),format:mapFormat(raw)};
-    setTimeout(function(){if(typeof onResult==="function"){onResult(resultData);}else{manual(resultData);}},100);
-  }
-
-  async function nativeLoop(){
-    if(!detector||!video||handled)return;
-    try{
-      const found=await detector.detect(video);
-      if(found&&found.length){
-        const x=found[0];
-        finish(x.rawValue,x.format);
-        return;
-      }
-    }catch(e){}
-    if(!handled)raf=requestAnimationFrame(nativeLoop);
-  }
-
-  if("BarcodeDetector" in window){
-    BarcodeDetector.getSupportedFormats().then(function(supported){
-      const use=formats.filter(function(x){return supported.indexOf(x)>=0;});
-      if(use.length)detector=new BarcodeDetector({formats:use});
-      if(video && video.readyState>=2 && !handled) nativeLoop();
-    }).catch(function(){detector=null;});
-  }
-
-  try{reader=new ZXingBrowser.BrowserMultiFormatReader();}catch(e){reader=null;}
-
-  const readerBox=document.getElementById("reader");
-  video=document.createElement("video");
-  video.setAttribute("playsinline","");
-  video.setAttribute("autoplay","");
-  video.setAttribute("muted","");
-  video.muted=true;
-  video.style.width="100%";video.style.height="100%";video.style.objectFit="cover";
-  readerBox.appendChild(video);
-
-  navigator.mediaDevices.getUserMedia({
-    video:{
-      facingMode:{ideal:"environment"},
-      width:{ideal:1920},
-      height:{ideal:1080},
-      focusMode:"continuous"
-    },
-    audio:false
-  }).then(function(stream){
-    video.srcObject=stream;
-    return video.play();
-  }).then(function(){
-    if(detector)nativeLoop();
-    if(reader){
-      return reader.decodeFromVideoElement(video,function(result){
-        if(result){
-          const text=result.getText?result.getText():result.text;
-          const fmt=result.getBarcodeFormat?result.getBarcodeFormat():"QR_CODE";
-          finish(text,fmt);
-        }
-      }).then(function(c){controls=c;});
-    }
-  }).catch(function(){
-    readerBox.innerHTML='<p style="padding:30px;color:white;text-align:center">Камера недоступна. Можно выбрать фото из галереи.</p>';
-  });
-
-  document.getElementById("scanFile").onchange=async function(e){
-    const file=e.target.files[0];
-    if(!file||handled)return;
-    try{
-      if(raf)cancelAnimationFrame(raf);
-      try{if(controls)controls.stop();}catch(x){}
-      await decodeGalleryFile(file,reader,finish);
-    }catch(err){
-      alert("Код не найден. Увеличьте фото, переместите рамку на код и попробуйте снова.");
-    }
-    e.target.value="";
-  };
+  function mapFormat(raw){const s=String(raw||"").toUpperCase();if(s.indexOf("QR")>=0)return "QR_CODE";if(s.indexOf("DATA_MATRIX")>=0)return "DATA_MATRIX";if(s.indexOf("EAN_13")>=0)return "EAN_13";if(s.indexOf("EAN_8")>=0)return "EAN_8";if(s.indexOf("CODE_128")>=0)return "CODE_128";if(s.indexOf("CODE_39")>=0)return "CODE_39";if(s.indexOf("CODE_93")>=0)return "CODE_93";if(s.indexOf("UPC_A")>=0)return "UPC_A";if(s.indexOf("UPC_E")>=0)return "UPC_E";if(s.indexOf("ITF")>=0)return "ITF";if(s.indexOf("PDF_417")>=0||s.indexOf("PDF417")>=0)return "PDF417";return "CODE_128";}
+  function cleanup(){if(raf)cancelAnimationFrame(raf);try{if(controls)controls.stop();}catch(e){}try{if(reader&&reader.reset)reader.reset();}catch(e){}try{if(video&&video.srcObject){video.srcObject.getTracks().forEach(function(t){t.stop();});video.srcObject=null;}}catch(e){}}
+  function finish(text,raw){if(handled||!text)return;const code=String(text).trim();if(!code)return;const format=mapFormat(raw),key=format+"|"+code;if(key!==lastKey){lastKey=key;stableHits=1;return;}stableHits++;if(stableHits<2)return;handled=true;cleanup();closeModal();const resultData={code:code,format:format};setTimeout(function(){if(typeof onResult==="function")onResult(resultData);else manual(resultData);},100);}
+  async function nativeLoop(){if(!detector||!video||handled)return;try{const found=await detector.detect(video);if(found&&found.length)finish(found[0].rawValue,found[0].format);else{lastKey="";stableHits=0;}}catch(e){}if(!handled)raf=requestAnimationFrame(nativeLoop);}
+  const readerBox=document.getElementById("reader");video=document.createElement("video");video.setAttribute("playsinline","");video.setAttribute("autoplay","");video.setAttribute("muted","");video.muted=true;video.style.width="100%";video.style.height="100%";video.style.objectFit="cover";readerBox.appendChild(video);
+  navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:"environment"},width:{ideal:1920},height:{ideal:1080},focusMode:"continuous"},audio:false}).then(function(stream){video.srcObject=stream;return video.play();}).then(function(){if("BarcodeDetector" in window){return BarcodeDetector.getSupportedFormats().then(function(supported){const use=formats.filter(function(x){return supported.indexOf(x)>=0;});if(use.length)detector=new BarcodeDetector({formats:use});if(detector)nativeLoop();else throw Error("BarcodeDetector unavailable");});}throw Error("BarcodeDetector unavailable");}).catch(function(){try{reader=new ZXingBrowser.BrowserMultiFormatReader();}catch(e){reader=null;}if(!reader){readerBox.innerHTML='<p style="padding:30px;color:white;text-align:center">Камера недоступна. Можно выбрать фото из галереи.</p>';return;}reader.decodeFromVideoElement(video,function(result){if(result){const text=result.getText?result.getText():result.text;const fmt=result.getBarcodeFormat?result.getBarcodeFormat():"CODE_128";finish(text,fmt);}}).then(function(c){controls=c;}).catch(function(){});});
+  document.getElementById("scanFile").onchange=async function(e){const file=e.target.files[0];if(!file||handled)return;try{cleanup();await decodeGalleryFile(file,reader,finish);}catch(err){alert("Код не найден. Увеличьте фото, переместите рамку на код и попробуйте снова.");}e.target.value="";};
 }
-
 async function decodeGalleryFile(file,reader,finish){
   const url=URL.createObjectURL(file);
   try{
@@ -383,8 +290,7 @@ function showCropper(file,reader,finish){
   if(!c)return;
   openModal('<button class="close" id="cardClose">×</button><div class="detail">'+
     '<div class="brand">'+esc(c.name)+'</div>'+
-    '<div class="codebox"><svg id="barcode"></svg><div class="codeText">'+esc(c.code)+'</div></div>'+
-    '<button type="button" class="btn primary" id="cardEdit">Изменить карту</button>'+
+    '<div class="codebox"><svg id="barcode"></svg></div>'+\n    '<button type="button" class="btn primary" id="cardEdit">Изменить карту</button>'+
     '<button type="button" class="btn danger" id="cardDelete">Удалить карту</button></div>');
   document.getElementById("cardClose").onclick=closeModal;
   document.getElementById("cardEdit").onclick=function(){manualEdit(String(c.id));};
@@ -399,7 +305,7 @@ function showCropper(file,reader,finish){
       if(err){console.error("QR render:",err);q.remove();return;} q.innerHTML=svg;
     });}catch(e){console.error("QR render:",e);q.remove();}
   }else{
-    try{JsBarcode("#barcode",c.code,{format:c.format==="EAN_13"?"ean13":c.format==="EAN_8"?"ean8":"CODE128",displayValue:false,height:90,margin:4});}
+    try{JsBarcode("#barcode",c.code,{format:c.format==="EAN_13"?"ean13":c.format==="EAN_8"?"ean8":c.format==="CODE_39"?"CODE39":"CODE128",displayValue:false,height:90,margin:4});}
     catch(e){const el=document.getElementById("barcode");if(el)el.outerHTML="";}
   }
 }
