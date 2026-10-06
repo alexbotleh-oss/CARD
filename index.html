@@ -290,7 +290,8 @@ function showCropper(file,reader,finish){
   if(!c)return;
   openModal('<button class="close" id="cardClose">×</button><div class="detail">'+
     '<div class="brand">'+esc(c.name)+'</div>'+
-    '<div class="codebox"><svg id="barcode"></svg></div>'+\n    '<button type="button" class="btn primary" id="cardEdit">Изменить карту</button>'+
+    '<div class="codebox"><svg id="barcode"></svg></div>'+
+    '<button type="button" class="btn primary" id="cardEdit">Изменить карту</button>'+
     '<button type="button" class="btn danger" id="cardDelete">Удалить карту</button></div>');
   document.getElementById("cardClose").onclick=closeModal;
   document.getElementById("cardEdit").onclick=function(){manualEdit(String(c.id));};
