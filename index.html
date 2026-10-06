@@ -690,7 +690,9 @@ function refreshEditorPreview(c){
   const cover=coverForCard(p);
   const logo=p.image?'<img class="cardLogo" src="'+esc(p.image)+'" alt="">':brandMarkup(cover,p.name);
   box.className="card editorPreview "+coverClass(p)+" "+cardStyleClass(p);
-  box.setAttribute("style","--card-color:"+esc(String(p.color||colors[0]))+";"+esc(cardStyleInline(p)));\n  const previewTitle=box.querySelector("strong");\n  if(previewTitle){const ps=cardStyle(p);previewTitle.style.fontFamily=CARD_FONTS[ps.font];previewTitle.style.fontSize=ps.size+"px";previewTitle.style.color=CARD_TEXT_COLORS[ps.textColor];}
+  box.setAttribute("style","--card-color:"+esc(String(p.color||colors[0]))+";"+esc(cardStyleInline(p)));
+  const previewTitle=box.querySelector("strong");
+  if(previewTitle){const ps=cardStyle(p);previewTitle.style.fontFamily=CARD_FONTS[ps.font];previewTitle.style.fontSize=ps.size+"px";previewTitle.style.color=CARD_TEXT_COLORS[ps.textColor];}
   box.innerHTML=logo+'<strong>'+esc(p.name)+'</strong>';
 }
 function setEditorTab(tab){
