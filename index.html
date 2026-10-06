@@ -170,13 +170,13 @@ function scanner(){
     if(!handled)raf=requestAnimationFrame(nativeLoop);
   }
 
-  try{
-    if("BarcodeDetector" in window){
-      const supported=await BarcodeDetector.getSupportedFormats().catch(function(){return [];});
+  if("BarcodeDetector" in window){
+    BarcodeDetector.getSupportedFormats().then(function(supported){
       const use=formats.filter(function(x){return supported.indexOf(x)>=0;});
       if(use.length)detector=new BarcodeDetector({formats:use});
-    }
-  }catch(e){detector=null;}
+      if(video && video.readyState>=2 && !handled) nativeLoop();
+    }).catch(function(){detector=null;});
+  }
 
   try{reader=new ZXingBrowser.BrowserMultiFormatReader();}catch(e){reader=null;}
 
