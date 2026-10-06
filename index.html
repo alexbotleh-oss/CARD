@@ -369,9 +369,29 @@ function readImage(file){
 }
 function syncCardsFromStorage(){
   try{
-    const raw=localStorage.getItem(KEY);
-    if(!raw)return false;
-    const parsed=JSON.parse(raw);
+    let raw=localStorage.getItem(KEY);
+    let parsed=null;
+    if(raw){
+      try{parsed=JSON.parse(raw);}catch(e){parsed=null;}
+    }
+    if(!Array.isArray(parsed)){
+      const sources=[localStorage,sessionStorage];
+      for(let si=0;si<sources.length&&!Array.isArray(parsed);si++){
+        const st=sources[si];
+        for(let i=0;i<st.length;i++){
+          const k=st.key(i);
+          if(!k||k===KEY||k===SAFE_KEY)continue;
+          try{
+            const v=JSON.parse(st.getItem(k));
+            const a=Array.isArray(v)?v:(v&&Array.isArray(v.cards)?v.cards:null);
+            if(Array.isArray(a)&&a.some(function(x){return x&&typeof x==="object"&&(x.code||x.barcode||x.number||x.cardNumber);})){
+              parsed=a;
+              break;
+            }
+          }catch(e){}
+        }
+      }
+    }
     if(!Array.isArray(parsed))return false;
     const normalized=parsed.filter(function(x){return x&&typeof x==="object"&&(x.code||x.barcode||x.number||x.cardNumber);}).map(function(x){
       return {
@@ -385,11 +405,15 @@ function syncCardsFromStorage(){
         style:(x.style&&typeof x.style==="object")?x.style:{}
       };
     });
+    if(!normalized.length)return false;
     cards=normalized;
+    try{localStorage.setItem(KEY,JSON.stringify(cards));}catch(e){}
     storageState="ok";
     storageError="";
     return true;
   }catch(e){
+    storageState="error";
+    storageError=String(e&&e.message||e);
     return false;
   }
 }
