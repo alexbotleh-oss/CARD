@@ -179,6 +179,50 @@ h1{margin:0;font-size:28px}.sub{color:#737780;font-size:14px;margin-top:4px}.btn
 .coverOption.cover-bristol{background-color:#e51f2a!important;background-image:repeating-linear-gradient(0deg,#ffffff0a 0 2px,transparent 2px 10px)!important}
 .coverOption.cover-k_b{background-color:#fff!important;color:#b30f18!important;text-shadow:none!important;background-image:repeating-linear-gradient(-35deg,transparent 0 16px,#c7192212 16px 18px)!important}
 
+
+/* CARD111 cover readability v44 — brand artwork stays behind, label stays clear */
+.card strong{
+  left:18px!important;right:auto!important;top:auto!important;bottom:12px!important;
+  transform:none!important;width:auto!important;max-width:calc(100% - 36px)!important;
+  padding:7px 13px!important;border-radius:12px!important;
+  background:#17181cdd!important;color:#fff!important;
+  font-size:19px!important;line-height:1.1!important;
+  text-align:left!important;text-shadow:none!important;
+  box-sizing:border-box;
+}
+.card.cover-vkusvill strong,.card.cover-chizhik strong,.card.cover-dns strong,.card.cover-k_b strong{
+  background:#17181cdd!important;color:#fff!important;text-shadow:none!important;
+}
+.card.cover-magnit:before{
+  content:""!important;right:-36px!important;top:-52px!important;width:150px!important;height:150px!important;
+  border-radius:50%!important;background:#ffffff14!important;box-shadow:-44px 58px 0 8px #ffffff0b!important;
+  transform:none!important;
+}
+.card.cover-pyaterochka:before{
+  content:""!important;right:-38px!important;top:-46px!important;width:150px!important;height:150px!important;
+  border-radius:50%!important;background:#e6323220!important;box-shadow:-72px 72px 0 2px #49a94218!important;
+}
+.card.cover-stolichki:before{
+  content:""!important;right:-28px!important;top:-48px!important;width:160px!important;height:160px!important;
+  border-radius:50%!important;background:#ffffff14!important;box-shadow:-62px 64px 0 8px #ffffff09!important;
+}
+.card.cover-antey:before{
+  content:""!important;right:-34px!important;top:-52px!important;width:165px!important;height:165px!important;
+  border-radius:50%!important;background:#ffffff13!important;box-shadow:-70px 72px 0 8px #ffffff08!important;
+}
+.card.cover-rodina_udacha:before{
+  content:""!important;right:-42px!important;top:-58px!important;width:170px!important;height:170px!important;
+  border-radius:50%!important;background:#f3c34a20!important;box-shadow:-70px 72px 0 8px #ffffff08!important;
+}
+.card.cover-bristol:before{
+  content:""!important;right:-42px!important;top:-54px!important;width:170px!important;height:170px!important;
+  border-radius:50%!important;background:#ffffff12!important;box-shadow:-70px 72px 0 8px #ffffff08!important;
+}
+.card.cover-k_b:before{
+  content:""!important;right:-44px!important;top:-54px!important;width:170px!important;height:170px!important;
+  border-radius:50%!important;background:#c7192210!important;box-shadow:-70px 72px 0 8px #c7192209!important;
+}
+
 </style>
 </head>
 <body>
@@ -658,7 +702,7 @@ function readImport(e){
   e.target.value="";
 }
 if("serviceWorker" in navigator){
-  window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js?v=43").catch(function(){});});
+  window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js?v=44").catch(function(){});});
 }
 render();
 </script>
