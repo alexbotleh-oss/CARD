@@ -13,7 +13,7 @@
 <style>
 *{box-sizing:border-box}body{margin:0;background:#f6f7fb;color:#17181c;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
 .app{max-width:720px;margin:auto;min-height:100vh;padding-bottom:100px}header{padding:22px 18px 12px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:#f6f7fbf2;backdrop-filter:blur(15px);z-index:5}
-h1{margin:0;font-size:28px}.sub{color:#737780;font-size:14px;margin-top:4px}.btn{border:0;border-radius:14px;padding:14px;font-weight:650}.icon{width:44px;height:44px;background:#fff;border:1px solid #e6e7eb;font-size:24px}.search{padding:8px 18px 16px}.search input,.sheet input{width:100%;padding:13px;border:1px solid #e2e3e8;border-radius:13px;background:#fff}.formatPicker{position:relative;flex:1}.formatButton{width:100%;padding:13px;border:1px solid #e2e3e8;border-radius:13px;background:#fff;color:#17181c;text-align:left;font:inherit}.formatMenu{display:none;position:absolute;left:0;right:0;top:calc(100% + 6px);z-index:50;background:#fff;border:1px solid #e2e3e8;border-radius:13px;box-shadow:0 10px 28px #0002;overflow:hidden}.formatMenu.open{display:block}.formatOption{display:block;width:100%;padding:13px 14px;border:0;border-bottom:1px solid #eee;background:#fff;color:#17181c;text-align:left;font:inherit}.formatOption:last-child{border-bottom:0}
+h1{margin:0;font-size:28px}.sub{color:#737780;font-size:14px;margin-top:4px}.btn{border:0;border-radius:14px;padding:14px;font-weight:650}.icon{width:44px;height:44px;background:#fff;border:1px solid #e6e7eb;font-size:24px}.addBtn{background:#17181c;color:#fff;padding:12px 16px;border-radius:14px;white-space:nowrap}.search{padding:8px 18px 16px}.search input,.sheet input{width:100%;padding:13px;border:1px solid #e2e3e8;border-radius:13px;background:#fff}.formatPicker{position:relative;flex:1}.formatButton{width:100%;padding:13px;border:1px solid #e2e3e8;border-radius:13px;background:#fff;color:#17181c;text-align:left;font:inherit}.formatMenu{display:none;position:absolute;left:0;right:0;top:calc(100% + 6px);z-index:50;background:#fff;border:1px solid #e2e3e8;border-radius:13px;box-shadow:0 10px 28px #0002;overflow:hidden}.formatMenu.open{display:block}.formatOption{display:block;width:100%;padding:13px 14px;border:0;border-bottom:1px solid #eee;background:#fff;color:#17181c;text-align:left;font:inherit}.formatOption:last-child{border-bottom:0}
 .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;padding:0 14px}.card{min-height:118px;position:relative;overflow:hidden;background:linear-gradient(135deg,var(--card-color,#17181c) 0%,var(--card-color,#17181c) 58%,#00000066 100%);border:0;border-radius:18px;padding:13px;color:#fff;text-align:left;display:flex;flex-direction:column;justify-content:flex-end;box-shadow:0 7px 18px #00000018;isolation:isolate}.card strong{position:absolute;z-index:3;left:50%;top:50%;transform:translate(-50%,-50%);font-size:22px;line-height:1.12;padding:0;color:#fff;text-shadow:0 1px 2px #0008;text-align:center;width:88%}.card small,.card .code{display:none}.card:before{content:"";position:absolute;z-index:1;right:-22px;top:-30px;width:105px;height:105px;border-radius:50%;background:#ffffff20;box-shadow:-28px 34px 0 2px #ffffff12,38px 58px 0 -10px #ffffff10}.card:after{content:"";position:absolute;inset:0;z-index:2;background:linear-gradient(120deg,#ffffff18 0%,#ffffff00 42%,#00000018 100%);pointer-events:none}.cardLogo{width:42px;height:42px;object-fit:contain;border-radius:12px;background:#fff;border:0;display:block;margin-bottom:auto;position:relative;z-index:3;padding:3px}.cardLogoFallback{display:none}
 .card.cover-magnit{background:#d71939;box-shadow:inset 0 -24px 0 #b50f31,inset 0 0 0 1px #ffffff20}
 .card.cover-magnit:before{width:150px;height:150px;right:-30px;top:-52px;background:#ffffff16;box-shadow:-42px 54px 0 8px #ffffff10,30px 92px 0 -18px #ffffff12}
@@ -71,159 +71,6 @@ h1{margin:0;font-size:28px}.sub{color:#737780;font-size:14px;margin-top:4px}.btn
 .coverOption.cover-bristol{background-image:url("data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABQODxIPDRQSEBIXFRQYHjIhHhwcHj0sLiQySUBMS0dARkVQWnNiUFVtVkVGZIhlbXd7gYKBTmCNl4x9lnN+gXz/2wBDARUXFx4aHjshITt8U0ZTfHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHz/wAARCABNAHgDASIAAhEBAxEB/8QAGgABAAMBAQEAAAAAAAAAAAAAAAEEBQIDBv/EAC0QAAEEAQIEBgICAwEAAAAAAAEAAgMEEQUSITFSkRMUMkFRcSJhI6EGgcHR/8QAGQEBAQEBAQEAAAAAAAAAAAAAAAECBAMG/8QAJhEAAgIBBAEEAgMAAAAAAAAAAAECERIDBCFRMRNBYaEUIjKBkf/aAAwDAQACEQMRAD8Ay44mNYPxBOOJK72N6R2Ut9I+lK522fRwhFRSSOdjekdk2N6R2XShLN4R6I2N6R2TY3pHZSiWMI9EbG9I7Jsb0jspRLGEeiNjekdk2N6R2UoljCPRGxnSOybG9I7KVKWMI9HOxvSOyLpEsYR6OW+kfSlQ30D6UoWPhBERChERChQpRAQpUKUAREQBERAEREAb6R9LQ03TTbDppXGOuz1O9z9LPb6R9L62uxsehAN5GAn/ZC1FWzj3Gq9OCUfLKLW6EG7dwP7JdlU7umxCA2qMhlgBw4Hm1WdNbb8kww0q8zOOHPxk8VpadZju15YzCInNJa9gHBaqzllOWi24tunzzZ89Wr1pI2GWba4vw78gNo+l22tSc/YZi07y3cXggDGQe/BXasdWDR32Za7JXMkIGRz44C8rsUFrS23oYWwvDtrmt5FSuD29Rym+XV1/ZWq1Kj3StsWg3Y7DS08HBH1akcW/x/EcGcWtcB+WR/XH+lpWNLhks1trGxwti3ykcAV53tPhk1ivXjYI43sy7bw+Uoi11KX8n3/hTNOmHY8y1w8PJIcODvj9rs0tPDsecyPnh8r3ns6bFYlqy0w2NmWh7fVleekPqyysqvqMeST/I7njnyTgrlqY5c/RxFSoOLd9rALcn8h+u3vw/Sr160Ejv5bDWt37ce+OpXLLa9m82jDWZC4S7TI33AVh79Phuto+Ta5uQ0yHnkpQ9SSXvbV+3goVqdadkznSloDiI8uAJwM8R2Xq2lpxfh1raMZzuBzx/89l6Q6FDrorPaHxEFwDvjCt1vJT6hLU8jG3Zn8vnCJGJ6ru03VWZb6dPazZbaCXHdk5wPZFa0irDNbuNkia8N9II5cSiJWJ7j05YuT+jEb6W/S39IusnpOoyPDJNpawnkQV8+30j6XSynTOzU0lqwSZ9NBp2o1oRFFdjawchsXlI6PRqkrfF8W3NxJ/6sVt201m1tiUN+NxXiSXEkkkn3KuS9jwjtpt/u1XwvJvUpIY/wDHybLC+IyEOA581RvX4X1GVKcbmQtO4l3MlUvGk8HwvEd4ec7M8MrzUcj1htkpOUu7NbUNYFitHBC1zWjG8n3x7Li3qok1CC1A1w8NoBDvfmsxEyZqO204+F39m07UdNEr7QrPdO8cWuxtys/T7Ta2oNsSA7QSSGj5VVEtljt4RTj3wWZLZGoutQ8P5N7QVpHUNMknbbkhlE447RyJWIiJsS0ISr44Nerqdc3pLloPEnKMN4gDHJeVHUY4dTltSh21+7g0ZxkrMRMmT8aHPyqNXTdRhq2bMkoftl5YH7RZSIpNGJ7TTm8mGegfSlQz0t+lKh0x8IIpRQoREQpCKUQEIiIAiIgIRSoQBERAf//Z")}
 .coverOption.cover-k_b{background-image:url("data:image/jpeg;base64,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")}
 
-/* CARD111 cover redesign v43 — crisp vector-like brand references, no sample photos */
-.card.cover-magnit{
-  background-color:#d71939!important;
-  background-image:
-    radial-gradient(circle at 8px 8px,#7d1026 0 2px,transparent 2.5px),
-    radial-gradient(circle at 28px 28px,#8f1730 0 3px,transparent 3.5px),
-    linear-gradient(135deg,transparent 0 48%,#ffffff12 49% 51%,transparent 52%);
-  background-size:36px 36px,52px 52px,100% 100%;
-  box-shadow:inset 0 -18px 0 #b30f30,inset 0 0 0 1px #ffffff20!important;
-}
-.card.cover-magnit:before{
-  content:"M"!important;right:-4px!important;top:-30px!important;width:145px!important;height:145px!important;
-  border-radius:0!important;background:none!important;box-shadow:none!important;
-  color:#fff;font-size:122px;font-weight:900;line-height:145px;text-align:center;
-  opacity:.94;transform:rotate(-4deg);
-}
-.card.cover-pyaterochka{
-  background-color:#fff!important;
-  background-image:
-    radial-gradient(circle at 12% 20%,#e63232 0 7px,transparent 8px),
-    radial-gradient(circle at 34% 78%,#49a942 0 8px,transparent 9px),
-    radial-gradient(circle at 68% 22%,#e63232 0 6px,transparent 7px),
-    radial-gradient(circle at 88% 70%,#49a942 0 9px,transparent 10px),
-    radial-gradient(circle at 50% 48%,#f4b72b 0 5px,transparent 6px);
-  background-size:92px 72px,105px 86px,118px 78px,96px 92px,80px 80px;
-  box-shadow:inset 0 0 0 1px #d9d9d9!important;
-}
-.card.cover-pyaterochka:before{
-  content:"5"!important;right:-4px!important;top:-28px!important;width:150px!important;height:150px!important;
-  border-radius:50%!important;background:#e63232!important;box-shadow:none!important;
-  color:#fff;font-size:112px;font-weight:900;line-height:150px;text-align:center;
-}
-.card.cover-stolichki{
-  background-color:#f4f7f5!important;
-  background-image:
-    radial-gradient(circle at 15px 15px,#d7eee7 0 3px,transparent 3.5px),
-    radial-gradient(circle at 42px 34px,#c9e8de 0 5px,transparent 5.5px),
-    linear-gradient(135deg,#0a927b 0 24%,transparent 24% 100%);
-  background-size:54px 54px,76px 76px,100% 100%;
-  color:#0b5d50!important;
-}
-.card.cover-stolichki:before{
-  content:"+"!important;right:-12px!important;top:-34px!important;width:135px!important;height:135px!important;
-  border-radius:50%!important;background:#0a927b!important;box-shadow:none!important;
-  color:#fff;font-size:108px;font-weight:800;line-height:130px;text-align:center;
-}
-.card.cover-antey{
-  background-color:#1767d8!important;
-  background-image:
-    radial-gradient(circle at 82% 18%,#ffffff18 0 34px,transparent 35px),
-    radial-gradient(circle at 16% 88%,#ffffff12 0 58px,transparent 59px),
-    repeating-linear-gradient(135deg,#ffffff08 0 2px,transparent 2px 24px);
-}
-.card.cover-antey:before{
-  content:"+"!important;right:-16px!important;top:-34px!important;width:138px!important;height:138px!important;
-  border-radius:50%!important;background:#ffffff16!important;box-shadow:none!important;
-  color:#fff;font-size:105px;font-weight:800;line-height:132px;text-align:center;
-}
-.card.cover-rodina_udacha{
-  background-color:#1b5264!important;
-  background-image:
-    radial-gradient(circle at 85% 12%,#f3c34a55 0 34px,transparent 35px),
-    linear-gradient(135deg,#153d72 0%,#155d67 52%,#167554 100%);
-}
-.card.cover-rodina_udacha:before{
-  content:"У"!important;right:-8px!important;top:-30px!important;width:138px!important;height:138px!important;
-  border-radius:50%!important;background:#f3c34a!important;box-shadow:none!important;
-  color:#15515f;font-size:82px;font-weight:900;line-height:138px;text-align:center;
-}
-.card.cover-bristol{
-  background-color:#e51f2a!important;
-  background-image:
-    repeating-linear-gradient(0deg,#ffffff0a 0 2px,transparent 2px 12px),
-    linear-gradient(135deg,#c81422 0%,#ef2530 55%,#b80f1e 100%);
-}
-.card.cover-bristol:before{
-  content:"B"!important;right:-10px!important;top:-28px!important;width:145px!important;height:145px!important;
-  border-radius:50%!important;background:#ffffff14!important;box-shadow:none!important;
-  color:#fff;font-size:100px;font-weight:900;line-height:140px;text-align:center;
-}
-.card.cover-k_b{
-  background-color:#fff!important;
-  background-image:
-    repeating-linear-gradient(-35deg,transparent 0 18px,#c7192212 18px 20px),
-    linear-gradient(135deg,#fff 0%,#fff 62%,#f2d9da 100%)!important;
-  box-shadow:inset 0 0 0 2px #c71922!important;
-}
-.card.cover-k_b:before{
-  content:"КБ"!important;right:-6px!important;top:-20px!important;width:145px!important;height:120px!important;
-  border-radius:0!important;background:#c71922!important;box-shadow:none!important;
-  color:#fff;font-size:48px;font-weight:900;line-height:120px;text-align:center;
-}
-/* Picker tiles use the same sharp artwork instead of raster photos */
-.coverOption.cover-magnit{
-  background-color:#d71939!important;
-  background-image:radial-gradient(circle at 8px 8px,#7d1026 0 2px,transparent 2.5px),radial-gradient(circle at 28px 28px,#8f1730 0 3px,transparent 3.5px)!important;
-  background-size:36px 36px,52px 52px!important;
-}
-.coverOption.cover-pyaterochka{
-  background-color:#fff!important;color:#c71922!important;text-shadow:none!important;
-  background-image:radial-gradient(circle at 15% 25%,#e63232 0 6px,transparent 7px),radial-gradient(circle at 70% 70%,#49a942 0 8px,transparent 9px)!important;
-}
-.coverOption.cover-stolichki{background-color:#0a927b!important;background-image:radial-gradient(circle at 18px 18px,#ffffff20 0 4px,transparent 5px)!important;background-size:42px 42px!important}
-.coverOption.cover-antey{background-color:#1767d8!important;background-image:repeating-linear-gradient(135deg,#ffffff10 0 2px,transparent 2px 18px)!important}
-.coverOption.cover-rodina_udacha{background-image:linear-gradient(135deg,#153d72,#167554)!important}
-.coverOption.cover-bristol{background-color:#e51f2a!important;background-image:repeating-linear-gradient(0deg,#ffffff0a 0 2px,transparent 2px 10px)!important}
-.coverOption.cover-k_b{background-color:#fff!important;color:#b30f18!important;text-shadow:none!important;background-image:repeating-linear-gradient(-35deg,transparent 0 16px,#c7192212 16px 18px)!important}
-
-
-/* CARD111 cover readability v44 — brand artwork stays behind, label stays clear */
-.card strong{
-  left:18px!important;right:auto!important;top:auto!important;bottom:12px!important;
-  transform:none!important;width:auto!important;max-width:calc(100% - 36px)!important;
-  padding:7px 13px!important;border-radius:12px!important;
-  background:#17181cdd!important;color:#fff!important;
-  font-size:19px!important;line-height:1.1!important;
-  text-align:left!important;text-shadow:none!important;
-  box-sizing:border-box;
-}
-.card.cover-vkusvill strong,.card.cover-chizhik strong,.card.cover-dns strong,.card.cover-k_b strong{
-  background:#17181cdd!important;color:#fff!important;text-shadow:none!important;
-}
-.card.cover-magnit:before{
-  content:""!important;right:-36px!important;top:-52px!important;width:150px!important;height:150px!important;
-  border-radius:50%!important;background:#ffffff14!important;box-shadow:-44px 58px 0 8px #ffffff0b!important;
-  transform:none!important;
-}
-.card.cover-pyaterochka:before{
-  content:""!important;right:-38px!important;top:-46px!important;width:150px!important;height:150px!important;
-  border-radius:50%!important;background:#e6323220!important;box-shadow:-72px 72px 0 2px #49a94218!important;
-}
-.card.cover-stolichki:before{
-  content:""!important;right:-28px!important;top:-48px!important;width:160px!important;height:160px!important;
-  border-radius:50%!important;background:#ffffff14!important;box-shadow:-62px 64px 0 8px #ffffff09!important;
-}
-.card.cover-antey:before{
-  content:""!important;right:-34px!important;top:-52px!important;width:165px!important;height:165px!important;
-  border-radius:50%!important;background:#ffffff13!important;box-shadow:-70px 72px 0 8px #ffffff08!important;
-}
-.card.cover-rodina_udacha:before{
-  content:""!important;right:-42px!important;top:-58px!important;width:170px!important;height:170px!important;
-  border-radius:50%!important;background:#f3c34a20!important;box-shadow:-70px 72px 0 8px #ffffff08!important;
-}
-.card.cover-bristol:before{
-  content:""!important;right:-42px!important;top:-54px!important;width:170px!important;height:170px!important;
-  border-radius:50%!important;background:#ffffff12!important;box-shadow:-70px 72px 0 8px #ffffff08!important;
-}
-.card.cover-k_b:before{
-  content:""!important;right:-44px!important;top:-54px!important;width:170px!important;height:170px!important;
-  border-radius:50%!important;background:#c7192210!important;box-shadow:-70px 72px 0 8px #c7192209!important;
-}
-
-
 /* CARD111 card style editor v46 */
 /* CARD111 editor preview and split v47 */
 .editorPreviewWrap{display:flex;justify-content:center;margin:0 0 12px}
@@ -260,7 +107,7 @@ h1{margin:0;font-size:28px}.sub{color:#737780;font-size:14px;margin-top:4px}.btn
 </head>
 <body>
 <div class="app">
-<header><div><h1>Мой кошелёк</h1><div class="sub" id="count">0 карт</div></div><button class="icon" onclick="addMenu()">＋</button></header>
+<header><div><h1>Мои карты лояльности</h1><div class="sub" id="count">0 карт</div></div><button class="btn addBtn" onclick="addMenu()">Добавить карту</button></header>
 <div class="search"><input id="search" placeholder="Поиск карты" oninput="render()"></div>
 <main id="cards" class="grid"></main>
 </div>
@@ -301,7 +148,7 @@ const CARD_FONTS={SYSTEM:'system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",
 const CARD_FONT_LABELS={SYSTEM:"Системный",ARIAL:"Arial",TREBUCHET:"Trebuchet",GEORGIA:"Georgia",COURIER:"Courier"};
 function cardStyle(c){
   const s=(c&&c.style&&typeof c.style==="object")?c.style:{};
-  return {palette:CARD_PALETTES[s.palette]?s.palette:"AUTO",textColor:CARD_TEXT_COLORS[s.textColor]?s.textColor:"WHITE",position:CARD_TEXT_POSITIONS[s.position]?s.position:"BOTTOM",size:Math.max(14,Math.min(28,Number(s.size)||19)),font:CARD_FONTS[s.font]?s.font:"SYSTEM"};
+  return {palette:CARD_PALETTES[s.palette]?s.palette:"AUTO",textColor:CARD_TEXT_COLORS[s.textColor]?s.textColor:"WHITE",position:CARD_TEXT_POSITIONS[s.position]?s.position:"CENTER",size:Math.max(14,Math.min(28,Number(s.size)||19)),font:CARD_FONTS[s.font]?s.font:"SYSTEM"};
 }
 function cardStyleClass(c){const s=cardStyle(c);return "palette-"+s.palette.toLowerCase()+" title-"+s.position.toLowerCase();}
 function cardStyleInline(c){const s=cardStyle(c);return "--title-color:"+CARD_TEXT_COLORS[s.textColor]+";--title-size:"+s.size+"px;--title-font:"+CARD_FONTS[s.font]+";"}
@@ -441,7 +288,7 @@ function render(){
       out.innerHTML='<div class="empty"><b>Не удалось прочитать сохранённые карты</b><span>Данные не перезаписываются. Ошибка: '+esc(storageError)+'</span><button class="btn primary" onclick="exportStorageRecovery()">Выгрузить данные для восстановления</button></div>';
       return;
     }
-    out.innerHTML='<div class="empty"><b>'+(q?"Ничего не найдено":"Кошелёк пока пуст")+'</b><span>'+(q?"Попробуйте другой запрос":"Добавьте первую карту кнопкой ＋")+'</span></div>';
+    out.innerHTML='<div class="empty"><b>'+(q?"Ничего не найдено":"Кошелёк пока пуст")+'</b><span>'+(q?"Попробуйте другой запрос":"Добавьте первую карту кнопкой «Добавить карту»")+'</span></div>';
     return;
   }
   out.innerHTML=list.map(function(c){
@@ -498,7 +345,7 @@ async function addCard(){
   const code=document.getElementById("code").value.trim();
   const format=document.getElementById("format").value;
   const cover=(document.getElementById("cover")&&document.getElementById("cover").value)||"AUTO";
-  const style={palette:(document.getElementById("cardPalette")&&document.getElementById("cardPalette").value)||"AUTO",textColor:(document.getElementById("titleColor")&&document.getElementById("titleColor").value)||"WHITE",position:(document.getElementById("titlePosition")&&document.getElementById("titlePosition").value)||"BOTTOM",size:Math.max(14,Math.min(28,Number(document.getElementById("titleSize")&&document.getElementById("titleSize").value)||19)),font:(document.getElementById("titleFont")&&document.getElementById("titleFont").value)||"SYSTEM"};
+  const style={palette:(document.getElementById("cardPalette")&&document.getElementById("cardPalette").value)||"AUTO",textColor:(document.getElementById("titleColor")&&document.getElementById("titleColor").value)||"WHITE",position:(document.getElementById("titlePosition")&&document.getElementById("titlePosition").value)||"CENTER",size:Math.max(14,Math.min(28,Number(document.getElementById("titleSize")&&document.getElementById("titleSize").value)||19)),font:(document.getElementById("titleFont")&&document.getElementById("titleFont").value)||"SYSTEM"};
   const file=document.getElementById("cardImage")&&document.getElementById("cardImage").files[0];
   if(!code){alert("Введите код карты");return;}
   let image="";
