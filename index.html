@@ -436,7 +436,7 @@ function manual(data){
 }
 function formatLabel(v){return ({CODE_128:"Штрихкод — CODE 128",EAN_13:"Штрихкод — EAN-13",EAN_8:"Штрихкод — EAN-8",QR_CODE:"QR-код"})[v]||"Штрихкод — CODE 128";}
 function toggleFormatMenu(){const m=document.getElementById("formatMenu");if(m)m.classList.toggle("open");}
-function chooseFormat(v,label){const f=document.getElementById("format");const btn=document.querySelector(".formatButton");const m=document.getElementById("formatMenu");if(f)f.value=v;if(btn)btn.textContent=label;if(m)m.classList.remove("open");}
+function chooseFormat(v,label){const f=document.getElementById("format");const btn=document.querySelector(".formatButton");const m=document.getElementById("formatMenu");if(f)f.value=v;if(btn)btn.textContent=label;if(m)m.classList.remove("open");if(typeof refreshEditorCodePreview==="function")refreshEditorCodePreview(window.__editorPreviewCard||{});}
 async function addCard(){
   const name=document.getElementById("name").value.trim()||"Моя карта";
   const code=document.getElementById("code").value.trim();
