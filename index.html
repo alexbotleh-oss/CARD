@@ -392,7 +392,8 @@ function manualEdit(id){
     '<button type="button" class="formatOption" onclick="chooseFormat(\'EAN_8\',\'Штрихкод — EAN-8\')">Штрихкод — EAN-8</button>'+
     '<button type="button" class="formatOption" onclick="chooseFormat(\'QR_CODE\',\'QR-код\')">QR-код</button></div></div>'+
     '<label class="hint" style="display:block;margin-top:12px">Заменить фото карты<input id="cardImage" type="file" accept="image/*" style="width:100%;margin-top:6px"></label>'+
-    '<button class="btn primary" onclick="updateCard('+JSON.stringify(String(id))+')">Сохранить</button>');
+    '<button class="btn primary" onclick="updateCard('+JSON.stringify(String(id))+')">Сохранить</button>'+
+    '<button class="btn secondary" onclick="closeModal()">Отмена</button>');
 }
 async function updateCard(id){
   const c=cards.find(function(x){return String(x.id)===String(id);});
