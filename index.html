@@ -733,9 +733,9 @@ function refreshEditorPreview(c){
   const previewTitle=box.querySelector("strong");
   if(previewTitle){
     const ps=cardStyle(p);
-    previewTitle.style.fontFamily=CARD_FONTS[ps.font];
-    previewTitle.style.fontSize=ps.size+"px";
-    previewTitle.style.color=CARD_TEXT_COLORS[ps.textColor];
+    previewTitle.style.setProperty("font-family",CARD_FONTS[ps.font],"important");
+    previewTitle.style.setProperty("font-size",ps.size+"px","important");
+    previewTitle.style.setProperty("color",CARD_TEXT_COLORS[ps.textColor],"important");
   }
 }
 function setEditorTab(tab){
