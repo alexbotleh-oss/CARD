@@ -398,17 +398,24 @@ function manualEdit(id){
 async function updateCard(id){
   const c=cards.find(function(x){return String(x.id)===String(id);});
   if(!c)return;
-  c.name=document.getElementById("name").value.trim()||"Моя карта";
-  c.code=document.getElementById("code").value.trim();
-  c.format=document.getElementById("format").value;
+  const newName=document.getElementById("name").value.trim()||"Моя карта";
+  const newCode=document.getElementById("code").value.trim();
+  const newFormat=document.getElementById("format").value;
+  if(!newCode){alert("Введите код карты");return;}
+  if(!confirm("Сохранить изменения карты «"+newName+"»?"))return;
+  c.name=newName;
+  c.code=newCode;
+  c.format=newFormat;
   const file=document.getElementById("cardImage")&&document.getElementById("cardImage").files[0];
   if(file)c.image=await readImage(file);
   save();
   closeModal();
 }
 function delCard(id){
-  if(confirm("Удалить эту карту?")){
-    cards=cards.filter(function(c){return String(c.id)!==String(id);});
+  const c=cards.find(function(x){return String(x.id)===String(id);});
+  if(!c)return;
+  if(!confirm("Удалить карту «"+String(c.name||"Моя карта")+"»?\n\nЭто действие нельзя отменить."))return;
+  cards=cards.filter(function(c){return String(c.id)!==String(id);});
     save();
     closeModal();
   }
@@ -443,7 +450,7 @@ function readImport(e){
   e.target.value="";
 }
 if("serviceWorker" in navigator){
-  window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js?v=29").catch(function(){});});
+  window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js?v=30").catch(function(){});});
 }
 render();
 </script>
