@@ -58,9 +58,39 @@ h1{margin:0;font-size:28px}.sub{color:#737780;font-size:14px;margin-top:4px}.btn
 @media(max-width:720px){.fab{bottom:88px}}
 @media(max-width:420px){.grid{gap:11px;padding:0 13px}.search{padding-left:13px;padding-right:13px}.card{min-height:112px;padding:12px}.card strong{font-size:20px;width:90%}}
 
+.editorPreview{width:240px;min-height:140px;height:140px!important;flex:none;border-radius:18px}
+.editorPreview strong{font-size:18px!important}
+.editorTabs{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:0 0 12px;padding:4px;background:#f0f1f4;border-radius:14px}
+.editorTab{border:0;border-radius:10px;background:transparent;padding:10px 8px;font:inherit;font-weight:700;color:#737780}
+.editorTab.active{background:#fff;color:#17181c;box-shadow:0 1px 4px #0001}
+.editorPanel{display:none}.editorPanel.active{display:block}
+.editorPreviewHint{text-align:center;margin:-3px 0 12px}
+.editorAppearance .coverPicker{margin-top:0}
+.editorAppearance .coverGrid{grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}
+.editorAppearance .coverOption{min-height:70px;padding:8px 5px;text-align:center;font-size:11px;border-radius:12px}
+.editorAppearance .coverHint{margin-top:7px}
+.coverCategoryGrid{display:flex;gap:6px;overflow-x:auto;padding:2px 1px 5px;margin:7px 0 8px;scrollbar-width:none}
+.coverCategoryGrid::-webkit-scrollbar{display:none}
+.coverCategory{flex:0 0 auto;border:0;border-radius:10px;background:#f0f1f4;padding:8px 11px;font:inherit;font-size:12px}
+.coverCategory.active{background:#1677ff;color:#fff}
+@media(max-width:420px){.editorPreview{width:220px;min-height:128px;height:128px!important}.editorAppearance .coverGrid{grid-template-columns:repeat(4,minmax(0,1fr))}.editorAppearance .coverOption{min-height:64px;font-size:10px}}
+
+.card.title-hide strong{display:none!important}.card.title-top strong{top:12px!important;bottom:auto!important}
+.card.title-center strong{top:50%!important;bottom:auto!important;transform:translateY(-50%)!important}
+.card.title-bottom strong{top:auto!important;bottom:12px!important}
+.card strong{color:var(--title-color,#fff)!important;font-size:var(--title-size,19px)!important;font-family:var(--title-font,system-ui,-apple-system,"Segoe UI",sans-serif)!important}
+.card.palette-red{background:linear-gradient(135deg,#ef3340,#b30f30)!important}.card.palette-blue{background:linear-gradient(135deg,#1767d8,#163c91)!important}.card.palette-green{background:linear-gradient(135deg,#0aa66d,#087557)!important}.card.palette-purple{background:linear-gradient(135deg,#7b3fe4,#45218b)!important}.card.palette-amber{background:linear-gradient(135deg,#f5bd2e,#c47708)!important}.card.palette-graphite{background:linear-gradient(135deg,#4a5058,#17181c)!important}.card.palette-light{background:linear-gradient(135deg,#fff,#e7e9ed)!important}
+.card.palette-red:before,.card.palette-blue:before,.card.palette-green:before,.card.palette-purple:before,.card.palette-amber:before,.card.palette-graphite:before,.card.palette-light:before{opacity:.28}.card.palette-light strong{background:#ffffffd9!important;text-shadow:none!important}
+.cardStylePicker{margin-top:14px;padding:14px;border:1px solid #e4e6eb;border-radius:18px;background:#fafbfc}.styleBlockTitle{margin-top:14px}.styleGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:7px}.styleOption{min-height:42px;border:2px solid #e2e3e8;border-radius:12px;background:#fff;padding:8px 10px;font:inherit;font-weight:700;color:#30333a}.styleOption.selected{border-color:#1677ff;box-shadow:0 0 0 1px #1677ff inset}
+.palette-choice-red{background:linear-gradient(135deg,#ef3340,#b30f30);color:#fff}.palette-choice-blue{background:linear-gradient(135deg,#1767d8,#163c91);color:#fff}.palette-choice-green{background:linear-gradient(135deg,#0aa66d,#087557);color:#fff}.palette-choice-purple{background:linear-gradient(135deg,#7b3fe4,#45218b);color:#fff}.palette-choice-amber{background:linear-gradient(135deg,#f5bd2e,#c47708);color:#17181c}.palette-choice-graphite{background:linear-gradient(135deg,#4a5058,#17181c);color:#fff}.palette-choice-light{background:linear-gradient(135deg,#fff,#e7e9ed);color:#17181c}
+.textColorGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin-top:7px}.styleColorChoice{min-height:42px;border:2px solid #e2e3e8;border-radius:12px;background:#fff;padding:5px 3px;font:11px inherit;font-weight:700;color:#30333a}.styleColorChoice span{display:block;width:20px;height:20px;border-radius:50%;margin:0 auto 3px;border:1px solid #c9cbd0}.styleColorChoice b{font-weight:650}.styleColorChoice.selected{border-color:#1677ff;box-shadow:0 0 0 1px #1677ff inset}.style-color-white span{background:#fff}.style-color-black span{background:#17181c}.style-color-yellow span{background:#ffd43b}.style-color-red span{background:#e03131}.style-color-green span{background:#159447}.style-color-blue span{background:#1767d8}
+.styleRange{width:100%;margin-top:7px;accent-color:#1677ff}.fontGrid .styleOption{font-size:15px}
+
+ 
+
 /* CARD111 approved card artwork v48 — crisp CSS covers, no low-res raster backgrounds */
 .card{min-height:132px!important;border-radius:20px!important;padding:12px!important;box-shadow:0 8px 22px #00000018!important}
-.card strong{left:50%!important;top:auto!important;bottom:12px!important;transform:translateX(-50%)!important;width:auto!important;max-width:calc(100% - 24px)!important;padding:8px 16px!important;border-radius:16px!important;background:#17181cdd!important;color:#fff!important;font-size:20px!important;line-height:1.08!important;white-space:normal!important;overflow-wrap:anywhere!important;text-align:center!important;text-shadow:none!important;box-sizing:border-box!important}
+.card strong{left:50%!important;top:auto!important;bottom:12px!important;transform:translateX(-50%)!important;width:auto!important;max-width:calc(100% - 24px)!important;padding:8px 16px!important;border-radius:16px!important;background:#17181cdd!important;color:#fff!important;font-size:20px!important;line-height:1.08!important;white-space:normal!important;overflow-wrap:normal!important;word-break:normal!important;text-align:center!important;text-shadow:none!important;box-sizing:border-box!important}
 .cardLogo{display:none!important}
 .card.cover-magnit{background:linear-gradient(135deg,#e51b3e 0%,#d71939 58%,#b80f31 100%)!important}
 .card.cover-magnit:before{width:190px;height:190px;right:-62px;top:-72px;border-radius:50%;background:#ffffff14;box-shadow:-92px 92px 0 -22px #ffffff12,38px 132px 0 -34px #ffffff0f}
