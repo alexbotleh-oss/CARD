@@ -325,10 +325,17 @@ function showCropper(file,reader,finish){
   const looksLikeQr=storedFormat==="QR_CODE" || /[A-Z]/i.test(codeValue) || (codeValue.length>=15 && /^\d+$/.test(codeValue));
   if(looksLikeQr){
     document.getElementById("barcode").remove();
-    const q=document.createElement("canvas");
+    const box=document.querySelector(".codebox");
+    const q=document.createElement("div");
     q.id="qr";
-    document.querySelector(".codebox").prepend(q);
-    try{QRCode.toCanvas(q,String(c.code),{width:230,margin:2},function(err){if(err){console.error("QR render:",err);q.remove();}});}catch(e){console.error("QR render:",e);q.remove();}
+    q.style.cssText="display:flex;justify-content:center;align-items:center;min-height:230px";
+    box.prepend(q);
+    try{
+      QRCode.toString(String(c.code),{type:"svg",width:230,margin:2,errorCorrectionLevel:"M"},function(err,svg){
+        if(err){console.error("QR render:",err);q.remove();return;}
+        q.innerHTML=svg;
+      });
+    }catch(e){console.error("QR render:",e);q.remove();}
   }else{
     try{
       JsBarcode("#barcode",c.code,{format:c.format==="EAN_13"?"ean13":c.format==="EAN_8"?"ean8":"CODE128",displayValue:false,height:90,margin:4});
@@ -397,7 +404,7 @@ function readImport(e){
   e.target.value="";
 }
 if("serviceWorker" in navigator){
-  window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js").catch(function(){});});
+  window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js?v=26").catch(function(){});});
 }
 render();
 </script>
