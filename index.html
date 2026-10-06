@@ -394,7 +394,7 @@ function manualEdit(id){
     '<label class="hint" style="display:block;margin-top:12px">Заменить фото карты<input id="cardImage" type="file" accept="image/*" style="width:100%;margin-top:6px"></label>'+
     '<button class="btn primary" onclick="updateCard('+JSON.stringify(String(id))+')">Сохранить</button>');
 }
-async async function updateCard(id){
+async function updateCard(id){
   const c=cards.find(function(x){return String(x.id)===String(id);});
   if(!c)return;
   c.name=document.getElementById("name").value.trim()||"Моя карта";
