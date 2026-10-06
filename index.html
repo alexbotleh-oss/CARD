@@ -416,9 +416,8 @@ function delCard(id){
   if(!c)return;
   if(!confirm("Удалить карту «"+String(c.name||"Моя карта")+"»?\n\nЭто действие нельзя отменить."))return;
   cards=cards.filter(function(c){return String(c.id)!==String(id);});
-    save();
-    closeModal();
-  }
+  save();
+  closeModal();
 }
 function exportData(){
   const blob=new Blob([JSON.stringify({version:1,cards:cards},null,2)],{type:"application/json"});
