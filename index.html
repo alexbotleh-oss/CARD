@@ -320,7 +320,10 @@ function showCropper(file,reader,finish){
     '<div class="codebox"><svg id="barcode"></svg><div class="codeText">'+esc(c.code)+'</div></div>'+
     '<button class="btn primary" onclick="manualEdit('+JSON.stringify(String(c.id))+')">Изменить</button>'+
     '<button class="btn danger" onclick="delCard('+JSON.stringify(String(c.id))+')">Удалить карту</button></div>');
-  if(String(c.format||"").toUpperCase()==="QR_CODE"){
+  const codeValue=String(c.code||"");
+  const storedFormat=String(c.format||"").toUpperCase();
+  const looksLikeQr=storedFormat==="QR_CODE" || (/[A-Z]/i.test(codeValue) && !/^\\d{8,14}$/.test(codeValue));
+  if(looksLikeQr){
     document.getElementById("barcode").remove();
     const q=document.createElement("canvas");
     q.id="qr";
