@@ -761,7 +761,7 @@ function manualEdit(id){
   openModal('<button class="close" id="editClose">×</button><h2>Изменить скидочную карту</h2>'+
     '<div class="editorPreviewWrap"><div id="editorPreview" class="card editorPreview"></div></div>'+
     '<div class="hint editorPreviewHint">Предпросмотр меняется сразу при редактировании</div>'+
-    '<div class="editorTabs"><button type="button" class="editorTab active" data-tab="data">Данные</button><button type="button" class="editorTab" data-tab="appearance">Оформление</button><button type="button" class="editorTab" data-tab="additional">Дополнительно</button></div>'+
+    '<div class="editorTabs"><button type="button" class="editorTab active" data-tab="data">Данные</button><button type="button" class="editorTab" data-tab="appearance">Оформление</button></div>'+
     '<div class="editorPanel active" data-panel="data">'+
       '<div class="hint" style="margin-bottom:6px">Название карты</div><input id="name" name="discount_name" autocomplete="off" value="'+esc(c.name)+'">'+
       '<div class="hint" style="margin:12px 0 6px">Номер / код карты</div><input id="code" name="discount_code" type="text" inputmode="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" value="'+esc(c.code)+'">'+
@@ -776,10 +776,6 @@ function manualEdit(id){
     '<div class="editorPanel editorAppearance" data-panel="appearance">'+
       '<div class="coverPicker"><div class="hint">Выбор рубашки</div><input id="cover" type="hidden" value="'+esc(c.cover||"AUTO")+'">'+editorCoverCatalog(c.cover||"AUTO")+'<div class="coverHint">Авто — подбор по названию магазина.</div></div>'+
       styleEditor(c)+
-    '</div>'+
-    '<div class="editorPanel editorAdditional" data-panel="additional">'+
-      '<div class="additionalBlock"><b>Резервная копия</b><div class="hint">Сохраните карты в файл, чтобы перенести или восстановить их позже.</div><button type="button" class="btn secondary" onclick="exportData()">Сохранить резервную копию</button><button type="button" class="btn secondary" onclick="importData()">Восстановить из файла</button></div>'+
-      '<div class="additionalBlock"><b>Данные карты</b><div class="hint">Фото и оформление карты сохраняются вместе с локальными данными.</div></div>'+
     '</div>'+
     '<button type="button" class="btn primary" id="editSave">Сохранить</button>'+
     '<button type="button" class="btn secondary" id="editCancel">Отмена</button>');
