@@ -137,7 +137,7 @@ function scanner(){
 
   function mapFormat(raw){
     const s=String(raw||"").toUpperCase();
-    if(s.indexOf("QR")>=0)return "QR_CODE";
+    if(s.indexOf("QR")>=0||s.indexOf("DATA_MATRIX")>=0)return "QR_CODE";
     if(s.indexOf("EAN_13")>=0)return "EAN_13";
     if(s.indexOf("EAN_8")>=0)return "EAN_8";
     if(s.indexOf("CODE_128")>=0)return "CODE_128";
@@ -320,7 +320,7 @@ function showCropper(file,reader,finish){
     '<div class="codebox"><svg id="barcode"></svg><div class="codeText">'+esc(c.code)+'</div></div>'+
     '<button class="btn primary" onclick="manualEdit('+JSON.stringify(String(c.id))+')">Изменить</button>'+
     '<button class="btn danger" onclick="delCard('+JSON.stringify(String(c.id))+')">Удалить карту</button></div>');
-  if(c.format==="QR_CODE"){
+  if(String(c.format||"").toUpperCase()==="QR_CODE"){
     document.getElementById("barcode").remove();
     const q=document.createElement("canvas");
     q.id="qr";
