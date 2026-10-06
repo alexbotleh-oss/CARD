@@ -98,14 +98,21 @@ function addMenu(){
 }
 function manual(data){
   data=data||{};
+  const fmt=data.format||"CODE_128";
   openModal('<button class="close" onclick="addMenu()">×</button><h2>Новая скидочная карта</h2>'+
     '<input id="name" name="discount_name" autocomplete="off" placeholder="Название карты" value="'+esc(data.name)+'">'+
     '<div class="row"><input id="code" name="discount_code" type="text" inputmode="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Код штрихкода или QR-кода" value="'+esc(data.code)+'">'+
-    '<select id="format"><option value="CODE_128">Штрихкод — CODE 128</option><option value="EAN_13">Штрихкод — EAN-13</option><option value="EAN_8">Штрихкод — EAN-8</option><option value="QR_CODE">QR-код</option></select></div>'+
+    '<div class="formatPicker"><input id="format" type="hidden" value="'+esc(fmt)+'"><button type="button" class="formatButton" onclick="toggleFormatMenu()">'+esc(formatLabel(fmt))+'</button><div id="formatMenu" class="formatMenu">'+
+    '<button type="button" class="formatOption" onclick="chooseFormat(\'CODE_128\',\'Штрихкод — CODE 128\')">Штрихкод — CODE 128</button>'+
+    '<button type="button" class="formatOption" onclick="chooseFormat(\'EAN_13\',\'Штрихкод — EAN-13\')">Штрихкод — EAN-13</button>'+
+    '<button type="button" class="formatOption" onclick="chooseFormat(\'EAN_8\',\'Штрихкод — EAN-8\')">Штрихкод — EAN-8</button>'+
+    '<button type="button" class="formatOption" onclick="chooseFormat(\'QR_CODE\',\'QR-код\')">QR-код</button></div></div></div>'+
     '<label class="hint" style="display:block;margin-top:12px">Фото карты<input id="cardImage" type="file" accept="image/*" style="width:100%;margin-top:6px"></label>'+
     '<button class="btn primary" onclick="addCard()">Сохранить карту</button>');
-  if(data.format)document.getElementById("format").value=data.format;
 }
+function formatLabel(v){return ({CODE_128:"Штрихкод — CODE 128",EAN_13:"Штрихкод — EAN-13",EAN_8:"Штрихкод — EAN-8",QR_CODE:"QR-код"})[v]||"Штрихкод — CODE 128";}
+function toggleFormatMenu(){const m=document.getElementById("formatMenu");if(m)m.classList.toggle("open");}
+function chooseFormat(v,label){const f=document.getElementById("format");const btn=document.querySelector(".formatButton");const m=document.getElementById("formatMenu");if(f)f.value=v;if(btn)btn.textContent=label;if(m)m.classList.remove("open");}
 async function addCard(){
   const name=document.getElementById("name").value.trim()||"Моя карта";
   const code=document.getElementById("code").value.trim();
@@ -265,8 +272,12 @@ function showCropper(file,config){
       const cropped=new File([blob],"card-crop.jpg",{type:"image/jpeg"});
       const fs=new Html5Qrcode("reader",config);
       let result;
-      if(typeof fs.scanFileV2==="function")result=await fs.scanFileV2(cropped,true);
-      else result={decodedText:await fs.scanFile(cropped,true),result:{format:{formatName:"QR_CODE"}}};
+      if(typeof fs.scanFileV2==="function")result=await fs.scanFileV2(file,true);
+      else result={decodedText:await fs.scanFile(file,true),result:{format:{formatName:"QR_CODE"}}};
+      if(!result || !result.decodedText){
+        if(typeof fs.scanFileV2==="function")result=await fs.scanFileV2(cropped,true);
+        else result={decodedText:await fs.scanFile(cropped,true),result:{format:{formatName:"QR_CODE"}}};
+      }
       const text=result&&result.decodedText;
       const raw=result&&result.result&&result.result.format&&result.result.format.formatName||"QR_CODE";
       if(!text)throw Error("empty");
@@ -304,10 +315,13 @@ function manualEdit(id){
   openModal('<button class="close" onclick="openCard('+JSON.stringify(String(id))+')">×</button><h2>Изменить скидочную карту</h2>'+
     '<input id="name" name="discount_name" autocomplete="off" value="'+esc(c.name)+'">'+
     '<input id="code" name="discount_code" type="text" inputmode="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" value="'+esc(c.code)+'" style="margin-top:10px">'+
-    '<select id="format" style="margin-top:10px"><option value="CODE_128">Штрихкод — CODE 128</option><option value="EAN_13">Штрихкод — EAN-13</option><option value="EAN_8">Штрихкод — EAN-8</option><option value="QR_CODE">QR-код</option></select>'+
+    '<div class="formatPicker" style="margin-top:10px"><input id="format" type="hidden" value="'+esc(c.format||"CODE_128")+'"><button type="button" class="formatButton" onclick="toggleFormatMenu()">'+esc(formatLabel(c.format||"CODE_128"))+'</button><div id="formatMenu" class="formatMenu">'+
+    '<button type="button" class="formatOption" onclick="chooseFormat(\'CODE_128\',\'Штрихкод — CODE 128\')">Штрихкод — CODE 128</button>'+
+    '<button type="button" class="formatOption" onclick="chooseFormat(\'EAN_13\',\'Штрихкод — EAN-13\')">Штрихкод — EAN-13</button>'+
+    '<button type="button" class="formatOption" onclick="chooseFormat(\'EAN_8\',\'Штрихкод — EAN-8\')">Штрихкод — EAN-8</button>'+
+    '<button type="button" class="formatOption" onclick="chooseFormat(\'QR_CODE\',\'QR-код\')">QR-код</button></div></div>'+
     '<label class="hint" style="display:block;margin-top:12px">Заменить фото карты<input id="cardImage" type="file" accept="image/*" style="width:100%;margin-top:6px"></label>'+
     '<button class="btn primary" onclick="updateCard('+JSON.stringify(String(id))+')">Сохранить</button>');
-  document.getElementById("format").value=c.format;
 }
 async function updateCard(id){
   const c=cards.find(function(x){return String(x.id)===String(id);});
