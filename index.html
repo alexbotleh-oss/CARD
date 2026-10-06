@@ -131,18 +131,17 @@ function scanner(){
     '<div class="scanTools">'+
     '<button class="btn primary galleryPrimary" onclick="document.getElementById(\'scanFile\').click()">▣ Сканировать фото из галереи</button>'+
     '<input id="scanFile" type="file" accept="image/*" style="display:none">'+
-    '<p class="hint">Наведите камеру на QR/штрихкод — распознавание происходит автоматически. Для фото можно увеличить изображение и выбрать область кода.</p></div>');
-  let controls=null, handled=false, reader=null;
-  try{reader=new ZXingBrowser.BrowserMultiFormatReader();}catch(e){reader=null;}
+    '<p class="hint">Наведите камеру на QR/штрихкод — распознавание происходит автоматически.</p></div>');
+  let controls=null,handled=false,reader=null,detector=null,raf=0,video=null;
+  const formats=["qr_code","code_128","code_39","code_93","ean_13","ean_8","upc_a","upc_e","itf","data_matrix","pdf417"];
 
   function mapFormat(raw){
-    const s=String(raw||"");
-    if(s.indexOf("QR_CODE")>=0)return "QR_CODE";
+    const s=String(raw||"").toUpperCase();
+    if(s.indexOf("QR")>=0)return "QR_CODE";
     if(s.indexOf("EAN_13")>=0)return "EAN_13";
     if(s.indexOf("EAN_8")>=0)return "EAN_8";
     if(s.indexOf("CODE_128")>=0)return "CODE_128";
-    if(s.indexOf("CODE_39")>=0)return "CODE_128";
-    if(s.indexOf("CODE_93")>=0)return "CODE_128";
+    if(s.indexOf("CODE_39")>=0||s.indexOf("CODE_93")>=0)return "CODE_128";
     if(s.indexOf("UPC_A")>=0)return "EAN_13";
     if(s.indexOf("UPC_E")>=0)return "EAN_8";
     return "CODE_128";
@@ -150,59 +149,109 @@ function scanner(){
   function finish(text,raw){
     if(handled||!text)return;
     handled=true;
+    if(raf)cancelAnimationFrame(raf);
     try{if(controls)controls.stop();}catch(e){}
     try{if(reader&&reader.reset)reader.reset();}catch(e){}
+    try{if(video&&video.srcObject){video.srcObject.getTracks().forEach(function(t){t.stop();});video.srcObject=null;}}catch(e){}
     closeModal();
     setTimeout(function(){manual({code:String(text),format:mapFormat(raw)});},100);
   }
-  function start(){
-    if(!reader)throw Error("ZXing недоступен");
-    const video=document.createElement("video");
-    video.setAttribute("playsinline","");
-    video.setAttribute("autoplay","");
-    video.muted=true;
-    video.style.width="100%";video.style.height="100%";video.style.objectFit="cover";
-    document.getElementById("reader").appendChild(video);
-    return reader.decodeFromVideoDevice(undefined,video,function(result,error,c){
-      if(c)controls=c;
-      if(result){
-        const text=result.getText?result.getText():result.text;
-        const fmt=result.getBarcodeFormat?result.getBarcodeFormat():"QR_CODE";
-        finish(text,fmt);
+
+  async function nativeLoop(){
+    if(!detector||!video||handled)return;
+    try{
+      const found=await detector.detect(video);
+      if(found&&found.length){
+        const x=found[0];
+        finish(x.rawValue,x.format);
+        return;
       }
-    });
+    }catch(e){}
+    if(!handled)raf=requestAnimationFrame(nativeLoop);
   }
-  start().catch(function(err){
-    const r=document.getElementById("reader");
-    if(r)r.innerHTML='<p style="padding:30px;color:white;text-align:center">Камера недоступна. Можно выбрать фото из галереи.</p>';
+
+  try{
+    if("BarcodeDetector" in window){
+      const supported=await BarcodeDetector.getSupportedFormats().catch(function(){return [];});
+      const use=formats.filter(function(x){return supported.indexOf(x)>=0;});
+      if(use.length)detector=new BarcodeDetector({formats:use});
+    }
+  }catch(e){detector=null;}
+
+  try{reader=new ZXingBrowser.BrowserMultiFormatReader();}catch(e){reader=null;}
+
+  const readerBox=document.getElementById("reader");
+  video=document.createElement("video");
+  video.setAttribute("playsinline","");
+  video.setAttribute("autoplay","");
+  video.setAttribute("muted","");
+  video.muted=true;
+  video.style.width="100%";video.style.height="100%";video.style.objectFit="cover";
+  readerBox.appendChild(video);
+
+  navigator.mediaDevices.getUserMedia({
+    video:{
+      facingMode:{ideal:"environment"},
+      width:{ideal:1920},
+      height:{ideal:1080},
+      focusMode:"continuous"
+    },
+    audio:false
+  }).then(function(stream){
+    video.srcObject=stream;
+    return video.play();
+  }).then(function(){
+    if(detector)nativeLoop();
+    if(reader){
+      return reader.decodeFromVideoElement(video,function(result){
+        if(result){
+          const text=result.getText?result.getText():result.text;
+          const fmt=result.getBarcodeFormat?result.getBarcodeFormat():"QR_CODE";
+          finish(text,fmt);
+        }
+      }).then(function(c){controls=c;});
+    }
+  }).catch(function(){
+    readerBox.innerHTML='<p style="padding:30px;color:white;text-align:center">Камера недоступна. Можно выбрать фото из галереи.</p>';
   });
 
   document.getElementById("scanFile").onchange=async function(e){
     const file=e.target.files[0];
     if(!file||handled)return;
     try{
-      try{if(controls)controls.stop();}catch(err){}
+      if(raf)cancelAnimationFrame(raf);
+      try{if(controls)controls.stop();}catch(x){}
       await decodeGalleryFile(file,reader,finish);
     }catch(err){
-      alert("Код не найден. Увеличьте фото, переместите рамку на код и нажмите распознать ещё раз.");
+      alert("Код не найден. Увеличьте фото, переместите рамку на код и попробуйте снова.");
     }
     e.target.value="";
   };
 }
 
 async function decodeGalleryFile(file,reader,finish){
-  if(!reader)throw Error("ZXing недоступен");
   const url=URL.createObjectURL(file);
   try{
     const img=new Image();
     img.src=url;
     await new Promise(function(resolve,reject){img.onload=resolve;img.onerror=reject;});
-    try{
-      const result=await reader.decodeFromImageElement(img);
-      const text=result.getText?result.getText():result.text;
-      const fmt=result.getBarcodeFormat?result.getBarcodeFormat():"QR_CODE";
-      if(text){finish(text,fmt);return;}
-    }catch(e){}
+    if("BarcodeDetector" in window){
+      try{
+        const supported=await BarcodeDetector.getSupportedFormats();
+        const detector=new BarcodeDetector({formats:supported});
+        const found=await detector.detect(img);
+        if(found&&found.length){finish(found[0].rawValue,found[0].format);return;}
+      }catch(e){}
+    }
+    if(reader){
+      try{
+        const result=await reader.decodeFromImageElement(img);
+        if(result){
+          finish(result.getText?result.getText():result.text,result.getBarcodeFormat?result.getBarcodeFormat():"QR_CODE");
+          return;
+        }
+      }catch(e){}
+    }
     showCropper(file,reader,finish);
   }finally{
     setTimeout(function(){URL.revokeObjectURL(url);},1000);
@@ -213,90 +262,53 @@ function showCropper(file,reader,finish){
   const readerBox=document.getElementById("reader");
   if(!readerBox)return;
   const url=URL.createObjectURL(file);
-  readerBox.innerHTML='<div class="cropWrap" id="cropWrap">'+
-    '<img id="cropImage" class="cropImage" alt="">'+
-    '<div class="cropBox" id="cropBox" aria-label="Перемещаемое окно захвата"></div>'+
-    '</div>'+
+  readerBox.innerHTML='<div class="cropWrap" id="cropWrap"><img id="cropImage" class="cropImage" alt=""><div class="cropBox" id="cropBox"></div></div>'+
     '<div class="cropControls"><button type="button" id="zoomOut">−</button><button type="button" id="zoomReset">100%</button><button type="button" id="zoomIn">+</button></div>'+
     '<div class="cropZoomValue" id="zoomValue">Масштаб 100%</div>'+
     '<p class="cropHint">Увеличивайте фото двумя пальцами и двигайте его под рамкой. Рамку тоже можно перетащить.</p>'+
-    '<button class="btn primary" id="cropScan">Распознать выбранную область</button>'+
-    '<button class="btn secondary" id="cropBack">Назад к камере</button>';
+    '<button class="btn primary" id="cropScan">Распознать выбранную область</button><button class="btn secondary" id="cropBack">Назад к камере</button>';
   const img=document.getElementById("cropImage"),box=document.getElementById("cropBox");
   img.src=url;
-
   let drag=false,sx=0,sy=0,sl=0,st=0;
-  box.addEventListener("pointerdown",function(e){
-    e.preventDefault();drag=true;sx=e.clientX;sy=e.clientY;
-    const r=box.getBoundingClientRect();sl=r.left;st=r.top;
-    try{box.setPointerCapture(e.pointerId);}catch(x){}
-  });
-  box.addEventListener("pointermove",function(e){
-    if(!drag)return;e.preventDefault();
-    const w=document.getElementById("cropWrap").getBoundingClientRect();
-    let x=sl+(e.clientX-sx)-w.left,y=st+(e.clientY-sy)-w.top;
-    x=Math.max(0,Math.min(x,w.width-box.offsetWidth));y=Math.max(0,Math.min(y,w.height-box.offsetHeight));
-    box.style.left=x+"px";box.style.top=y+"px";
-  });
+  box.addEventListener("pointerdown",function(e){e.preventDefault();drag=true;sx=e.clientX;sy=e.clientY;const r=box.getBoundingClientRect();sl=r.left;st=r.top;try{box.setPointerCapture(e.pointerId);}catch(x){}});
+  box.addEventListener("pointermove",function(e){if(!drag)return;e.preventDefault();const w=document.getElementById("cropWrap").getBoundingClientRect();let x=sl+e.clientX-sx-w.left,y=st+e.clientY-sy-w.top;x=Math.max(0,Math.min(x,w.width-box.offsetWidth));y=Math.max(0,Math.min(y,w.height-box.offsetHeight));box.style.left=x+"px";box.style.top=y+"px";});
   ["pointerup","pointercancel"].forEach(function(ev){box.addEventListener(ev,function(){drag=false;});});
-
-  let scale=1,tx=0,ty=0,pinch=false,pStart=1,sStart=1,pTx=0,pTy=0;
-  function apply(){
-    img.style.transform="translate("+tx+"px,"+ty+"px) scale("+scale+")";
-    document.getElementById("zoomValue").textContent="Масштаб "+Math.round(scale*100)+"%";
-    document.getElementById("zoomReset").textContent=Math.round(scale*100)+"%";
-  }
-  function clamp(){
-    const w=document.getElementById("cropWrap");
-    if(!w)return;
-    tx=Math.max(-(w.clientWidth*(scale-1))/2,Math.min((w.clientWidth*(scale-1))/2,tx));
-    ty=Math.max(-(w.clientHeight*(scale-1))/2,Math.min((w.clientHeight*(scale-1))/2,ty));
-  }
+  let scale=1,tx=0,ty=0,pinch=false,pStart=1,sStart=1;
+  function apply(){img.style.transform="translate("+tx+"px,"+ty+"px) scale("+scale+")";document.getElementById("zoomValue").textContent="Масштаб "+Math.round(scale*100)+"%";document.getElementById("zoomReset").textContent=Math.round(scale*100)+"%";}
+  function clamp(){const w=document.getElementById("cropWrap");tx=Math.max(-(w.clientWidth*(scale-1))/2,Math.min((w.clientWidth*(scale-1))/2,tx));ty=Math.max(-(w.clientHeight*(scale-1))/2,Math.min((w.clientHeight*(scale-1))/2,ty));}
   function setScale(v){scale=Math.max(1,Math.min(5,v));clamp();apply();}
   document.getElementById("zoomIn").onclick=function(){setScale(scale+.25);};
   document.getElementById("zoomOut").onclick=function(){setScale(scale-.25);};
   document.getElementById("zoomReset").onclick=function(){scale=1;tx=0;ty=0;apply();};
-
-  img.addEventListener("touchstart",function(e){
-    if(e.touches.length===2){
-      e.preventDefault();pinch=true;
-      const dx=e.touches[0].clientX-e.touches[1].clientX,dy=e.touches[0].clientY-e.touches[1].clientY;
-      pStart=Math.hypot(dx,dy);sStart=scale;pTx=tx;pTy=ty;
-    }
-  },{passive:false});
-  img.addEventListener("touchmove",function(e){
-    if(!pinch||e.touches.length!==2)return;e.preventDefault();
-    const dx=e.touches[0].clientX-e.touches[1].clientX,dy=e.touches[0].clientY-e.touches[1].clientY;
-    scale=Math.max(1,Math.min(5,sStart*(Math.hypot(dx,dy)/pStart)));clamp();apply();
-  },{passive:false});
+  img.addEventListener("touchstart",function(e){if(e.touches.length===2){e.preventDefault();pinch=true;const dx=e.touches[0].clientX-e.touches[1].clientX,dy=e.touches[0].clientY-e.touches[1].clientY;pStart=Math.hypot(dx,dy);sStart=scale;}},{passive:false});
+  img.addEventListener("touchmove",function(e){if(!pinch||e.touches.length!==2)return;e.preventDefault();const dx=e.touches[0].clientX-e.touches[1].clientX,dy=e.touches[0].clientY-e.touches[1].clientY;scale=Math.max(1,Math.min(5,sStart*(Math.hypot(dx,dy)/pStart)));clamp();apply();},{passive:false});
   img.addEventListener("touchend",function(e){if(e.touches.length<2)pinch=false;});
-
   document.getElementById("cropBack").onclick=function(){URL.revokeObjectURL(url);scanner();};
   document.getElementById("cropScan").onclick=async function(){
-    const button=this;button.disabled=true;button.textContent="Распознавание…";
+    const btn=this;btn.disabled=true;btn.textContent="Распознавание…";
     try{
-      const wr=document.getElementById("cropWrap").getBoundingClientRect();
-      const br=box.getBoundingClientRect();
-      const ir=img.getBoundingClientRect();
-      const nw=img.naturalWidth,nh=img.naturalHeight;
-      const renderedW=ir.width,renderedH=ir.height;
-      const sx=Math.max(0,(br.left-ir.left)/renderedW*nw);
-      const sy=Math.max(0,(br.top-ir.top)/renderedH*nh);
-      const sw=Math.min(nw-sx,br.width/renderedW*nw);
-      const sh=Math.min(nh-sy,br.height/renderedH*nh);
-      const canvas=document.createElement("canvas");
-      canvas.width=Math.max(1,Math.round(sw));canvas.height=Math.max(1,Math.round(sh));
+      const br=box.getBoundingClientRect(),ir=img.getBoundingClientRect(),nw=img.naturalWidth,nh=img.naturalHeight;
+      const sx=Math.max(0,(br.left-ir.left)/ir.width*nw),sy=Math.max(0,(br.top-ir.top)/ir.height*nh);
+      const sw=Math.min(nw-sx,br.width/ir.width*nw),sh=Math.min(nh-sy,br.height/ir.height*nh);
+      const canvas=document.createElement("canvas");canvas.width=Math.max(1,Math.round(sw));canvas.height=Math.max(1,Math.round(sh));
       canvas.getContext("2d").drawImage(img,sx,sy,sw,sh,0,0,canvas.width,canvas.height);
-      const cropped=new Image();
-      cropped.src=canvas.toDataURL("image/png");
-      await new Promise(function(resolve,reject){cropped.onload=resolve;cropped.onerror=reject;});
-      const result=await reader.decodeFromImageElement(cropped);
-      const text=result.getText?result.getText():result.text;
-      const fmt=result.getBarcodeFormat?result.getBarcodeFormat():"QR_CODE";
-      if(!text)throw Error("empty");
-      finish(text,fmt);
-    }catch(err){
-      button.disabled=false;button.textContent="Распознать выбранную область";
+      const dataUrl=canvas.toDataURL("image/png");
+      if("BarcodeDetector" in window){
+        try{
+          const ci=new Image();ci.src=dataUrl;await new Promise(function(r,j){ci.onload=r;ci.onerror=j;});
+          const detector=new BarcodeDetector({formats:await BarcodeDetector.getSupportedFormats()});
+          const found=await detector.detect(ci);
+          if(found&&found.length){finish(found[0].rawValue,found[0].format);return;}
+        }catch(e){}
+      }
+      if(reader){
+        const ci=new Image();ci.src=dataUrl;await new Promise(function(r,j){ci.onload=r;ci.onerror=j;});
+        const result=await reader.decodeFromImageElement(ci);
+        if(result){finish(result.getText?result.getText():result.text,result.getBarcodeFormat?result.getBarcodeFormat():"QR_CODE");return;}
+      }
+      throw Error("not-found");
+    }catch(e){
+      btn.disabled=false;btn.textContent="Распознать выбранную область";
       alert("Код не найден в этой области. Увеличьте фото или передвиньте рамку точно на QR/штрихкод.");
     }
   };
