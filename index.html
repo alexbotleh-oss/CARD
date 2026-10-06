@@ -88,6 +88,46 @@ h1{margin:0;font-size:28px}.sub{color:#737780;font-size:14px;margin-top:4px}.btn
 
  
 
+/* CARD111 constructed UI v49 — wallet proportions, clean titles, branded picker */
+.grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;padding:0 14px}
+.card{min-height:0!important;aspect-ratio:1.48/1!important;height:auto!important;border-radius:20px!important;padding:12px!important}
+.card strong{left:50%!important;top:auto!important;bottom:14px!important;transform:translateX(-50%)!important;width:calc(100% - 20px)!important;max-width:calc(100% - 20px)!important;padding:0!important;margin:0!important;border-radius:0!important;background:transparent!important;color:var(--title-color,#fff)!important;font-size:clamp(17px,var(--title-size,19px),23px)!important;font-family:var(--title-font,system-ui,-apple-system,"Segoe UI",sans-serif)!important;font-weight:750!important;line-height:1.08!important;white-space:normal!important;overflow-wrap:normal!important;word-break:normal!important;text-align:center!important;text-shadow:0 1px 3px #000a!important;box-sizing:border-box!important}
+.card.title-top strong{top:14px!important;bottom:auto!important;transform:translateX(-50%)!important}
+.card.title-center strong{top:50%!important;bottom:auto!important;transform:translate(-50%,-50%)!important}
+.card.title-bottom strong{top:auto!important;bottom:14px!important;transform:translateX(-50%)!important}
+.card.title-hide strong{display:none!important}
+.card.palette-light strong,.card.cover-pyaterochka strong,.card.cover-vkusvill strong,.card.cover-chizhik strong,.card.cover-dns strong{text-shadow:0 1px 2px #fff8!important}
+.coverOption{position:relative;overflow:hidden;min-height:66px!important;padding:10px 7px!important;border-radius:14px!important;text-align:center!important;font-size:12px!important;line-height:1.08!important;display:flex!important;align-items:center!important;justify-content:center!important;isolation:isolate}
+.coverOption:before,.coverOption:after{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none}
+.coverOption.cover-auto{background:linear-gradient(135deg,#f2f3f5,#ffffff)!important;color:#3a3d44!important}
+.coverOption.cover-magnit{background:#d71939!important;color:#fff!important}
+.coverOption.cover-magnit:before{width:95px;height:95px;left:-25px;top:-30px;border-radius:50%;background:#ffffff14;box-shadow:55px 38px 0 8px #ffffff10}
+.coverOption.cover-pyaterochka{background:#fff!important;color:#333!important;box-shadow:inset 0 0 0 2px #e1e3e7}
+.coverOption.cover-pyaterochka:before{width:18px;height:18px;right:10px;top:9px;border-radius:50%;background:#e32d35;box-shadow:-35px 22px 0 1px #f3b62b,12px 35px 0 2px #159447}
+.coverOption.cover-stolichki{background:#f5f8f7!important;color:#fff!important}
+.coverOption.cover-stolichki:before{width:82px;height:82px;left:-28px;top:-28px;border-radius:0 0 100% 0;background:#0aa58d}
+.coverOption.cover-perekrestok{background:#0a8f52!important;color:#fff!important}
+.coverOption.cover-lenta{background:#0b64ae!important;color:#fff!important}
+.coverOption.cover-vkusvill{background:#f6c928!important;color:#17181c!important}
+.coverOption.cover-okei{background:#00854a!important;color:#fff!important}
+.coverOption.cover-ashan{background:#e30613!important;color:#fff!important}
+.coverOption.cover-diksi{background:#e31b23!important;color:#fff!important}
+.coverOption.cover-chizhik{background:#ffcc00!important;color:#17181c!important}
+.coverOption.cover-antey{background:#1767d8!important;color:#fff!important}
+.coverOption.cover-rodina_udacha{background:linear-gradient(135deg,#214d73,#1d6b6a 55%,#187450)!important;color:#fff!important}
+.coverOption.cover-detmir{background:#e83b31!important;color:#fff!important}
+.coverOption.cover-kari{background:#252a31!important;color:#fff!important}
+.coverOption.cover-dns{background:#fff!important;color:#17181c!important;box-shadow:inset 0 0 0 2px #e1e3e7}
+.coverOption.cover-bristol{background:#d71920!important;color:#fff!important}
+.coverOption.cover-k_b{background:#fff!important;color:#b30f18!important;box-shadow:inset 0 0 0 2px #e1e3e7}
+.coverOption.cover-custom{background:linear-gradient(135deg,#252a31,#4b5563)!important;color:#fff!important}
+@media(max-width:420px){
+ .grid{gap:12px;padding:0 14px}
+ .card{aspect-ratio:1.43/1!important}
+ .card strong{width:calc(100% - 16px)!important;max-width:calc(100% - 16px)!important}
+ .coverOption{min-height:64px!important;font-size:11px!important}
+}
+
 /* CARD111 approved card artwork v48 — crisp CSS covers, no low-res raster backgrounds */
 .card{min-height:132px!important;border-radius:20px!important;padding:12px!important;box-shadow:0 8px 22px #00000018!important}
 .card strong{left:50%!important;top:auto!important;bottom:12px!important;transform:translateX(-50%)!important;width:auto!important;max-width:calc(100% - 24px)!important;padding:0!important;border-radius:0!important;background:transparent!important;color:var(--title-color,#fff)!important;font-size:var(--title-size,19px)!important;font-family:var(--title-font,system-ui,-apple-system,"Segoe UI",sans-serif)!important;line-height:1.08!important;white-space:normal!important;overflow-wrap:normal!important;word-break:normal!important;text-align:center!important;text-shadow:0 1px 3px #0009!important;box-sizing:border-box!important}
