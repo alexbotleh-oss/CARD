@@ -224,8 +224,8 @@ h1{margin:0;font-size:28px}.sub{color:#737780;font-size:14px;margin-top:4px}.btn
 }
 
 
-/* CARD111 card style editor v45 */
-.card.title-top strong{top:12px!important;bottom:auto!important}
+/* CARD111 card style editor v46 */
+.card.title-hide strong{display:none!important}.card.title-top strong{top:12px!important;bottom:auto!important}
 .card.title-center strong{top:50%!important;bottom:auto!important;transform:translateY(-50%)!important}
 .card.title-bottom strong{top:auto!important;bottom:12px!important}
 .card strong{color:var(--title-color,#fff)!important;font-size:var(--title-size,19px)!important;font-family:var(--title-font,system-ui,-apple-system,"Segoe UI",sans-serif)!important}
@@ -276,7 +276,7 @@ function coverForName(name){
 const CARD_PALETTES={AUTO:"Фирменная",RED:"Красная",BLUE:"Синяя",GREEN:"Зелёная",PURPLE:"Фиолетовая",AMBER:"Янтарная",GRAPHITE:"Графитовая",LIGHT:"Светлая"};
 const CARD_TEXT_COLORS={WHITE:"#ffffff",BLACK:"#17181c",YELLOW:"#ffd43b",RED:"#e03131",GREEN:"#159447",BLUE:"#1767d8"};
 const CARD_TEXT_COLOR_LABELS={WHITE:"Белый",BLACK:"Чёрный",YELLOW:"Жёлтый",RED:"Красный",GREEN:"Зелёный",BLUE:"Синий"};
-const CARD_TEXT_POSITIONS={TOP:"Сверху",CENTER:"По центру",BOTTOM:"Снизу"};
+const CARD_TEXT_POSITIONS={HIDE:"Не показывать",TOP:"Сверху",CENTER:"По центру",BOTTOM:"Снизу"};
 const CARD_FONTS={SYSTEM:'system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif',ARIAL:"Arial,Helvetica,sans-serif",TREBUCHET:'"Trebuchet MS",Arial,sans-serif',GEORGIA:'Georgia,"Times New Roman",serif',COURIER:'"Courier New",monospace'};
 const CARD_FONT_LABELS={SYSTEM:"Системный",ARIAL:"Arial",TREBUCHET:"Trebuchet",GEORGIA:"Georgia",COURIER:"Courier"};
 function cardStyle(c){
