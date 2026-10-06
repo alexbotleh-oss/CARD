@@ -190,7 +190,7 @@ async function addCard(){
   save();
   closeModal();
 }
-function scanner(){
+function scanner(onResult){
   openModal('<button class="close" onclick="closeModal()">×</button><h2>Сканирование скидочной карты</h2>'+
     '<div id="reader"></div>'+
     '<div class="scanTools">'+
@@ -219,7 +219,8 @@ function scanner(){
     try{if(reader&&reader.reset)reader.reset();}catch(e){}
     try{if(video&&video.srcObject){video.srcObject.getTracks().forEach(function(t){t.stop();});video.srcObject=null;}}catch(e){}
     closeModal();
-    setTimeout(function(){manual({code:String(text),format:mapFormat(raw)});},100);
+    const resultData={code:String(text),format:mapFormat(raw)};
+    setTimeout(function(){if(typeof onResult==="function"){onResult(resultData);}else{manual(resultData);}},100);
   }
 
   async function nativeLoop(){
@@ -414,8 +415,22 @@ function manualEdit(id){
     '<button type="button" class="formatOption" onclick="chooseFormat(\'EAN_8\',\'Штрихкод — EAN-8\')">Штрихкод — EAN-8</button>'+
     '<button type="button" class="formatOption" onclick="chooseFormat(\'QR_CODE\',\'QR-код\')">QR-код</button></div></div>'+
     '<label class="hint" style="display:block;margin-top:12px">Заменить фото карты<input id="cardImage" type="file" accept="image/*" style="width:100%;margin-top:6px"></label>'+
+    '<button type="button" class="btn secondary" onclick="rescanEdit('+JSON.stringify(String(id))+')">Пересканировать код</button>'+
     '<button class="btn primary" onclick="updateCard('+JSON.stringify(String(id))+')">Сохранить</button>'+
     '<button class="btn secondary" onclick="closeModal()">Отмена</button>');
+}
+function rescanEdit(id){
+  scanner(function(data){
+    const c=cards.find(function(x){return String(x.id)===String(id);});
+    if(!c)return;
+    manualEdit(id);
+    const code=document.getElementById("code");
+    const format=document.getElementById("format");
+    if(code)code.value=data.code;
+    if(format)format.value=data.format;
+    const btn=document.querySelector(".formatButton");
+    if(btn)btn.textContent=formatLabel(data.format);
+  });
 }
 async function updateCard(id){
   const c=cards.find(function(x){return String(x.id)===String(id);});
