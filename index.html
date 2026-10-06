@@ -495,18 +495,31 @@ function formatLabel(v){return ({CODE_128:"Штрихкод — CODE 128",EAN_13
 function toggleFormatMenu(){const m=document.getElementById("formatMenu");if(m)m.classList.toggle("open");}
 function chooseFormat(v,label){const f=document.getElementById("format");const btn=document.querySelector(".formatButton");const m=document.getElementById("formatMenu");if(f)f.value=v;if(btn)btn.textContent=label;if(m)m.classList.remove("open");if(typeof refreshEditorCodePreview==="function")refreshEditorCodePreview(window.__editorPreviewCard||{});}
 async function addCard(){
-  const name=document.getElementById("name").value.trim()||"Моя карта";
-  const code=document.getElementById("code").value.trim();
-  const format=document.getElementById("format").value;
-  const cover=(document.getElementById("cover")&&document.getElementById("cover").value)||"AUTO";
-  const style={palette:(document.getElementById("cardPalette")&&document.getElementById("cardPalette").value)||"AUTO",textColor:(document.getElementById("titleColor")&&document.getElementById("titleColor").value)||"WHITE",position:(document.getElementById("titlePosition")&&document.getElementById("titlePosition").value)||"CENTER",size:Math.max(14,Math.min(28,Number(document.getElementById("titleSize")&&document.getElementById("titleSize").value)||19)),font:(document.getElementById("titleFont")&&document.getElementById("titleFont").value)||"SYSTEM"};
-  const file=document.getElementById("cardImage")&&document.getElementById("cardImage").files[0];
-  if(!code){alert("Введите код карты");return;}
-  let image="";
-  if(file)image=await readImage(file);
-  cards.unshift({id:String(Date.now()),name:name,code:code,format:format,image:image,color:colors[cards.length%colors.length],cover:cover,style:style});
-  save();
-  closeModal();
+  try{
+    const nameEl=document.getElementById("name"),codeEl=document.getElementById("code"),formatEl=document.getElementById("format");
+    if(!nameEl||!codeEl||!formatEl){alert("Не удалось открыть форму добавления карты.");return;}
+    const name=nameEl.value.trim()||"Моя карта";
+    const code=codeEl.value.trim();
+    const format=formatEl.value||"CODE_128";
+    const cover=(document.getElementById("cover")&&document.getElementById("cover").value)||"AUTO";
+    const style={palette:(document.getElementById("cardPalette")&&document.getElementById("cardPalette").value)||"AUTO",textColor:(document.getElementById("titleColor")&&document.getElementById("titleColor").value)||"WHITE",position:(document.getElementById("titlePosition")&&document.getElementById("titlePosition").value)||"CENTER",size:Math.max(14,Math.min(28,Number(document.getElementById("titleSize")&&document.getElementById("titleSize").value)||19)),font:(document.getElementById("titleFont")&&document.getElementById("titleFont").value)||"SYSTEM"};
+    const file=document.getElementById("cardImage")&&document.getElementById("cardImage").files[0];
+    if(!code){alert("Введите код карты");return;}
+    let image="";
+    if(file)image=await readImage(file);
+    if(!Array.isArray(cards))cards=[];
+    const card={id:String(Date.now()),name:name,code:code,format:format,image:image,color:colors[cards.length%colors.length],cover:cover,style:style};
+    cards.unshift(card);
+    localStorage.setItem(KEY,JSON.stringify(cards));
+    storageState="ok";
+    storageError="";
+    render();
+    closeModal();
+  }catch(e){
+    storageState="error";
+    storageError=String(e&&e.message||e);
+    alert("Не удалось добавить карту: "+storageError);
+  }
 }
 function scanner(onResult){
   openModal('<button class="close" onclick="closeModal()">×</button><h2>Сканирование скидочной карты</h2><div id="reader"></div><div class="scanTools"><button class="btn primary galleryPrimary" onclick="document.getElementById(\'scanFile\').click()">▣ Сканировать фото из галереи</button><input id="scanFile" type="file" accept="image/*" style="display:none"><p class="hint">Наведите камеру на QR/штрихкод — распознавание происходит автоматически.</p></div>');
