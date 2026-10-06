@@ -285,7 +285,22 @@ function showCropper(file,reader,finish){
       alert("Код не найден в этой области. Увеличьте фото или передвиньте рамку точно на QR/штрихкод.");
     }
   };
-}function openCard(id){
+}function normalizeFormat(value){
+  const s=String(value||"").toUpperCase().replace(/[\s-]+/g,"_");
+  if(s==="QR"||s==="QRCODE"||s==="QR_CODE")return "QR_CODE";
+  if(s==="EAN13"||s==="EAN_13")return "EAN_13";
+  if(s==="EAN8"||s==="EAN_8")return "EAN_8";
+  if(s==="CODE128"||s==="CODE_128")return "CODE_128";
+  if(s==="CODE39"||s==="CODE_39")return "CODE_39";
+  if(s==="CODE93"||s==="CODE_93")return "CODE_93";
+  if(s==="UPC_A"||s==="UPCA")return "UPC_A";
+  if(s==="UPC_E"||s==="UPCE")return "UPC_E";
+  if(s==="ITF")return "ITF";
+  if(s==="DATA_MATRIX"||s==="DATAMATRIX")return "DATA_MATRIX";
+  if(s==="PDF417"||s==="PDF_417")return "PDF417";
+  return s||"CODE_128";
+}
+function openCard(id){
   const c=cards.find(function(x){return String(x.id)===String(id);});
   if(!c)return;
   openModal('<button class="close" id="cardClose">×</button><div class="detail">'+
@@ -296,18 +311,50 @@ function showCropper(file,reader,finish){
   document.getElementById("cardClose").onclick=closeModal;
   document.getElementById("cardEdit").onclick=function(){manualEdit(String(c.id));};
   document.getElementById("cardDelete").onclick=function(){delCard(String(c.id));};
-  const storedFormat=String(c.format||"").toUpperCase();
+
+  const storedFormat=normalizeFormat(c.format||c.barcodeFormat||c.type||"CODE_128");
+  const box=document.querySelector(".codebox");
+
   if(storedFormat==="QR_CODE"){
-    const old=document.getElementById("barcode");if(old)old.remove();
-    const q=document.createElement("div");q.id="qr";
+    const old=document.getElementById("barcode");
+    if(old)old.remove();
+    const q=document.createElement("div");
+    q.id="qr";
     q.style.cssText="display:flex;justify-content:center;align-items:center;min-height:230px";
-    document.querySelector(".codebox").prepend(q);
-    try{QRCode.toString(String(c.code),{type:"svg",width:230,margin:2,errorCorrectionLevel:"M"},function(err,svg){
-      if(err){console.error("QR render:",err);q.remove();return;} q.innerHTML=svg;
-    });}catch(e){console.error("QR render:",e);q.remove();}
+    box.prepend(q);
+    try{
+      if(typeof QRCode!=="undefined"&&typeof QRCode.toString==="function"){
+        QRCode.toString(String(c.code),{type:"svg",width:230,margin:2,errorCorrectionLevel:"M"},function(err,svg){
+          if(err){
+            console.error("QR render:",err);
+            q.innerHTML='<div class="hint">Не удалось построить QR-код из сохранённого значения.</div>';
+            return;
+          }
+          q.innerHTML=svg;
+        });
+      }else{
+        q.innerHTML='<div class="hint">Модуль генерации QR-кода недоступен.</div>';
+      }
+    }catch(e){
+      console.error("QR render:",e);
+      q.innerHTML='<div class="hint">Не удалось построить QR-код из сохранённого значения.</div>';
+    }
   }else{
-    try{JsBarcode("#barcode",c.code,{format:c.format==="EAN_13"?"ean13":c.format==="EAN_8"?"ean8":c.format==="CODE_39"?"CODE39":"CODE128",displayValue:false,height:90,margin:4});}
-    catch(e){const el=document.getElementById("barcode");if(el)el.outerHTML="";}
+    try{
+      JsBarcode("#barcode",String(c.code),{
+        format:storedFormat==="EAN_13"?"ean13":
+               storedFormat==="EAN_8"?"ean8":
+               storedFormat==="CODE_39"?"CODE39":
+               storedFormat==="ITF"?"ITF":
+               storedFormat==="UPC_A"?"upc":
+               storedFormat==="UPC_E"?"upce":"CODE128",
+        displayValue:false,height:90,margin:4
+      });
+    }catch(e){
+      console.error("Barcode render:",storedFormat,e);
+      const el=document.getElementById("barcode");
+      if(el)el.outerHTML='<div class="hint">Не удалось построить штрихкод для сохранённого формата.</div>';
+    }
   }
 }
 function manualEdit(id){
