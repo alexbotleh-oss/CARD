@@ -212,7 +212,7 @@ header{padding:18px 20px 10px;background:#f6f7fbf5}
 <main id="cards" class="grid"></main>
 </div>
 <nav class="bottomNav" aria-label="Навигация"><button class="bottomNavItem active" onclick="showWallet()"><span>▣</span><b>Кошелёк</b></button><button class="bottomNavItem" onclick="scanner()"><span>⌗</span><b>Сканер</b></button><button class="bottomNavItem" onclick="showSettings()"><span>⚙</span><b>Настройки</b></button></nav>
-<div id="modal" class="overlay" onclick="if(event.target===this)closeModal()"><div class="sheet" id="sheet"></div></div>
+<div id="modal" class="overlay" onclick="if(event.target===this)closeModal()"><div class="sheet" id="sheet"></div></div><input id="importFile" type="file" accept="application/json,.json" style="display:none">
 <script>
 const KEY="card_wallet_v1";
 const SAFE_KEY=KEY+"_safe_backup";
@@ -471,7 +471,7 @@ function addMenu(){
     '<button class="btn secondary" onclick="manual()">Ввести данные вручную</button>'+
     '<button class="btn secondary" onclick="exportData()">Сохранить резервную копию</button>'+
     '<button class="btn secondary" onclick="importData()">Восстановить из файла</button>'+
-    '<input id="importFile" type="file" accept="application/json,.json" style="display:none" onchange="readImport(event)">'+
+    ''+
     '<p class="hint">Карта сохраняется локально в этом браузере. На iPhone камера работает через HTTPS после разрешения доступа.</p>');
 }
 function manual(data){
@@ -850,7 +850,7 @@ function exportData(){
   a.click();
   setTimeout(function(){URL.revokeObjectURL(a.href);},1000);
 }
-function importData(){document.getElementById("importFile").click();}
+function importData(){const input=document.getElementById("importFile");if(!input){alert("Не найдено поле выбора резервной копии");return;}input.onchange=readImport;input.value="";input.click();}
 function readImport(e){
   const f=e.target.files[0];
   if(!f)return;
