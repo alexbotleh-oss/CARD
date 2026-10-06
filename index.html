@@ -69,12 +69,18 @@ function render(){
     return;
   }
   out.innerHTML=list.map(function(c){
-    const bg=c.image?'background-image:url("'+c.image+'");':'background:#fff;';
     const mark=String(c.name||"?").trim().charAt(0).toUpperCase();
     const color=String(c.color||colors[0]);
-    return '<button class="card" data-mark="'+esc(mark)+'" style="'+bg+';--card-color:'+esc(color)+'" onclick="openCard('+JSON.stringify(String(c.id))+')"><strong>'+esc(c.name)+'</strong><small>'+esc(c.format)+'</small><span class="code">'+esc(c.code)+'</span></button>';
+    return '<button type="button" class="card" data-id="'+esc(String(c.id))+'" data-mark="'+esc(mark)+'" style="'+(c.image?'':'background:#fff;')+';--card-color:'+esc(color)+'"><strong>'+esc(c.name)+'</strong><small>'+esc(c.format)+'</small><span class="code">'+esc(c.code)+'</span></button>';
   }).join("");
 }
+document.getElementById("cards").addEventListener("click",function(e){
+  const card=e.target.closest(".card");
+  if(!card)return;
+  e.preventDefault();
+  e.stopPropagation();
+  openCard(card.getAttribute("data-id"));
+});
 function openModal(html){
   document.getElementById("sheet").innerHTML=html;
   document.getElementById("modal").classList.add("open");
