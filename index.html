@@ -380,29 +380,26 @@ function showCropper(file,reader,finish){
 }function openCard(id){
   const c=cards.find(function(x){return String(x.id)===String(id);});
   if(!c)return;
-  openModal('<button class="close" onclick="closeModal()">×</button><div class="detail">'+
+  openModal('<button class="close" id="cardClose">×</button><div class="detail">'+
     '<div class="brand">'+esc(c.name)+'</div>'+
     '<div class="codebox"><svg id="barcode"></svg><div class="codeText">'+esc(c.code)+'</div></div>'+
-    '<button class="btn primary" onclick="manualEdit('+JSON.stringify(String(c.id))+')">Изменить</button>'+
-    '<button class="btn danger" onclick="delCard('+JSON.stringify(String(c.id))+')">Удалить карту</button></div>');
-  const codeValue=String(c.code||"");
+    '<button type="button" class="btn primary" id="cardEdit">Изменить карту</button>'+
+    '<button type="button" class="btn danger" id="cardDelete">Удалить карту</button></div>');
+  document.getElementById("cardClose").onclick=closeModal;
+  document.getElementById("cardEdit").onclick=function(){manualEdit(String(c.id));};
+  document.getElementById("cardDelete").onclick=function(){delCard(String(c.id));};
   const storedFormat=String(c.format||"").toUpperCase();
   if(storedFormat==="QR_CODE"){
-    document.getElementById("barcode").remove();
-    const q=document.createElement("div");
-    q.id="qr";
+    const old=document.getElementById("barcode");if(old)old.remove();
+    const q=document.createElement("div");q.id="qr";
     q.style.cssText="display:flex;justify-content:center;align-items:center;min-height:230px";
     document.querySelector(".codebox").prepend(q);
-    try{
-      QRCode.toString(String(c.code),{type:"svg",width:230,margin:2,errorCorrectionLevel:"M"},function(err,svg){
-        if(err){console.error("QR render:",err);q.remove();return;}
-        q.innerHTML=svg;
-      });
-    }catch(e){console.error("QR render:",e);q.remove();}
+    try{QRCode.toString(String(c.code),{type:"svg",width:230,margin:2,errorCorrectionLevel:"M"},function(err,svg){
+      if(err){console.error("QR render:",err);q.remove();return;} q.innerHTML=svg;
+    });}catch(e){console.error("QR render:",e);q.remove();}
   }else{
-    try{
-      JsBarcode("#barcode",c.code,{format:c.format==="EAN_13"?"ean13":c.format==="EAN_8"?"ean8":"CODE128",displayValue:false,height:90,margin:4});
-    }catch(e){document.getElementById("barcode").outerHTML="";}
+    try{JsBarcode("#barcode",c.code,{format:c.format==="EAN_13"?"ean13":c.format==="EAN_8"?"ean8":"CODE128",displayValue:false,height:90,margin:4});}
+    catch(e){const el=document.getElementById("barcode");if(el)el.outerHTML="";}
   }
 }
 function manualEdit(id){
