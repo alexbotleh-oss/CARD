@@ -286,7 +286,7 @@ function brandMarkup(cover,name){
     LENTA:'<span class="brandArtwork lenta"><b>2</b><i>Лента</i></span>',
     PEREKRESTOK:'<span class="brandArtwork perek"><b>•</b><i>Перекрёсток</i></span>'
   };
-  return map[cover]||'<span class="brandArtwork generic"><b>'+n.charAt(0)+'</b></span>';
+  return map[cover]||'';
 }
 function coverForCard(c){const v=String(c.cover||"AUTO");return v==="AUTO"?coverForName(c.name):COVER_LABELS[v]?v:"CUSTOM";}
 function coverClass(c){return "cover-"+coverForCard(c).toLowerCase();}
