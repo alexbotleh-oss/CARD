@@ -172,3 +172,12 @@ Resolution order: individual card image > user-defined brand default > built-in 
 **Corrections:** labels now reflect each saved code's format (QR vs linear barcode). Unsupported formats no longer silently fall back to Code 128; the UI displays an explicit unsupported-format message instead. Commits: `113bbf8`, `9e12eec`.
 
 **Static verification:** both inline JavaScript blocks pass syntax checks after the latest change. No browser/device scan test has been performed. Do not mark barcode readability or visual parity as verified.
+
+
+## 2026-10-10 — PDF417 was incorrectly classified as Code 128
+
+**Evidence:** user screenshot after rescanning showed the stored format label “PDF417”, but scanner flow was falling back to Code 128 for formats it could not map. In ZXing results, `getBarcodeFormat()` can be a numeric enum; old `mapFormat` only inspected strings and returned `CODE_128` as its fallback.
+
+**Fix:** map numeric ZXing BarcodeFormat enum values (including PDF417), return an explicit unknown format instead of Code 128 for unknown values, request PDF417/Data Matrix in native camera formats when supported, and render PDF417/Data Matrix with bwip-js. Commit: `48bbe4b18579d2ce6120b63ab0b9c27cc5774a17`.
+
+**Verification:** both inline JavaScript blocks pass syntax checks. Real device scan/render and CDN availability are not yet verified.
