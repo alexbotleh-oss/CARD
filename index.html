@@ -161,6 +161,14 @@ header{padding:18px 36px 10px;align-items:center;background:#f6f7fbf5}
 .brandArtwork.magnit b{width:58px;height:58px;display:grid;place-items:center;background:#fff;color:#d71939;border-radius:16px 16px 16px 5px;border:3px solid #f6c7d0;box-shadow:0 0 0 3px #ffffff35,inset 0 0 0 2px #d7193920;font-size:37px;font-weight:900;line-height:1;transform:rotate(-3deg)}.brandArtwork.magnit b::first-letter{display:inline-block}.brandArtwork.magnit i{font-size:clamp(15px,3vw,22px)}.brandArtwork.magnit i{font-size:clamp(15px,3vw,22px)}
 .brandArtwork.pyat b{width:54px;height:54px;border-radius:50%;background:#fff;color:#e21d32;font-size:34px;box-shadow:0 0 0 5px #f6b323}.brandArtwork.stol{color:#d71939}.brandArtwork.stol b{width:54px;height:54px;border-radius:50%;background:#fff;color:#159447;font-size:42px}.brandArtwork.antey b{font-size:55px}.brandArtwork.rodina b{font-size:48px;color:#f6c64a}.brandArtwork.bristol b{font-size:42px}.brandArtwork.kb{color:#b30f18}.brandArtwork.lenta b{font-size:50px;color:#f6c64a}.brandArtwork.perek b{font-size:44px;color:#f6c64a}
 .brandArtwork.generic b{width:52px;height:52px;border-radius:14px;background:#fff;color:#17181c;font-size:30px}
+
+.card[class*="cover-"] .brandArtwork b.brandSymbol{display:flex!important;align-items:center!important;justify-content:center!important;width:clamp(42px,25%,68px)!important;height:clamp(42px,25%,68px)!important;flex:0 0 auto!important;box-sizing:border-box!important;background:transparent!important;color:inherit!important;border:0!important;border-radius:0!important;box-shadow:none!important;transform:none!important;font-size:0!important;line-height:0!important;padding:0!important}
+.brandArtwork b.brandSymbol svg{display:block;width:100%;height:100%;overflow:visible}
+.brandArtwork.perek b.brandSymbol,.brandArtwork.lenta b.brandSymbol{color:#fff!important}
+.brandArtwork.ashan b.brandSymbol{color:#e30613!important}
+.brandArtwork.generic b.brandSymbol{background:transparent!important;color:inherit!important}
+.brandArtwork.vkusvill,.brandArtwork.chizhik,.brandArtwork.dns{color:#17181c!important}
+.brandArtwork.kb{color:#b30f18!important}
 .editorDataPanel{background:#fff;border:1px solid #e5e7eb;border-radius:18px;padding:14px;margin-bottom:12px}
 .editorSectionTitle{font-size:16px;font-weight:800;margin-bottom:12px}.editorFieldLabel{font-size:13px;font-weight:700;color:#40434a;margin:11px 0 6px}
 .editorDataPanel input{margin:0}.editorCodePreview{padding:10px 8px 2px;display:flex;justify-content:center;align-items:center;min-height:88px}.editorCodePreview svg{width:min(100%,300px);height:auto}
@@ -487,6 +495,40 @@ function bindStyleEditor(){
   if(positionOpen)positionOpen.onclick=openTitlePositionPicker;
   const range=document.getElementById("titleSize"),out=document.getElementById("titleSizeValue");if(range&&out)range.oninput=function(){out.textContent=range.value+" px";};
 }
+const BRAND_MARK_SVGS={
+  PEREKRESTOK:`<svg viewBox="0 0 64 64" aria-hidden="true"><path fill="currentColor" d="M32 28C23 17 24 6 32 4C40 6 41 17 32 28ZM36 32C47 23 58 24 60 32C58 40 47 41 36 32ZM32 36C41 47 40 58 32 60C24 58 23 47 32 36ZM28 32C17 41 6 40 4 32C6 24 17 23 28 32Z"/></svg>`,
+  LENTA:`<svg viewBox="0 0 64 64" aria-hidden="true"><path fill="currentColor" d="M13 9H24V43H51V54H13Z"/><path fill="currentColor" opacity=".72" d="M30 9H51V19H30ZM30 25H45V35H30Z"/></svg>`,
+  OKEI:`<svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="26" fill="none" stroke="currentColor" stroke-width="8"/><path d="M20 33L28 41L45 23" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  DIKSI:`<svg viewBox="0 0 64 64" aria-hidden="true"><path fill="currentColor" d="M32 3L39 17L55 9L51 26L63 32L51 39L55 55L39 47L32 61L25 47L9 55L13 39L1 32L13 25L9 9L25 17Z"/><circle cx="32" cy="32" r="8" fill="#e31b23"/></svg>`,
+  CHIZHIK:`<svg viewBox="0 0 64 64" aria-hidden="true"><path fill="currentColor" d="M7 41C19 36 26 26 31 9C34 25 43 29 57 24C52 36 44 42 31 42L43 54L28 50L20 58L20 44Z"/><circle cx="42" cy="29" r="2.5" fill="#ffcc00"/></svg>`,
+  ASHAN:`<svg viewBox="0 0 64 64" aria-hidden="true"><path fill="currentColor" d="M7 43C20 20 39 10 58 8C43 23 28 35 7 43Z"/><path fill="currentColor" opacity=".78" d="M11 49C26 34 43 27 59 27C45 40 29 47 11 49Z"/><path fill="currentColor" opacity=".55" d="M18 55C31 46 44 42 57 43C45 52 33 56 18 55Z"/></svg>`,
+  GLOBUS:`<svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="26" fill="none" stroke="currentColor" stroke-width="5"/><ellipse cx="32" cy="32" rx="12" ry="26" fill="none" stroke="currentColor" stroke-width="4"/><path d="M7 24H57M7 40H57" fill="none" stroke="currentColor" stroke-width="4"/></svg>`,
+  VkusVill:`<svg viewBox="0 0 64 64" aria-hidden="true"><path fill="currentColor" d="M55 7C26 7 8 19 8 38C8 49 17 57 29 54C47 50 54 29 55 7Z"/><path d="M14 51C25 38 36 27 48 16" fill="none" stroke="#f6c928" stroke-width="4" stroke-linecap="round"/></svg>`,
+  RIGLA:`<svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="27" fill="none" stroke="currentColor" stroke-width="5"/><path fill="currentColor" d="M25 12H39V25H52V39H39V52H25V39H12V25H25Z"/></svg>`,
+  BUDZOROV:`<svg viewBox="0 0 64 64" aria-hidden="true"><path fill="currentColor" d="M32 56S6 41 6 23C6 7 27 4 32 20C37 4 58 7 58 23C58 41 32 56 32 56Z"/><path d="M13 32H25L31 21L39 42L44 32H52" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  ZDRAVCITY:`<svg viewBox="0 0 64 64" aria-hidden="true"><path fill="currentColor" d="M23 4H41V23H60V41H41V60H23V41H4V23H23Z"/><circle cx="32" cy="32" r="7" fill="#fff"/></svg>`,
+  STOLICHKI:`<svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="29" fill="none" stroke="currentColor" stroke-width="5"/><path fill="currentColor" d="M26 8H38V26H56V38H38V56H26V38H8V26H26Z"/></svg>`,
+  GORZDRAV:`<svg viewBox="0 0 64 64" aria-hidden="true"><path fill="currentColor" d="M4 11H60V25H39V60H25V25H4Z"/><path d="M10 43H20L26 35L34 49L41 39H55" fill="none" stroke="#fff" stroke-width="4" stroke-linejoin="round"/></svg>`,
+  APTEKA366:`<svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="29" fill="none" stroke="currentColor" stroke-width="4"/><text x="32" y="39" fill="currentColor" font-size="19" font-family="Arial,sans-serif" font-weight="900" text-anchor="middle">36,6</text></svg>`,
+  NEOFARM:`<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M32 4L56 18V46L32 60L8 46V18Z" fill="none" stroke="currentColor" stroke-width="5"/><path fill="currentColor" d="M26 14H38V26H50V38H38V50H26V38H14V26H26Z"/></svg>`,
+  PLANETA_ZDOROVYA:`<svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="27" fill="none" stroke="currentColor" stroke-width="4"/><ellipse cx="32" cy="32" rx="12" ry="27" fill="none" stroke="currentColor" stroke-width="3"/><path d="M7 24H57M7 40H57" fill="none" stroke="currentColor" stroke-width="3"/><circle cx="32" cy="32" r="6" fill="currentColor"/></svg>`,
+  MAXAVIT:`<svg viewBox="0 0 64 64" aria-hidden="true"><path fill="currentColor" d="M9 33C9 15 27 5 51 8C54 31 44 53 26 56C13 57 7 47 9 33Z"/><path d="M14 53C26 35 35 25 48 14" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round"/><path d="M25 30H39M32 23V37" stroke="#fff" stroke-width="4" stroke-linecap="round"/></svg>`,
+  OSTIN:`<svg viewBox="0 0 64 64" aria-hidden="true"><path fill="currentColor" d="M32 3L40 24L61 15L48 34L61 49L39 44L32 62L24 44L3 49L16 34L3 15L25 24Z"/></svg>`,
+  KARI:`<svg viewBox="0 0 64 64" aria-hidden="true"><path fill="currentColor" d="M32 3L38 25L60 17L45 33L61 48L39 42L32 61L25 42L3 48L19 33L4 17L26 25Z"/></svg>`,
+  RENDEZVOUS:`<svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="24" cy="32" r="17" fill="none" stroke="currentColor" stroke-width="7"/><circle cx="40" cy="32" r="17" fill="none" stroke="currentColor" stroke-width="7" opacity=".72"/></svg>`,
+  HC:`<svg viewBox="0 0 64 64" aria-hidden="true"><path fill="currentColor" d="M32 3L59 18V46L32 61L5 46V18Z"/><path fill="none" stroke="#fff" stroke-width="5" stroke-linejoin="round" d="M19 20V44M45 20V44M19 32H45"/></svg>`,
+  LCWAIKIKI:`<svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="27" fill="none" stroke="currentColor" stroke-width="5"/><path d="M11 38C20 31 28 31 37 38S53 45 58 39M11 27C20 20 28 20 37 27S53 34 58 28" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"/></svg>`,
+  MAXIDOM:`<svg viewBox="0 0 64 64" aria-hidden="true"><path fill="currentColor" d="M4 30L32 7L60 30H52V57H12V30Z"/><path fill="none" stroke="#fff" stroke-width="4" d="M25 57V39H39V57"/></svg>`,
+  MVIDEO:`<svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="25" fill="none" stroke="currentColor" stroke-width="8"/><circle cx="32" cy="32" r="9" fill="none" stroke="currentColor" stroke-width="5"/></svg>`,
+  ELDORADO:`<svg viewBox="0 0 64 64" aria-hidden="true"><path fill="currentColor" d="M32 2L40 22L62 14L47 32L62 50L40 42L32 62L24 42L2 50L17 32L2 14L24 22Z"/><circle cx="32" cy="32" r="8" fill="#fff"/></svg>`,
+  DETMIR:`<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M8 42C2 29 14 17 25 24C27 9 50 8 52 26C67 28 63 47 51 48H18C13 48 10 46 8 42Z" fill="currentColor"/><path d="M22 36Q32 47 43 36" fill="none" stroke="#9acb3c" stroke-width="4" stroke-linecap="round"/></svg>`,
+  DNS:`<svg viewBox="0 0 64 64" aria-hidden="true"><path fill="currentColor" d="M21 5L40 5L50 22L40 39H21L11 22Z"/><path fill="currentColor" opacity=".78" d="M37 30L54 30L63 45L54 60H37L28 45Z"/><path fill="currentColor" opacity=".6" d="M3 35L20 35L29 50L20 64H3L-6 50Z"/></svg>`,
+  ANTEY:`<svg viewBox="0 0 64 64" aria-hidden="true"><path fill="currentColor" d="M24 4H40V24H60V40H40V60H24V40H4V24H24Z"/><circle cx="32" cy="32" r="7" fill="#fff"/></svg>`,
+  RODINA_UDACHA:`<svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="9" fill="currentColor"/><path fill="currentColor" d="M32 2L39 18L56 8L47 25L62 32L47 39L56 56L39 46L32 62L25 46L8 56L17 39L2 32L17 25L8 8L25 18Z"/></svg>`,
+  BRISTOL:`<svg viewBox="0 0 64 64" aria-hidden="true"><path fill="currentColor" d="M32 3C24 17 10 28 10 42C10 55 20 61 32 61S54 55 54 42C54 28 40 17 32 3Z"/><path d="M22 41C22 47 26 50 31 50" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round"/></svg>`,
+  K_B:`<svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="28" fill="none" stroke="currentColor" stroke-width="5"/><text x="32" y="39" fill="currentColor" font-size="19" font-family="Arial,sans-serif" font-weight="900" text-anchor="middle">K&amp;Б</text></svg>`,
+  CUSTOM:`<svg viewBox="0 0 64 64" aria-hidden="true"><path fill="currentColor" d="M32 3L39 24L61 15L47 33L61 50L39 42L32 61L25 42L3 50L17 33L3 15L25 24Z"/></svg>`
+};
 function brandMarkup(cover,name){
   const labels={
     MAGNIT:["М","Магнит"],PYATEROCHKA:["5","Пятёрочка"],PEREKRESTOK:["✚","Перекрёсток"],LENTA:["Л","Лента"],OKEI:["О’","О’КЕЙ"],DIKSI:["Д","Дикси"],CHIZHIK:["Ч","Чижик"],ASHAN:["A","Ашан"],GLOBUS:["G","Глобус"],VkusVill:["v","ВкусВилл"],
@@ -498,7 +540,9 @@ function brandMarkup(cover,name){
   if(!item)return "";
   const aliases={MAGNIT:"magnit",PYATEROCHKA:"pyat",PEREKRESTOK:"perek",LENTA:"lenta",STOLICHKI:"stol",ANTEY:"antey",RODINA_UDACHA:"rodina",BRISTOL:"bristol",K_B:"kb"};
   const family=aliases[cover]||"generic";
-  return '<span class="brandArtwork brand-'+String(cover).toLowerCase()+' '+family+'"><b>'+esc(item[0])+'</b><i>'+esc(item[1])+'</i></span>';
+  const vectorMark=BRAND_MARK_SVGS[cover];
+  const markHtml=vectorMark?'<b class="brandSymbol">'+vectorMark+'</b>':'<b>'+esc(item[0])+'</b>';
+  return '<span class="brandArtwork brand-'+String(cover).toLowerCase()+' '+family+'">'+markHtml+'<i>'+esc(item[1])+'</i></span>';
 }
 function coverForCard(c){const v=String(c.cover||"AUTO");return v==="AUTO"?coverForName(c.name):COVER_LABELS[v]?v:"CUSTOM";}
 function coverClass(c){return "cover-"+coverForCard(c).toLowerCase();}
