@@ -257,3 +257,13 @@ Evidence: changed source re-read from the work branch. Visual confirmation in br
 **Checks:** latest index.html was re-read from the target branch; both inline JavaScript blocks passed V8 new Function parsing. The image-MIME expression was evaluated for image/png and text/plain. Static presence checks confirmed the new-card preview, secondary-code scan flow, secondary-code persistence, preview format handler and import rollback.
 
 **Still unverified:** UI interaction in a real browser, image selection/cropping on Android, camera/gallery scan of the second code, visual layout regression, actual localStorage quota failure, and complete backup/restore round-trip. Static checks do not establish runtime success.
+## 2026-10-11 — code-format picker and gradient-selection state
+
+**Commits:**
+- 3180a15fc2c553d1ad5dadac855d9c919657a8f8 — added the full available primary-code format menu to new/edit forms and a dedicated selector for the secondary-code format, including draft/scan synchronization.
+- 92eb69c3482d4781990808f9a91a9851935b0727 — selecting a non-custom cover clears the gradient draft and marks inherited gradient settings for deletion on save; reset-gradient and apply-gradient states are explicit.
+- 407f2b0dac0c5dcf72ed7a33d7462a459f709d37 — added class aliases connecting existing cover markup to brand-specific CSS artwork selectors.
+
+**Static checks:** current index.html re-read from the target branch; both inline JS blocks passed V8 parsing. Presence checks passed for the second-format select, primary PDF417/Data Matrix choices, gradient deletion marker in updateCard, and brand-style aliases.
+
+**Remaining issues:** actual official/local SVG logos for all listed retailers have not been integrated; browser/mobile interaction, code scanning per format, and backup end-to-end round-trip still need real runtime verification.
