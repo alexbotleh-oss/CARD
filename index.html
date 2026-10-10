@@ -417,7 +417,7 @@ function openTitlePositionPicker(){
     pending=k;
     overlay.querySelectorAll(".titlePositionCell").forEach(function(cell){cell.classList.toggle("selected",cell.getAttribute("data-position")===k);});
     const title=overlay.querySelector("#titlePositionMapTitle");
-    if(title)title.className="title-position-"+k.toLowerCase();
+    if(title)title.className="titlePositionMapTitle title-position-"+k.toLowerCase();
   }
   overlay.querySelectorAll(".titlePositionCell").forEach(function(cell){cell.addEventListener("click",function(){choose(cell.getAttribute("data-position"));});});
   const close=function(){overlay.remove();};
