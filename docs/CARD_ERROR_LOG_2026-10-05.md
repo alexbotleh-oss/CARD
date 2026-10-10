@@ -276,3 +276,16 @@ Evidence: changed source re-read from the work branch. Visual confirmation in br
 **Verification:** both inline JS blocks parse in V8. A V8-injected harness exercised delete success and one-time localStorage write failure; success removed the intended card and preserved the old full list as recovery snapshot; failure left memory and persisted cards intact, reported an error and did not close the modal. This is a mocked storage test, not a browser test.
 
 **Still unverified:** installed PWA update on Android, actual browser-localStorage quota behavior, image selection/cropping on device, barcode scanning and backup end-to-end round-trip.
+## 2026-10-11 — vector brand marks and mobile/editor refinements
+
+**Commits:**
+- 53f74c4f702aa59def0e58ea83eb85bfde7eb2af — added 32 inline scalable SVG brand marks and connected them to `brandMarkup`; existing special renderers for Magnit/Pyaterochka retained.
+- 1a2b503653f224c04891bc5994362323bdad4cad — corrected light-background icon contrast and Ashan mark color.
+- 3180a15fc2c553d1ad5dadac855d9c919657a8f8 — primary and secondary format selection.
+- 92eb69c3482d4781990808f9a91a9851935b0727 — explicit stale-gradient clearing when selecting another cover.
+- f3151286d469a3bef1ab129b4596238cfa09b95b — mobile style for secondary format selection.
+- 3de57dc54b6326801a3a8f6374ba4cec4172059e and e4f748aa4a9d7f87336a50157cb778d897f008a4 — request/install service-worker cache v17.
+
+**Validation:** both inline script blocks parse in V8. The `BRAND_MARK_SVGS` object was evaluated; all 32 SVG fragments passed basic root/tag-balance checks. Source assertions confirmed brand-specific markup, contrast styles, format selectors and clear-gradient persistence.
+
+**Limitation:** these are custom vector marks that improve the cover design, not verified copies of official logos. No actual browser rendering or Android/PWA test has been run.
