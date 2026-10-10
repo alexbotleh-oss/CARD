@@ -879,7 +879,7 @@ function editorPreviewData(c){
   base.style={
     palette:(document.getElementById("cardPalette")&&document.getElementById("cardPalette").value)||"AUTO",
     textColor:(document.getElementById("titleColor")&&document.getElementById("titleColor").value)||"WHITE",
-    position:(document.getElementById("titlePosition")&&document.getElementById("titlePosition").value)||"BOTTOM",
+    position:(document.getElementById("titlePosition")&&document.getElementById("titlePosition").value)||"CENTER",
     background:(document.getElementById("titleBackground")&&document.getElementById("titleBackground").value)||"PILL",
     size:Math.max(14,Math.min(28,Number(document.getElementById("titleSize")&&document.getElementById("titleSize").value)||19)),
     font:(document.getElementById("titleFont")&&document.getElementById("titleFont").value)||"SYSTEM",
@@ -998,7 +998,7 @@ async function updateCard(id){
   const newCode=document.getElementById("code").value.trim();
   const newFormat=document.getElementById("format").value;
   const newCover=document.getElementById("cover")&&document.getElementById("cover").value||"AUTO";
-  const newStyle={palette:(document.getElementById("cardPalette")&&document.getElementById("cardPalette").value)||"AUTO",textColor:(document.getElementById("titleColor")&&document.getElementById("titleColor").value)||"WHITE",position:(document.getElementById("titlePosition")&&document.getElementById("titlePosition").value)||"BOTTOM",background:(document.getElementById("titleBackground")&&document.getElementById("titleBackground").value)||"PILL",size:Math.max(14,Math.min(28,Number(document.getElementById("titleSize")&&document.getElementById("titleSize").value)||19)),font:(document.getElementById("titleFont")&&document.getElementById("titleFont").value)||"SYSTEM",visible:!(document.getElementById("titleVisible")&&document.getElementById("titleVisible").value==="false")};
+  const newStyle={palette:(document.getElementById("cardPalette")&&document.getElementById("cardPalette").value)||"AUTO",textColor:(document.getElementById("titleColor")&&document.getElementById("titleColor").value)||"WHITE",position:(document.getElementById("titlePosition")&&document.getElementById("titlePosition").value)||"CENTER",background:(document.getElementById("titleBackground")&&document.getElementById("titleBackground").value)||"PILL",size:Math.max(14,Math.min(28,Number(document.getElementById("titleSize")&&document.getElementById("titleSize").value)||19)),font:(document.getElementById("titleFont")&&document.getElementById("titleFont").value)||"SYSTEM",visible:!(document.getElementById("titleVisible")&&document.getElementById("titleVisible").value==="false")};
   if(!newCode){alert("Введите код карты");return;}
   if(!confirm("Сохранить изменения карты «"+newName+"»?"))return;
   c.name=newName;
