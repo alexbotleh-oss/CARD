@@ -221,3 +221,12 @@ Resolution order: individual card image > user-defined brand default > built-in 
 **Commits:** `9c1dc7f`, `f836f36`, `5ac5aa6` (the `77ecee` commit adds an unused QR preview container; actual QR preview rendering remains open).
 
 **Verification:** GitHub API re-read confirms updated code is present in the working branch. No JavaScript parser, browser interaction, physical-device test, or storage-quota simulation has yet been run for these new changes.
+
+
+## 2026-10-11 — user cover did not render in editor preview
+
+Cause identified in source: HTML entities were inserted into a CSS style string through DOM setAttribute, where HTML entities are not decoded. The editor now sets the cover background through the CSS style API, with explicit size, position, and repeat settings.
+
+Commit: `5ed80be69efe62b01ab3f647bf133118d60ef9a9`.
+
+Evidence: changed source re-read from the work branch. Visual confirmation in browser/device has not yet been performed.
