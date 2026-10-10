@@ -210,3 +210,14 @@ Resolution order: individual card image > user-defined brand default > built-in 
 **Static verification:** both inline JavaScript blocks pass `new Function(...)` syntax compilation after the change.
 
 **Still unverified:** browser tests for valid/empty/invalid backups, localStorage quota failure, and full cover/second-code round trip. There is no physical-device validation yet. Also, browser localStorage updates are not a true cross-key transaction; if the cards key write succeeds and the cover-defaults write fails, persistent state may be partially updated even though in-memory values are restored. Follow-up should make the recovery path resilient to this storage-quota scenario.
+
+
+## 2026-10-11 — editor changes must not be lost on validation failure or rescanning
+
+**Finding:** editing code changed fields on the active card before the second-code validation completed. Also, scanning a primary/secondary code reopened a clean form, discarding unsaved edits to name and appearance.
+
+**Fixes:** editor save stages a copy and validates the required code before replacing the active card; image reading happens before commit; failed localStorage writes attempt to restore the previous card, safe-copy, and brand-cover values. Primary and secondary scan flows now capture and restore editor fields and the style draft before applying scan results.
+
+**Commits:** `9c1dc7f`, `f836f36`, `5ac5aa6` (the `77ecee` commit adds an unused QR preview container; actual QR preview rendering remains open).
+
+**Verification:** GitHub API re-read confirms updated code is present in the working branch. No JavaScript parser, browser interaction, physical-device test, or storage-quota simulation has yet been run for these new changes.
