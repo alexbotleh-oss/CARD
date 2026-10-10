@@ -1175,35 +1175,61 @@ function rescanEdit(id){
   });
 }
 async function updateCard(id){
-  const c=cards.find(function(x){return String(x.id)===String(id);});
-  if(!c)return;
+  const current=cards.find(function(x){return String(x.id)===String(id);});
+  if(!current)return;
   const newName=document.getElementById("name").value.trim()||"Моя карта";
   const newCode=document.getElementById("code").value.trim();
-  const newFormat=document.getElementById("format").value;
+  const newFormat=normalizeFormat(document.getElementById("format").value||current.format||"CODE_128");
   const newCover=document.getElementById("cover")&&document.getElementById("cover").value||"AUTO";
-  const priorStyle=(c.style&&typeof c.style==="object")?c.style:{};const previewCard=(window.__editorPreviewCard&&typeof window.__editorPreviewCard==="object")?window.__editorPreviewCard:{};const previewStyle=(previewCard.style&&typeof previewCard.style==="object")?previewCard.style:{};
-  const newStyle={palette:(document.getElementById("cardPalette")&&document.getElementById("cardPalette").value)||"AUTO",textColor:(document.getElementById("titleColor")&&document.getElementById("titleColor").value)||"WHITE",position:(document.getElementById("titlePosition")&&document.getElementById("titlePosition").value)||"CENTER",background:(document.getElementById("titleBackground")&&document.getElementById("titleBackground").value)||"PILL",size:Math.max(14,Math.min(28,Number(document.getElementById("titleSize")&&document.getElementById("titleSize").value)||19)),font:(document.getElementById("titleFont")&&document.getElementById("titleFont").value)||"SYSTEM",visible:!(document.getElementById("titleVisible")&&document.getElementById("titleVisible").value==="false"),customGradient:previewStyle.customGradient||priorStyle.customGradient||null};
-  if(!newCode){alert("Введите код карты");return;}
-  if(!confirm("Сохранить изменения карты «"+newName+"»?"))return;
-  c.name=newName;
-  c.code=newCode;
-  c.format=newFormat;
+  const priorStyle=(current.style&&typeof current.style==="object")?current.style:{};
+  const previewCard=(window.__editorPreviewCard&&typeof window.__editorPreviewCard==="object")?window.__editorPreviewCard:{};
+  const previewStyle=(previewCard.style&&typeof previewCard.style==="object")?previewCard.style:{};
   const secondEnabled=document.getElementById("secondCodeEnabled");
+  let secondCode="",secondFormat="";
   if(secondEnabled&&secondEnabled.checked){
-    const secondValue=document.getElementById("secondCode");
-    const secondFormat=document.getElementById("secondFormat");
-    const secondCode=String(secondValue&&secondValue.value||"").trim();
+    const secondValue=document.getElementById("secondCode"),secondFmt=document.getElementById("secondFormat");
+    secondCode=String(secondValue&&secondValue.value||"").trim();
+    secondFormat=normalizeFormat(secondFmt&&secondFmt.value||"CODE_128");
     if(!secondCode){alert("Включён второй код, но он не добавлен. Введите его или отсканируйте.");return;}
-    c.secondCode=secondCode;c.secondFormat=normalizeFormat(secondFormat&&secondFormat.value||"CODE_128");
-  }else{delete c.secondCode;delete c.secondFormat;}
-  c.cover=newCover;
-  c.coverImage=String(previewCard.coverImage||"");
-  c.style=newStyle;
-  if(document.getElementById("coverMakeDefault")&&document.getElementById("coverMakeDefault").checked&&c.coverImage){brandCovers[coverForCard(c)]=c.coverImage;saveBrandCovers();}
+  }
+  if(!newCode){alert("Введите код карты");return;}
+  const newStyle={
+    palette:(document.getElementById("cardPalette")&&document.getElementById("cardPalette").value)||"AUTO",
+    textColor:(document.getElementById("titleColor")&&document.getElementById("titleColor").value)||"WHITE",
+    position:(document.getElementById("titlePosition")&&document.getElementById("titlePosition").value)||"CENTER",
+    background:(document.getElementById("titleBackground")&&document.getElementById("titleBackground").value)||"PILL",
+    size:Math.max(14,Math.min(28,Number(document.getElementById("titleSize")&&document.getElementById("titleSize").value)||19)),
+    font:(document.getElementById("titleFont")&&document.getElementById("titleFont").value)||"SYSTEM",
+    visible:!(document.getElementById("titleVisible")&&document.getElementById("titleVisible").value==="false"),
+    customGradient:previewStyle.customGradient||priorStyle.customGradient||null
+  };
+  let imageData=current.image||"";
   const file=document.getElementById("cardImage")&&document.getElementById("cardImage").files[0];
-  if(file)c.image=await readImage(file);
-  save();
-  closeModal();
+  if(file){try{imageData=await readImage(file);}catch(e){alert("Не удалось прочитать изображение карты.");return;}}
+  if(!confirm("Сохранить изменения карты «"+newName+"»?"))return;
+  const nextCard=Object.assign({},current,{name:newName,code:newCode,format:newFormat,cover:newCover,coverImage:String(previewCard.coverImage||""),style:newStyle,image:imageData});
+  if(secondEnabled&&secondEnabled.checked){nextCard.secondCode=secondCode;nextCard.secondFormat=secondFormat;}
+  else{delete nextCard.secondCode;delete nextCard.secondFormat;}
+  const oldCards=cards,oldBrandCovers=brandCovers,nextCards=cards.map(function(x){return String(x.id)===String(id)?nextCard:x;});
+  const makeDefault=!!(document.getElementById("coverMakeDefault")&&document.getElementById("coverMakeDefault").checked&&nextCard.coverImage);
+  const nextBrandCovers=makeDefault?Object.assign({},brandCovers):brandCovers;
+  if(makeDefault)nextBrandCovers[coverForCard(nextCard)]=nextCard.coverImage;
+  let oldCardsRaw=null,oldSafeRaw=null,oldCoversRaw=null;
+  try{
+    oldCardsRaw=localStorage.getItem(KEY);oldSafeRaw=localStorage.getItem(SAFE_KEY);oldCoversRaw=localStorage.getItem(COVER_DEFAULTS_KEY);
+    if(oldCardsRaw!==null){try{localStorage.setItem(SAFE_KEY,oldCardsRaw);}catch(e){}}
+    localStorage.setItem(KEY,JSON.stringify(nextCards));
+    if(makeDefault)localStorage.setItem(COVER_DEFAULTS_KEY,JSON.stringify(nextBrandCovers));
+  }catch(e){
+    try{if(oldCardsRaw===null)localStorage.removeItem(KEY);else localStorage.setItem(KEY,oldCardsRaw);}catch(rollbackError){}
+    try{if(oldSafeRaw===null)localStorage.removeItem(SAFE_KEY);else localStorage.setItem(SAFE_KEY,oldSafeRaw);}catch(rollbackError){}
+    try{if(oldCoversRaw===null)localStorage.removeItem(COVER_DEFAULTS_KEY);else localStorage.setItem(COVER_DEFAULTS_KEY,oldCoversRaw);}catch(rollbackError){}
+    cards=oldCards;brandCovers=oldBrandCovers;
+    alert("Не удалось сохранить изменения. Проверьте свободное место в браузере; текущая карта в памяти не заменена.");
+    return;
+  }
+  cards=nextCards;if(makeDefault)brandCovers=nextBrandCovers;
+  storageState="ok";storageError="";render();closeModal();
 }
 function delCard(id){
   const c=cards.find(function(x){return String(x.id)===String(id);});
