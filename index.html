@@ -919,7 +919,7 @@ function renderPresentedCode(c,mode){
     catch(e){console.error("Barcode render:",format,e);box.innerHTML='<div class="hint">Значение не соответствует формату '+esc(format)+'. Проверьте результат сканирования и тип кода.</div>';}
   }
   const text=document.getElementById("cardCodeText");
-  if(text){text.textContent=code;text.style.display=format==="QR_CODE"?"none":"";}
+  if(text){text.textContent="";text.style.display="none";}
 }
 function openCard(id){
   const c=cards.find(function(x){return String(x.id)===String(id);});
