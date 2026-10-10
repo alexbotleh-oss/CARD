@@ -218,6 +218,16 @@ header{padding:18px 20px 10px;background:#f6f7fbf5}
 <script>
 const KEY="card_wallet_v1";
 const SAFE_KEY=KEY+"_safe_backup";
+const DIAG_KEY="card_wallet_diagnostics_v1";
+const DIAG_LIMIT=180;
+function diagLog(event,details){try{const entry={time:new Date().toISOString(),event:String(event||"event"),details:details||{}};let a=[];try{a=JSON.parse(localStorage.getItem(DIAG_KEY)||"[]");if(!Array.isArray(a))a=[];}catch(e){}a.push(entry);if(a.length>DIAG_LIMIT)a=a.slice(-DIAG_LIMIT);localStorage.setItem(DIAG_KEY,JSON.stringify(a));}catch(e){try{console.warn("CARD111 diagnostic write failed",e);}catch(ignore){}}}
+function diagError(stage,error){diagLog("error",{stage:String(stage),message:String(error&&error.message?error.message:error||"unknown").slice(0,240),name:error&&error.name?String(error.name):""});}
+function diagRead(){try{const a=JSON.parse(localStorage.getItem(DIAG_KEY)||"[]");return Array.isArray(a)?a:[];}catch(e){return [];}}
+function diagExportText(){return JSON.stringify({app:"CARD111",version:"diagnostics-v1",exportedAt:new Date().toISOString(),userAgent:navigator.userAgent,online:navigator.onLine,events:diagRead()},null,2);}
+window.addEventListener("error",function(e){diagLog("window.error",{message:String(e.message||"unknown").slice(0,240),source:String(e.filename||"").split("/").pop(),line:Number(e.lineno)||0,column:Number(e.colno)||0});});
+window.addEventListener("unhandledrejection",function(e){diagError("unhandledrejection",e.reason);});
+diagLog("app.start",{version:"diagnostics-v1",online:navigator.onLine});
+
 const colors=["#17181c","#3157d5","#16845b","#a35b17","#7b3db7","#c23b55"];
 const COVER_LABELS={AUTO:"Автоматически по магазину",MAGNIT:"Магнит",PYATEROCHKA:"Пятёрочка",STOLICHKI:"Столички",PEREKRESTOK:"Перекрёсток",LENTA:"Лента",VkusVill:"ВкусВилл",OKEI:"О'КЕЙ",ASHAN:"АШАН",DIKSI:"Дикси",CHIZHIK:"Чижик",ANTEY:"Аптека Антей",RODINA_UDACHA:"Родина / УДАЧА / Высшая лига",DETMIR:"Детский мир",KARI:"kari CLUB",DNS:"ДНС",BRISTOL:"Бристоль",K_B:"Красное & Белое",CUSTOM:"Свой вариант"};
 function coverForName(name){
@@ -452,10 +462,11 @@ document.getElementById("cards").addEventListener("click",function(e){
   openCard(card.getAttribute("data-id"));
 });
 function openModal(html){
+  diagLog("ui.modal.open",{});
   document.getElementById("sheet").innerHTML=html;
   document.getElementById("modal").classList.add("open");
 }
-function closeModal(){document.getElementById("modal").classList.remove("open");}
+function closeModal(){diagLog("ui.modal.close",{});document.getElementById("modal").classList.remove("open");}
 function showWallet(){
   document.querySelectorAll(".bottomNavItem").forEach((b,i)=>b.classList.toggle("active",i===0));
   closeModal();
@@ -465,8 +476,13 @@ function showSettings(){
   openModal('<button class="close" onclick="closeModal()">×</button><h2>Настройки</h2>'+
     '<button class="btn primary" onclick="exportData()">Сохранить резервную копию</button>'+
     '<button class="btn secondary" onclick="importData()">Восстановить из файла</button>'+
+    '<button class="btn secondary" onclick="showDiagnostics()">Диагностический код / журнал</button>'+
     '<p class="hint">Карты и настройки хранятся локально на устройстве.</p>');
 }
+function showDiagnostics(){diagLog("diagnostics.open",{});openModal('<button class="close" onclick="showSettings()">×</button><h2>Диагностический код</h2><p class="hint">Последние события и ошибки. Значения штрихкодов, изображения и номера карт не записываются.</p><textarea id="diagnosticText" readonly spellcheck="false" style="width:100%;min-height:42vh;box-sizing:border-box;font:12px/1.45 monospace;white-space:pre;overflow:auto"></textarea><button class="btn primary" onclick="copyDiagnostics()">Скопировать диагностический код</button><button class="btn secondary" onclick="refreshDiagnostics()">Обновить журнал</button><button class="btn secondary" onclick="clearDiagnostics()">Очистить журнал</button>');refreshDiagnostics();}
+function refreshDiagnostics(){const el=document.getElementById("diagnosticText");if(el)el.value=diagExportText();}
+async function copyDiagnostics(){const el=document.getElementById("diagnosticText");if(!el)return;el.value=diagExportText();el.focus();el.select();try{if(navigator.clipboard&&navigator.clipboard.writeText){await navigator.clipboard.writeText(el.value);alert("Диагностический код скопирован. Пришлите его в чат.");}else{document.execCommand("copy");alert("Попробовал скопировать журнал. Если не скопировался, выделите текст и выберите «Копировать».");}}catch(e){diagError("diagnostics.copy",e);alert("Не удалось скопировать автоматически. Выделите текст журнала и скопируйте вручную.");}}
+function clearDiagnostics(){if(!confirm("Очистить диагностический журнал? Сохранённые карты не затрагиваются."))return;try{localStorage.removeItem(DIAG_KEY);}catch(e){}diagLog("diagnostics.cleared",{});showDiagnostics();}
 function addMenu(){
   openModal('<button class="close" onclick="closeModal()">×</button><h2>Добавить карту</h2>'+
     '<button class="btn primary" onclick="scanner()">▣ Сканировать штрихкод / QR</button>'+
@@ -524,41 +540,46 @@ async function addCard(){
   }
 }
 function scanner(onResult){
+  diagLog("scanner.open",{mode:"camera-and-gallery"});
   openModal('<button class="close" onclick="closeModal()">×</button><h2>Сканирование скидочной карты</h2><div id="reader"></div><div class="scanTools"><button class="btn primary galleryPrimary" onclick="document.getElementById(\'scanFile\').click()">▣ Сканировать фото из галереи</button><input id="scanFile" type="file" accept="image/*" style="display:none"><p class="hint">Наведите камеру на QR/штрихкод — распознавание происходит автоматически.</p></div>');
   let controls=null,handled=false,reader=null,detector=null,raf=0,video=null,lastKey="",stableHits=0;
   const formats=["qr_code","code_128","ean_13","ean_8","upc_a","upc_e"];
   function mapFormat(raw){const s=String(raw||"").toUpperCase();if(s.indexOf("QR")>=0)return "QR_CODE";if(s.indexOf("DATA_MATRIX")>=0)return "DATA_MATRIX";if(s.indexOf("EAN_13")>=0)return "EAN_13";if(s.indexOf("EAN_8")>=0)return "EAN_8";if(s.indexOf("CODE_128")>=0)return "CODE_128";if(s.indexOf("CODE_39")>=0)return "CODE_39";if(s.indexOf("CODE_93")>=0)return "CODE_93";if(s.indexOf("UPC_A")>=0)return "UPC_A";if(s.indexOf("UPC_E")>=0)return "UPC_E";if(s.indexOf("ITF")>=0)return "ITF";if(s.indexOf("PDF_417")>=0||s.indexOf("PDF417")>=0)return "PDF417";return "CODE_128";}
-  function cleanup(){if(raf)cancelAnimationFrame(raf);try{if(controls)controls.stop();}catch(e){}try{if(reader&&reader.reset)reader.reset();}catch(e){}try{if(video&&video.srcObject){video.srcObject.getTracks().forEach(function(t){t.stop();});video.srcObject=null;}}catch(e){}}
-  function finish(text,raw){if(handled||!text)return;const code=String(text).trim();if(!code)return;const format=mapFormat(raw),key=format+"|"+code;if(key!==lastKey){lastKey=key;stableHits=1;return;}stableHits++;if(stableHits<2)return;handled=true;cleanup();closeModal();const resultData={code:code,format:format};setTimeout(function(){if(typeof onResult==="function")onResult(resultData);else manual(resultData);},100);}
+  function cleanup(){diagLog("scanner.cleanup",{handled:handled});if(raf)cancelAnimationFrame(raf);try{if(controls)controls.stop();}catch(e){}try{if(reader&&reader.reset)reader.reset();}catch(e){}try{if(video&&video.srcObject){video.srcObject.getTracks().forEach(function(t){t.stop();});video.srcObject=null;}}catch(e){}}
+  function finish(text,raw){if(handled||!text){diagLog("scanner.result.ignored",{handled:handled,hasText:!!text});return;}const code=String(text).trim();if(!code){diagLog("scanner.result.empty",{});return;}const format=mapFormat(raw),key=format+"|"+code;diagLog("scanner.result.detected",{source:"camera",format:format,codeLength:code.length});if(key!==lastKey){lastKey=key;stableHits=1;return;}stableHits++;if(stableHits<2)return;handled=true;cleanup();closeModal();const resultData={code:code,format:format};setTimeout(function(){if(typeof onResult==="function")onResult(resultData);else manual(resultData);},100);}
   async function nativeLoop(){if(!detector||!video||handled)return;try{const found=await detector.detect(video);if(found&&found.length)finish(found[0].rawValue,found[0].format);else{lastKey="";stableHits=0;}}catch(e){}if(!handled)raf=requestAnimationFrame(nativeLoop);}
   const readerBox=document.getElementById("reader");video=document.createElement("video");video.setAttribute("playsinline","");video.setAttribute("autoplay","");video.setAttribute("muted","");video.muted=true;video.style.width="100%";video.style.height="100%";video.style.objectFit="cover";readerBox.appendChild(video);
   navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:"environment"},width:{ideal:1280,max:1280},height:{ideal:720,max:720},focusMode:"continuous"},audio:false}).then(function(stream){video.srcObject=stream;return video.play();}).then(function(){if("BarcodeDetector" in window){return BarcodeDetector.getSupportedFormats().then(function(supported){const use=formats.filter(function(x){return supported.indexOf(x)>=0;});if(use.length)detector=new BarcodeDetector({formats:use});if(detector)nativeLoop();else throw Error("BarcodeDetector unavailable");});}throw Error("BarcodeDetector unavailable");}).catch(function(){try{reader=new ZXingBrowser.BrowserMultiFormatReader();}catch(e){reader=null;}if(!reader){readerBox.innerHTML='<p style="padding:30px;color:white;text-align:center">Камера недоступна. Можно выбрать фото из галереи.</p>';return;}reader.decodeFromVideoElement(video,function(result){if(result){const text=result.getText?result.getText():result.text;const fmt=result.getBarcodeFormat?result.getBarcodeFormat():"CODE_128";finish(text,fmt);}}).then(function(c){controls=c;}).catch(function(){});});
-  document.getElementById("scanFile").onchange=async function(e){const file=e.target.files[0];if(!file||handled)return;try{cleanup();await decodeGalleryFile(file,reader,finish);}catch(err){alert("Код не найден. Увеличьте фото, переместите рамку на код и попробуйте снова.");}e.target.value="";};
+  document.getElementById("scanFile").onchange=async function(e){const file=e.target.files[0];if(!file||handled)return;diagLog("scanner.gallery.selected",{type:file.type||"unknown",sizeBytes:file.size||0,nameLength:(file.name||"").length});try{cleanup();await decodeGalleryFile(file,reader,finish);diagLog("scanner.gallery.processing.finished",{});}catch(err){diagError("scanner.gallery.process",err);alert("Код не найден. Увеличьте фото, переместите рамку на код и попробуйте снова.");}e.target.value="";};
 }
 async function decodeGalleryFile(file,reader,finish){
+  diagLog("scanner.gallery.load.start",{type:file.type||"unknown",sizeBytes:file.size||0});
   const url=URL.createObjectURL(file);
   try{
     const img=new Image();
     img.src=url;
-    await new Promise(function(resolve,reject){img.onload=resolve;img.onerror=reject;});
+    await new Promise(function(resolve,reject){img.onload=resolve;img.onerror=function(){reject(Error("gallery-image-load-failed"));};});
+    diagLog("scanner.gallery.image.loaded",{width:img.naturalWidth,height:img.naturalHeight});
+    showCropper(file,reader,finish);
+    diagLog("scanner.gallery.preview.shown",{});
     if("BarcodeDetector" in window){
       try{
         const supported=await BarcodeDetector.getSupportedFormats();
         const detector=new BarcodeDetector({formats:supported});
         const found=await detector.detect(img);
-        if(found&&found.length){finish(found[0].rawValue,found[0].format);return;}
-      }catch(e){}
+        diagLog("scanner.gallery.native.result",{count:found?found.length:0});if(found&&found.length){finish(found[0].rawValue,found[0].format);return;}
+      }catch(e){diagError("scanner.gallery.native.detect",e);}
     }
     if(reader){
       try{
         const result=await reader.decodeFromImageElement(img);
-        if(result){
+        diagLog("scanner.gallery.zxing.result",{found:!!result});if(result){
           finish(result.getText?result.getText():result.text,result.getBarcodeFormat?result.getBarcodeFormat():"QR_CODE");
           return;
         }
-      }catch(e){}
+      }catch(e){diagError("scanner.gallery.zxing.detect",e);}
     }
-    showCropper(file,reader,finish);
+    diagLog("scanner.gallery.no-code",{nextStep:"manual crop"});
   }finally{
     setTimeout(function(){URL.revokeObjectURL(url);},1000);
   }
