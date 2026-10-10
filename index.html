@@ -261,6 +261,32 @@ header{padding:18px 20px 10px;background:#f6f7fbf5}
 }
 
 
+/* CARD111 nine-point title-position picker */
+.titlePositionOpen{display:block;width:100%;margin-top:8px}
+.titlePositionCurrent{margin-top:6px}
+.titlePositionOverlay{position:fixed;inset:0;z-index:80;background:#111a;display:flex;align-items:center;justify-content:center;padding:18px}
+.titlePositionDialog{width:min(440px,100%);max-height:92dvh;overflow:auto;background:#fff;border-radius:24px;padding:18px;box-shadow:0 24px 70px #0004}
+.titlePositionDialog h3{font-size:20px;margin:2px 46px 6px 0}
+.titlePositionDialog>.hint{margin:0 0 14px}
+.titlePositionMap{position:relative;width:min(360px,100%);margin:0 auto;aspect-ratio:1.48/1;border-radius:18px;border:2px solid #aeb5c0;overflow:hidden;background:linear-gradient(135deg,var(--card-color,#1767d8),#00000018);box-shadow:inset 0 0 0 1px #ffffff55}
+.titlePositionMap:before{content:"";position:absolute;inset:0;background:linear-gradient(120deg,#ffffff20,transparent 45%,#00000016);pointer-events:none}
+.titlePositionMapBrand{position:absolute;inset:9% 10% 38%;border-radius:14px;background:radial-gradient(ellipse at 70% 20%,#ffffff35,transparent 60%);pointer-events:none}
+.titlePositionMapTitle{position:absolute;z-index:1;left:8%;right:8%;top:50%;transform:translateY(-50%);font-size:clamp(12px,4vw,20px);line-height:1.12;text-align:center;overflow-wrap:anywhere;pointer-events:none;text-shadow:0 1px 3px #0005;color:#fff}
+.titlePositionMapTitle.title-position-top_left,.titlePositionMapTitle.title-position-middle_left,.titlePositionMapTitle.title-position-bottom_left{text-align:left;left:5%;right:5%}
+.titlePositionMapTitle.title-position-top_center,.titlePositionMapTitle.title-position-center,.titlePositionMapTitle.title-position-bottom_center{text-align:center}
+.titlePositionMapTitle.title-position-top_right,.titlePositionMapTitle.title-position-middle_right,.titlePositionMapTitle.title-position-bottom_right{text-align:right;left:5%;right:5%}
+.titlePositionMapTitle.title-position-top_left,.titlePositionMapTitle.title-position-top_center,.titlePositionMapTitle.title-position-top_right{top:6%;transform:none}
+.titlePositionMapTitle.title-position-middle_left,.titlePositionMapTitle.title-position-center,.titlePositionMapTitle.title-position-middle_right{top:50%;transform:translateY(-50%)}
+.titlePositionMapTitle.title-position-bottom_left,.titlePositionMapTitle.title-position-bottom_center,.titlePositionMapTitle.title-position-bottom_right{top:auto;bottom:6%;transform:none}
+.titlePositionCells{position:absolute;inset:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:repeat(3,minmax(0,1fr));z-index:2}
+.titlePositionCell{border:1px solid #ffffffa8;background:#ffffff08;color:transparent;padding:0;min-width:0;touch-action:manipulation}
+.titlePositionCell span{display:none}
+.titlePositionCell.selected{background:#1677ff36;box-shadow:inset 0 0 0 3px #1677ff}
+.titlePositionCell:focus-visible{outline:3px solid #1677ff;outline-offset:-4px}
+.titlePositionDialogActions{display:flex;gap:10px;margin-top:14px}
+.titlePositionDialogActions>*{flex:1;margin-top:0}
+.titlePositionDialog .close{float:right}
+@media(max-width:420px){.titlePositionOverlay{padding:12px}.titlePositionDialog{padding:15px}.titlePositionMap{width:100%}}
 /* CARD111 brand cover expansion — consistent brand wordmarks for all listed networks */
 .brandArtwork{left:9px;right:9px;top:8px;bottom:37px;gap:6px;text-shadow:none}
 .brandArtwork b{flex:0 0 auto;max-width:44%;font-size:clamp(12px,2.5vw,21px);letter-spacing:-.5px}
@@ -362,15 +388,55 @@ function backgroundOptions(selected){return Object.keys(CARD_TEXT_BACKGROUNDS).m
 function styleEditor(c){
   const s=cardStyle(c);
   return '<div class="cardStylePicker"><div class="hint">Цветовая палитра</div><input id="cardPalette" type="hidden" value="'+esc(s.palette)+'"><div id="paletteGrid" class="styleGrid">'+paletteOptions(s.palette)+'</div>'+
-    '<div class="hint styleBlockTitle">Расположение названия</div><input id="titlePosition" type="hidden" value="'+esc(s.position)+'"><div id="positionGrid" class="styleGrid positionGrid">'+positionOptions(s.position)+'</div>'+
+    '<div class="hint styleBlockTitle">Расположение надписи</div><input id="titlePosition" type="hidden" value="'+esc(s.position)+'"><button type="button" class="btn secondary titlePositionOpen" id="titlePositionOpen">Выбрать положение надписи</button><div class="hint titlePositionCurrent" id="titlePositionCurrent">Текущее положение: '+esc(CARD_TEXT_POSITIONS[s.position]||"По центру")+'</div>'+
     '<div class="hint styleBlockTitle">Стиль фона для названия</div><input id="titleBackground" type="hidden" value="'+esc(s.background)+'"><div id="backgroundGrid" class="styleGrid">'+backgroundOptions(s.background)+'</div>'+
     '<div class="hint styleBlockTitle">Цвет текста</div><input id="titleColor" type="hidden" value="'+esc(s.textColor)+'"><div id="textColorGrid" class="textColorGrid">'+textColorOptions(s.textColor)+'</div>'+
     '<div class="hint styleBlockTitle">Размер текста: <b id="titleSizeValue">'+s.size+' px</b></div><input id="titleSize" type="range" min="14" max="28" step="1" value="'+s.size+'" class="styleRange">'+
     '<div class="hint styleBlockTitle">Шрифт</div><input id="titleFont" type="hidden" value="'+esc(s.font)+'"><div id="fontGrid" class="styleGrid fontGrid">'+fontOptions(s.font)+'</div></div>';
 }
+function openTitlePositionPicker(){
+  const input=document.getElementById("titlePosition");
+  if(!input)return;
+  const selected=input.value||"CENTER";
+  const preview=document.getElementById("editorPreview");
+  const name=(document.getElementById("name")&&document.getElementById("name").value)||"Моя карта";
+  const positionLabels=CARD_TEXT_POSITIONS;
+  const positions=Object.keys(positionLabels);
+  const cardColor=preview?(preview.style.getPropertyValue("--card-color")||"#1767d8"):"#1767d8";
+  const markup='<div class="titlePositionOverlay" id="titlePositionModal" role="dialog" aria-modal="true" aria-labelledby="titlePositionHeading">'+
+    '<div class="titlePositionDialog"><button type="button" class="close" id="titlePositionClose" aria-label="Закрыть">×</button>'+
+    '<h3 id="titlePositionHeading">Положение надписи</h3><p class="hint">Нажмите на одну из 9 областей карты, затем подтвердите выбор.</p>'+
+    '<div class="titlePositionMap" id="titlePositionMap" style="--card-color:'+esc(cardColor)+'">'+
+    '<span class="titlePositionMapBrand" aria-hidden="true"></span><strong id="titlePositionMapTitle" class="title-position-'+selected.toLowerCase()+'">'+esc(name)+'</strong>'+
+    '<div class="titlePositionCells">'+positions.map(function(k){return '<button type="button" class="titlePositionCell '+(k===selected?"selected":"")+'" data-position="'+k+'" aria-label="'+esc(positionLabels[k])+'" title="'+esc(positionLabels[k])+'"><span>'+esc(positionLabels[k])+'</span></button>';}).join("")+'</div></div>'+
+    '<div class="titlePositionDialogActions"><button type="button" class="btn secondary" id="titlePositionCancel">Отмена</button><button type="button" class="btn primary" id="titlePositionConfirm">Подтвердить</button></div></div></div>';
+  document.body.insertAdjacentHTML("beforeend",markup);
+  const overlay=document.getElementById("titlePositionModal");
+  let pending=selected;
+  function choose(k){
+    pending=k;
+    overlay.querySelectorAll(".titlePositionCell").forEach(function(cell){cell.classList.toggle("selected",cell.getAttribute("data-position")===k);});
+    const title=overlay.querySelector("#titlePositionMapTitle");
+    if(title)title.className="title-position-"+k.toLowerCase();
+  }
+  overlay.querySelectorAll(".titlePositionCell").forEach(function(cell){cell.addEventListener("click",function(){choose(cell.getAttribute("data-position"));});});
+  const close=function(){overlay.remove();};
+  overlay.querySelector("#titlePositionClose").onclick=close;
+  overlay.querySelector("#titlePositionCancel").onclick=close;
+  overlay.addEventListener("click",function(e){if(e.target===overlay)close();});
+  overlay.querySelector("#titlePositionConfirm").onclick=function(){
+    input.value=pending;
+    const current=document.getElementById("titlePositionCurrent");
+    if(current)current.textContent="Текущее положение: "+(positionLabels[pending]||pending);
+    close();
+    if(typeof refreshEditorPreview==="function")refreshEditorPreview(window.__editorPreviewCard||{});
+  };
+}
 function bindStyleEditor(){
   function bindGrid(id,inputId,attr){const grid=document.getElementById(id),input=document.getElementById(inputId);if(!grid||!input)return;grid.querySelectorAll("button").forEach(function(btn){btn.onclick=function(){input.value=btn.getAttribute(attr)||"";grid.querySelectorAll("button").forEach(function(x){x.classList.remove("selected");});btn.classList.add("selected");if(typeof refreshEditorPreview==="function")refreshEditorPreview(window.__editorPreviewCard||{});};});}
-  bindGrid("paletteGrid","cardPalette","data-palette");bindGrid("positionGrid","titlePosition","data-position");bindGrid("backgroundGrid","titleBackground","data-background");bindGrid("textColorGrid","titleColor","data-text-color");bindGrid("fontGrid","titleFont","data-font");
+  bindGrid("paletteGrid","cardPalette","data-palette");bindGrid("backgroundGrid","titleBackground","data-background");bindGrid("textColorGrid","titleColor","data-text-color");bindGrid("fontGrid","titleFont","data-font");
+  const positionOpen=document.getElementById("titlePositionOpen");
+  if(positionOpen)positionOpen.onclick=openTitlePositionPicker;
   const range=document.getElementById("titleSize"),out=document.getElementById("titleSizeValue");if(range&&out)range.oninput=function(){out.textContent=range.value+" px";};
 }
 function brandMarkup(cover,name){
