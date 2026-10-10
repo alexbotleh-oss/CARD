@@ -1223,24 +1223,39 @@ function exportData(){
 }
 function importData(){const input=document.getElementById("importFile");if(!input){alert("Не найдено поле выбора резервной копии");return;}input.onchange=readImport;input.value="";input.click();}
 function readImport(e){
-  const f=e.target.files[0];
+  const f=e.target.files&&e.target.files[0];
   if(!f)return;
-  const r=new FileReader();
-  r.onload=function(){
+  const reader=new FileReader();
+  reader.onload=function(){
     try{
-      const d=JSON.parse(r.result);
-      const list=Array.isArray(d)?d:d.cards;
-      if(!Array.isArray(list))throw Error();
-      if(!Array.isArray(d)&&d.brandCovers&&typeof d.brandCovers==="object"&&!Array.isArray(d.brandCovers)){brandCovers=d.brandCovers;saveBrandCovers();}
-      cards=list.filter(function(c){return c&&c.code;}).map(function(c){
-        return {id:String(c.id||Date.now()+Math.random()),name:String(c.name||"Моя карта"),code:String(c.code),format:String(c.format||"CODE_128"),secondCode:String(c.secondCode||""),secondFormat:String(c.secondFormat||"CODE_128"),image:String(c.image||""),color:String(c.color||colors[0]),cover:String(c.cover||"AUTO"),coverImage:String(c.coverImage||""),style:(c.style&&typeof c.style==="object")?c.style:{}};
+      const d=JSON.parse(reader.result);
+      const list=Array.isArray(d)?d:(d&&d.cards);
+      if(!Array.isArray(list))throw new Error("В резервной копии нет списка карт.");
+      const importedCards=list.filter(function(c){return c&&typeof c==="object"&&String(c.code||"").trim();}).map(function(c){
+        return {id:String(c.id||Date.now()+Math.random()),name:String(c.name||"Моя карта"),code:String(c.code).trim(),format:String(c.format||"CODE_128"),secondCode:String(c.secondCode||""),secondFormat:String(c.secondFormat||"CODE_128"),image:String(c.image||""),color:String(c.color||colors[0]),cover:String(c.cover||"AUTO"),coverImage:String(c.coverImage||""),style:(c.style&&typeof c.style==="object"&&!Array.isArray(c.style))?c.style:{}};
       });
-      save();
+      if(!importedCards.length)throw new Error("В резервной копии нет пригодных карт.");
+      const importedCovers=(!Array.isArray(d)&&d.brandCovers&&typeof d.brandCovers==="object"&&!Array.isArray(d.brandCovers))?d.brandCovers:null;
+      if(!confirm("Восстановить "+importedCards.length+" карт? Текущий набор карт будет заменён."))return;
+      const previousCards=cards,previousCovers=brandCovers;
+      cards=importedCards;
+      if(importedCovers)brandCovers=importedCovers;
+      try{
+        localStorage.setItem(KEY,JSON.stringify(cards));
+        if(importedCovers)localStorage.setItem(COVER_DEFAULTS_KEY,JSON.stringify(brandCovers));
+        storageState="ok";storageError="";
+      }catch(saveError){
+        cards=previousCards;brandCovers=previousCovers;
+        alert("Не удалось восстановить резервную копию: данные не сохранены. Освободи место в памяти браузера и повтори попытку.");
+        return;
+      }
+      render();
       closeModal();
       alert("Карты восстановлены: "+cards.length);
-    }catch(x){alert("Не удалось прочитать резервную копию");}
+    }catch(x){alert("Не удалось прочитать резервную копию: "+String(x&&x.message||x));}
   };
-  r.readAsText(f);
+  reader.onerror=function(){alert("Не удалось прочитать файл резервной копии.");};
+  reader.readAsText(f);
   e.target.value="";
 }
 if("serviceWorker" in navigator){
