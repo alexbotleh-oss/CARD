@@ -579,8 +579,42 @@ const BUILTIN_COVER_IMAGES={
 function coverImageForCard(c){const key=coverForCard(c||{});return String((c&&c.coverImage)||brandCovers[key]||BUILTIN_COVER_IMAGES[key]||"");}
 function bindCoverImagePicker(){
   const file=document.getElementById("coverImageFile"),makeDefault=document.getElementById("coverMakeDefault"),restore=document.getElementById("coverRestoreDefault");
-  if(file)file.onchange=async function(e){const f=e.target.files&&e.target.files[0];if(!f)return;if(!/^image\//i.test(f.type||"")){alert("Выберите файл изображения.");file.value="";return;}try{const data=await readCoverImage(f),draft=window.__editorPreviewCard||{};draft.coverImage=data;window.__editorPreviewCard=draft;if(typeof refreshEditorPreview==="function")refreshEditorPreview(draft);const preview=document.getElementById("cardGradientPreview");if(preview){preview.classList.add("active");preview.style.backgroundImage='url("'+data+'")';preview.style.backgroundSize="cover";}}catch(err){alert("Не удалось прочитать изображение рубашки.");}file.value="";};
+  if(file)file.onchange=function(e){const f=e.target.files&&e.target.files[0];if(!f)return;if(!/^image\\//i.test(f.type||"")){alert("Выберите файл изображения.");file.value="";return;}openCoverCropEditor(f);file.value="";};
   if(restore)restore.onclick=function(){const draft=window.__editorPreviewCard||{};delete draft.coverImage;window.__editorPreviewCard=draft;if(makeDefault)makeDefault.checked=false;const preview=document.getElementById("cardGradientPreview");if(preview){const g=draft.style&&draft.style.customGradient;if(g&&g.colors)preview.style.background="linear-gradient("+Number(g.angle||135)+"deg,"+g.colors.join(",")+")";else{preview.classList.remove("active");preview.style.background="";preview.style.backgroundImage="";}}if(typeof refreshEditorPreview==="function")refreshEditorPreview(draft);};
+}
+function openCoverCropEditor(file){
+  const url=URL.createObjectURL(file),img=new Image();
+  img.onload=function(){
+    const ratio=1.48,viewW=320,viewH=Math.round(viewW/ratio);
+    let zoom=1,offsetX=0,offsetY=0,drag=null;
+    openModal('<button class="close" id="cropClose">×</button><div class="detail coverCropDetail"><h3>Подгонка изображения</h3><p class="hint">Увеличь или уменьши изображение и передвинь пальцем, чтобы выбрать нужный участок.</p><div id="coverCropViewport" style="position:relative;overflow:hidden;width:min(100%,320px);aspect-ratio:1.48/1;margin:16px auto;border-radius:16px;background:#17181b;touch-action:none"><img id="coverCropImage" alt="" style="position:absolute;max-width:none;max-height:none;user-select:none;-webkit-user-drag:none;transform-origin:top left"></div><label class="hint">Масштаб<input id="coverCropZoom" type="range" min="1" max="3.5" step=".01" value="1" style="width:100%"></label><button type="button" class="btn primary" id="coverCropApply">Подтвердить и сохранить</button><button type="button" class="btn secondary" id="coverCropCancel">Отмена</button></div>');
+    const viewport=document.getElementById("coverCropViewport"),picture=document.getElementById("coverCropImage"),slider=document.getElementById("coverCropZoom");
+    if(!viewport||!picture||!slider){URL.revokeObjectURL(url);return;}
+    const vw=viewport.clientWidth,vh=viewport.clientHeight,base=Math.max(vw/img.naturalWidth,vh/img.naturalHeight);
+    function paint(){const w=img.naturalWidth*base*zoom,h=img.naturalHeight*base*zoom;offsetX=Math.min(0,Math.max(vw-w,offsetX));offsetY=Math.min(0,Math.max(vh-h,offsetY));picture.style.width=img.naturalWidth+"px";picture.style.height=img.naturalHeight+"px";picture.style.transform="translate("+offsetX+"px,"+offsetY+"px) scale("+(base*zoom)+")";}
+    picture.src=url;picture.onload=paint;
+    slider.oninput=function(){const old=zoom,cx=vw/2,cy=vh/2;zoom=Number(slider.value)||1;offsetX=cx-(cx-offsetX)*(zoom/old);offsetY=cy-(cy-offsetY)*(zoom/old);paint();};
+    viewport.onpointerdown=function(ev){drag={x:ev.clientX,y:ev.clientY,ox:offsetX,oy:offsetY};if(viewport.setPointerCapture)viewport.setPointerCapture(ev.pointerId);};
+    viewport.onpointermove=function(ev){if(!drag)return;offsetX=drag.ox+ev.clientX-drag.x;offsetY=drag.oy+ev.clientY-drag.y;paint();};
+    viewport.onpointerup=viewport.onpointercancel=function(){drag=null;};
+    document.getElementById("cropClose").onclick=function(){URL.revokeObjectURL(url);closeModal();};
+    document.getElementById("coverCropCancel").onclick=function(){URL.revokeObjectURL(url);closeModal();};
+    document.getElementById("coverCropApply").onclick=function(){
+      try{
+        const scale=3,canvas=document.createElement("canvas");canvas.width=Math.round(vw*scale);canvas.height=Math.round(vh*scale);
+        const ctx=canvas.getContext("2d");ctx.fillStyle="#ffffff";ctx.fillRect(0,0,canvas.width,canvas.height);
+        const factor=base*zoom*scale;ctx.drawImage(img,offsetX*scale,offsetY*scale,img.naturalWidth*factor,img.naturalHeight*factor);
+        let data=canvas.toDataURL("image/webp",.84);if(data.indexOf("data:image/webp")!==0)data=canvas.toDataURL("image/jpeg",.84);
+        const draft=window.__editorPreviewCard||{};draft.coverImage=data;window.__editorPreviewCard=draft;
+        if(typeof refreshEditorPreview==="function")refreshEditorPreview(draft);
+        const preview=document.getElementById("cardGradientPreview");if(preview){preview.classList.add("active");preview.style.backgroundImage='url("'+data+'")';preview.style.backgroundSize="cover";preview.style.backgroundPosition="center";}
+        URL.revokeObjectURL(url);closeModal();
+      }catch(err){alert("Не удалось подготовить изображение. Попробуй файл меньшего размера.");}
+    };
+    paint();
+  };
+  img.onerror=function(){URL.revokeObjectURL(url);alert("Не удалось открыть это изображение.");};
+  img.src=url;
 }
 function readCoverImage(file){
   return new Promise(function(resolve,reject){
