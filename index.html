@@ -1322,8 +1322,8 @@ function refreshEditorCodePreview(c){
   const code=document.getElementById("code");
   const fmt=document.getElementById("format");
   if(!host||!el)return;
-  const value=String(code&&code.value||c&&c.code||"").trim();
-  const format=normalizeFormat(fmt&&fmt.value||c&&c.format||"CODE_128");
+  const value=String(code?code.value:(c&&c.code)||"").trim();
+  const format=normalizeFormat(fmt?fmt.value:(c&&c.format)||"CODE_128");
   el.style.display="none";
   el.innerHTML="";
   if(qr){qr.innerHTML="";qr.style.display="none";}
