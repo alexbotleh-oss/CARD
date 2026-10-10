@@ -59,3 +59,11 @@
 - Минимальная правка в `gh-pages-CARD111-ui`: показывать выбранное фото в области кадрирования сразу после загрузки изображения, до попыток автоматического распознавания. Если код распознаётся, штатный путь результата по-прежнему закрывает окно; если нет — фото уже доступно для перемещения/масштабирования и ручного распознавания области.
 - Коммиты: index preview `c128b675ea36fe2e7c025289dd998d9e2f05e104`; SW cache v52 `75ed76db397708bf9cbc11226cf025bab8483920`; регистрация `sw.js?v=52` `7588036595c336a3501a64b2a9509cf1ec6f9fdc`.
 - Проверки: оба inline JS-блока прошли синтаксический разбор; регистрация SW и cache v52 согласованы. Это статическая проверка, не проверка камеры/галереи на Android. Требуется проверить опубликованную страницу и выбрать QR-скриншот.
+
+
+## 2026-10-10 — CARD111 — fix deployment target for diagnostics
+- User screenshot of GitHub Pages settings confirms the published site is built from `candidate/CARD111-ui-2xN-20261006` at repository root, not `gh-pages-CARD111-ui`.
+- Confirmed by fetching files: candidate branch previously had no diagnostic panel, used service worker cache v11 and registration query v51; working branch had the recent diagnostic code but was not the Pages source. This explains why the UI did not change on the published site.
+- Safely applied the diagnostic journal to the configured Pages branch without switching the deployment source. Also adjusted the gallery path to show the selected photo/cropper immediately after image load, before automatic decode attempts.
+- Commits on `candidate/CARD111-ui-2xN-20261006`: index `f851328f19ea3db05b0c9a5a38bc715fdfa44f8d`; SW cache v12 `880b8531c156305ac4a60215eee74037a53eccea`; SW registration v12 `8be10d2dec3a31d0f29be6b6446c62296f47ed3c`.
+- Static checks: both inline JS blocks parse; diagnostic button/export/handlers present; SW cache and registration align at v12. Runtime still needs confirmation after GitHub Pages deployment and mobile refresh.
