@@ -150,3 +150,16 @@ Added `BUILTIN_COVER_IMAGES` URL fallbacks for:
 - Lenta: `https://imgproxy.kuper.ru/imgproxy/size-500-500/czM6Ly9jb250ZW50LWltYWdlcy1wcm9kL3Byb2R1Y3RzLzQ0NjkyNjU1L29yaWdpbmFsLzEvMjAyNS0wMi0wMyUyMDEyJTNBNTQlM0E1NS44MjcwNzklMkIwMCUzQTAwLzQ0NjkyNjU1XzEuanBn.jpg`
 
 Resolution order: individual card image > user-defined brand default > built-in image URL. These are external image sources, not repository-local assets. URL reachability, rendering, licensing, offline behavior and browser/device appearance have not been verified. Do not mark image integration fully tested until those checks pass.
+
+
+## 2026-10-10 — CARD111: optional second code (implementation; browser verification pending)
+
+**Запрос:** для одной карты разрешить включить «Второй код» в настройках, добавить его сканированием и переключать код на экране предъявления, как в приложении «Пятёрочка».
+
+**Изменение:** в `index.html` добавлены поля редактора для второго кода, кнопка запуска существующего сканера, сохранение `secondCode`/`secondFormat`, переключатель основного/второго кода на экране карты и импорт полей из JSON backup. Основной код не перезаписывается вторым. Если второй код не задан, переключатель не показывается. Коммит: `ab9e217d2d0c1edf349022711cb70942993d437d`.
+
+**Проверено:** оба inline JavaScript-блока проходят синтаксическую проверку; статические проверки подтвердили наличие UI, сканирования, сохранения, переключения и import mapping.
+
+**Не проверено:** запуск на реальном браузере/телефоне, фактическое считывание камерой, рендер каждого типа кода, перезапуск и полный экспорт/импорт. Поэтому задача пока не считается end-to-end проверенной.
+
+**Риск:** текущая работа через GitHub API не предоставляет состояние локальной рабочей копии и сама по себе не доказывает визуальную корректность. Handoff-файл отдельным поиском в репозитории не обнаружен; контекст и следующий шаг зафиксированы в `docs/CARD111_DESIGN_PROGRESS.md`.
