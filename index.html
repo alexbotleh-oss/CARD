@@ -269,17 +269,12 @@ header{padding:18px 20px 10px;background:#f6f7fbf5}
 .titlePositionDialog h3{font-size:20px;margin:2px 46px 6px 0}
 .titlePositionDialog>.hint{margin:0 0 14px}
 .titlePositionMap{position:relative;width:min(360px,100%);margin:0 auto;aspect-ratio:1.48/1;border-radius:18px;border:2px solid #aeb5c0;overflow:hidden;background:linear-gradient(135deg,var(--card-color,#1767d8),#00000018);box-shadow:inset 0 0 0 1px #ffffff55}
-.titlePositionMap:before{content:none}.titlePositionMapPlain{background:#f7f8fa!important;box-shadow:none!important}.titlePositionMapPlain .titlePositionMapTitle{color:#242832;text-shadow:none;border:1px dashed #b9bec8;border-radius:6px;padding:3px 6px;max-width:84%}.titlePositionMapBrand{display:none}
-.titlePositionMapTitle{position:absolute;z-index:1;left:8%;right:8%;top:50%;transform:translateY(-50%);font-size:clamp(12px,4vw,20px);line-height:1.12;text-align:center;overflow-wrap:anywhere;pointer-events:none;text-shadow:0 1px 3px #0005;color:#fff}
-.titlePositionMapTitle.title-position-top_left,.titlePositionMapTitle.title-position-middle_left,.titlePositionMapTitle.title-position-bottom_left{text-align:left;left:5%;right:5%}
-.titlePositionMapTitle.title-position-top_center,.titlePositionMapTitle.title-position-center,.titlePositionMapTitle.title-position-bottom_center{text-align:center}
-.titlePositionMapTitle.title-position-top_right,.titlePositionMapTitle.title-position-middle_right,.titlePositionMapTitle.title-position-bottom_right{text-align:right;left:5%;right:5%}
-.titlePositionMapTitle.title-position-top_left,.titlePositionMapTitle.title-position-top_center,.titlePositionMapTitle.title-position-top_right{top:6%;transform:none}
-.titlePositionMapTitle.title-position-middle_left,.titlePositionMapTitle.title-position-center,.titlePositionMapTitle.title-position-middle_right{top:50%;transform:translateY(-50%)}
-.titlePositionMapTitle.title-position-bottom_left,.titlePositionMapTitle.title-position-bottom_center,.titlePositionMapTitle.title-position-bottom_right{top:auto;bottom:6%;transform:none}
+.titlePositionMap:before{content:none}
+.titlePositionMapPlain{background:#f7f8fa!important;box-shadow:none!important}
 .titlePositionCells{position:absolute;inset:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:repeat(3,minmax(0,1fr));z-index:2}
-.titlePositionCell{border:1px solid #ffffffa8;background:#ffffff08;color:transparent;padding:0;min-width:0;touch-action:manipulation}
-.titlePositionCell span{display:none}
+.titlePositionCell{border:1px solid #cbd0d9;background:transparent;color:transparent;padding:0;min-width:0;touch-action:manipulation}
+.titlePositionCell.selected{background:#1677ff24;box-shadow:inset 0 0 0 3px #1677ff}
+.titlePositionCell:focus-visible{outline:3px solid #1677ff;outline-offset:-4px}
 .titlePositionCell.selected{background:#1677ff36;box-shadow:inset 0 0 0 3px #1677ff}
 .titlePositionCell:focus-visible{outline:3px solid #1677ff;outline-offset:-4px}
 .titlePositionDialogActions{display:flex;gap:10px;margin-top:14px}
@@ -398,17 +393,13 @@ function openTitlePositionPicker(){
   const input=document.getElementById("titlePosition");
   if(!input)return;
   const selected=input.value||"CENTER";
-  const preview=document.getElementById("editorPreview");
-  const name=(document.getElementById("name")&&document.getElementById("name").value)||"Моя карта";
   const positionLabels=CARD_TEXT_POSITIONS;
   const positions=Object.keys(positionLabels);
-  const cardColor=preview?(preview.style.getPropertyValue("--card-color")||"#1767d8"):"#1767d8";
   const markup='<div class="titlePositionOverlay" id="titlePositionModal" role="dialog" aria-modal="true" aria-labelledby="titlePositionHeading">'+
     '<div class="titlePositionDialog"><button type="button" class="close" id="titlePositionClose" aria-label="Закрыть">×</button>'+
-    '<h3 id="titlePositionHeading">Положение надписи</h3><p class="hint">Выберите одну из девяти зон на простой схеме карты.</p>'+
-    '<div class="titlePositionMap titlePositionMapPlain" id="titlePositionMap" style="--card-color:'+esc(cardColor)+'">'+
-    '<strong id="titlePositionMapTitle" class="titlePositionMapTitle title-position-'+selected.toLowerCase()+'">'+esc(name)+'</strong>'+
-    '<div class="titlePositionCells">'+positions.map(function(k){return '<button type="button" class="titlePositionCell '+(k===selected?"selected":"")+'" data-position="'+k+'" aria-label="'+esc(positionLabels[k])+'" title="'+esc(positionLabels[k])+'"><span>'+esc(positionLabels[k])+'</span></button>';}).join("")+'</div></div>'+
+    '<h3 id="titlePositionHeading">Положение надписи</h3><p class="hint">Выберите одну из девяти зон на схеме карты.</p>'+
+    '<div class="titlePositionMap titlePositionMapPlain" id="titlePositionMap">'+
+    '<div class="titlePositionCells">'+positions.map(function(k){return '<button type="button" class="titlePositionCell '+(k===selected?"selected":"")+'" data-position="'+k+'" aria-label="'+esc(positionLabels[k])+'" title="'+esc(positionLabels[k])+'"></button>';}).join("")+'</div></div>'+
     '<div class="titlePositionDialogActions"><button type="button" class="btn secondary" id="titlePositionCancel">Отмена</button><button type="button" class="btn primary" id="titlePositionConfirm">Подтвердить</button></div></div></div>';
   document.body.insertAdjacentHTML("beforeend",markup);
   const overlay=document.getElementById("titlePositionModal");
@@ -416,8 +407,6 @@ function openTitlePositionPicker(){
   function choose(k){
     pending=k;
     overlay.querySelectorAll(".titlePositionCell").forEach(function(cell){cell.classList.toggle("selected",cell.getAttribute("data-position")===k);});
-    const title=overlay.querySelector("#titlePositionMapTitle");
-    if(title)title.className="titlePositionMapTitle title-position-"+k.toLowerCase();
   }
   overlay.querySelectorAll(".titlePositionCell").forEach(function(cell){cell.addEventListener("click",function(){choose(cell.getAttribute("data-position"));});});
   const close=function(){overlay.remove();};
