@@ -370,6 +370,7 @@ header{padding:18px 20px 10px;background:#f6f7fbf5}
 <script>
 const KEY="card_wallet_v1";
 const SAFE_KEY=KEY+"_safe_backup";
+const COVER_DEFAULTS_KEY="card_cover_defaults_v1";
 const DIAG_KEY="card_wallet_diagnostics_v1";
 const DIAG_LIMIT=180;
 const CARD111_BUILD="CARD111-20261010-GALLERY-ACCEPT-2";
@@ -500,6 +501,7 @@ function bindCoverPicker(){
   });
   const gradientButton=document.getElementById("coverGradientAdd");
   if(gradientButton)gradientButton.onclick=openGradientPicker;
+  bindCoverImagePicker();
   const gradient=window.__editorPreviewCard&&window.__editorPreviewCard.style&&window.__editorPreviewCard.style.customGradient;
   const preview=document.getElementById("cardGradientPreview");
   if(preview&&gradient&&Array.isArray(gradient.colors)&&gradient.colors.length>=2){
@@ -508,6 +510,8 @@ function bindCoverPicker(){
   }
 }
 let cards=[];
+let brandCovers={};
+try{const stored=JSON.parse(localStorage.getItem(COVER_DEFAULTS_KEY)||"{}");if(stored&&typeof stored==="object"&&!Array.isArray(stored))brandCovers=stored;}catch(e){brandCovers={};}
 let storageState="missing";
 let storageError="";
 try{
@@ -558,6 +562,13 @@ function exportStorageRecovery(){
     a.click();
     setTimeout(function(){URL.revokeObjectURL(a.href);},1000);
   }catch(e){alert("Не удалось выгрузить данные локальной памяти");}
+}
+function saveBrandCovers(){try{localStorage.setItem(COVER_DEFAULTS_KEY,JSON.stringify(brandCovers));}catch(e){alert("Не удалось сохранить стандартные рубашки брендов.");}}
+function coverImageForCard(c){return String((c&&c.coverImage)||brandCovers[coverForCard(c||{})]||"");}
+function bindCoverImagePicker(){
+  const file=document.getElementById("coverImageFile"),makeDefault=document.getElementById("coverMakeDefault"),restore=document.getElementById("coverRestoreDefault");
+  if(file)file.onchange=async function(e){const f=e.target.files&&e.target.files[0];if(!f)return;if(!/^image\//i.test(f.type||"")){alert("Выберите файл изображения.");file.value="";return;}try{const data=await readImage(f),draft=window.__editorPreviewCard||{};draft.coverImage=data;window.__editorPreviewCard=draft;if(typeof refreshEditorPreview==="function")refreshEditorPreview(draft);const preview=document.getElementById("cardGradientPreview");if(preview){preview.classList.add("active");preview.style.backgroundImage='url("'+data+'")';preview.style.backgroundSize="cover";}}catch(err){alert("Не удалось прочитать изображение рубашки.");}file.value="";};
+  if(restore)restore.onclick=function(){const draft=window.__editorPreviewCard||{};delete draft.coverImage;window.__editorPreviewCard=draft;if(makeDefault)makeDefault.checked=false;const preview=document.getElementById("cardGradientPreview");if(preview){const g=draft.style&&draft.style.customGradient;if(g&&g.colors)preview.style.background="linear-gradient("+Number(g.angle||135)+"deg,"+g.colors.join(",")+")";else{preview.classList.remove("active");preview.style.background="";preview.style.backgroundImage="";}}if(typeof refreshEditorPreview==="function")refreshEditorPreview(draft);};
 }
 function readImage(file){
   return new Promise(function(resolve,reject){
@@ -639,7 +650,8 @@ function render(){
     const color=String(c.color||colors[0]);
     const cover=coverForCard(c);
     const logo=c.image?'<img class="cardLogo" src="'+esc(c.image)+'" alt="">':brandMarkup(cover,c.name);
-    return '<button type="button" class="card '+esc(coverClass(c))+' '+esc(cardStyleClass(c))+'" data-id="'+esc(String(c.id))+'" data-mark="" style="--card-color:'+esc(color)+';'+esc(cardStyleInline(c))+(cover==="CUSTOM"&&c.image?"background-image:url(&quot;"+esc(c.image)+"&quot;);":"")+'">'+logo+'<strong>'+esc(c.name)+'</strong></button>';
+    const coverImage=coverImageForCard(c);
+    return '<button type="button" class="card '+esc(coverClass(c))+' '+esc(cardStyleClass(c))+'" data-id="'+esc(String(c.id))+'" data-mark="" style="--card-color:'+esc(color)+';'+esc(cardStyleInline(c))+(coverImage?"background-image:url(&quot;"+esc(coverImage)+"&quot;)!important;background-size:cover!important;background-position:center!important;background-repeat:no-repeat!important;":"")+'">'+logo+'<strong>'+esc(c.name)+'</strong></button>';
   }).join("");
 }
 document.getElementById("cards").addEventListener("click",function(e){
@@ -692,7 +704,7 @@ function manual(data){
     '<button type="button" class="formatOption" onclick="chooseFormat(\'EAN_13\',\'Штрихкод — EAN-13\')">Штрихкод — EAN-13</button>'+
     '<button type="button" class="formatOption" onclick="chooseFormat(\'EAN_8\',\'Штрихкод — EAN-8\')">Штрихкод — EAN-8</button>'+
     '<button type="button" class="formatOption" onclick="chooseFormat(\'QR_CODE\',\'QR-код\')">QR-код</button></div></div></div>'+
-    '<div class="coverPicker"><div class="hint">Рубашка карты</div><input id="cover" type="hidden" value="AUTO"><div id="coverGrid" class="coverGrid">'+coverOptions("AUTO")+'</div><button type="button" class="styleOption gradientAdd coverGradientAdd" id="coverGradientAdd">＋ Создать рубашку с градиентом</button><div id="cardGradientPreview" class="gradientPreview"></div><div class="coverHint">Автоматически выберется знакомая рубашка по названию магазина. Её можно заменить вручную.</div></div>'+styleEditor({style:{}})+''+
+    '<div class="coverPicker"><div class="hint">Рубашка карты</div><input id="cover" type="hidden" value="AUTO"><div id="coverGrid" class="coverGrid">'+coverOptions("AUTO")+'</div><button type="button" class="styleOption gradientAdd coverGradientAdd" id="coverGradientAdd">＋ Создать рубашку с градиентом</button><div id="cardGradientPreview" class="gradientPreview"></div><div class="coverHint">Автоматически выберется знакомая рубашка по названию магазина. Её можно заменить вручную.</div><label class="coverUploadLabel">Изображение рубашки<input id="coverImageFile" type="file" accept="image/*"></label><label class="coverDefaultLabel"><input id="coverMakeDefault" type="checkbox"> Использовать как стандартную рубашку бренда</label><button type="button" class="btn secondary" id="coverRestoreDefault">Восстановить стандартную рубашку</button></div>'+styleEditor({style:{}})+''+
     '<label class="hint" style="display:block;margin-top:12px">Фото карты<input id="cardImage" type="file" accept="image/*" style="width:100%;margin-top:6px"></label>'+
     '<button class="btn primary" onclick="addCard()">Сохранить карту</button>');
   bindCoverPicker();
@@ -715,7 +727,9 @@ async function addCard(){
     let image="";
     if(file)image=await readImage(file);
     if(!Array.isArray(cards))cards=[];
-    const card={id:String(Date.now()),name:name,code:code,format:format,image:image,color:colors[cards.length%colors.length],cover:cover,style:style};
+    const draft=window.__editorPreviewCard||{};
+    const card={id:String(Date.now()),name:name,code:code,format:format,image:image,color:colors[cards.length%colors.length],cover:cover,coverImage:String(draft.coverImage||""),style:style};
+    if(document.getElementById("coverMakeDefault")&&document.getElementById("coverMakeDefault").checked&&card.coverImage){brandCovers[coverForCard(card)]=card.coverImage;saveBrandCovers();}
     cards.unshift(card);
     localStorage.setItem(KEY,JSON.stringify(cards));
     storageState="ok";
@@ -918,7 +932,7 @@ function editorCoverCategory(k){
 function editorCoverCatalog(selected){
   const cats=[["ALL","Все"],["PRODUCTS","Продукты"],["PHARMACY","Аптеки"],["CLOTHING","Одежда"],["OTHER","Другое"]];
   return '<div class="coverCategoryGrid" id="coverCategoryGrid">'+cats.map(function(x,i){return '<button type="button" class="coverCategory '+(i===0?"active":"")+'" data-cover-category="'+x[0]+'">'+x[1]+'</button>';}).join("")+'</div>'+
-    '<div id="editorCoverGrid" class="coverGrid">'+coverOptions(selected)+'</div><button type="button" class="styleOption gradientAdd coverGradientAdd" id="coverGradientAdd">＋ Создать рубашку с градиентом</button><div id="cardGradientPreview" class="gradientPreview"></div>';
+    '<div id="editorCoverGrid" class="coverGrid">'+coverOptions(selected)+'</div><button type="button" class="styleOption gradientAdd coverGradientAdd" id="coverGradientAdd">＋ Создать рубашку с градиентом</button><div id="cardGradientPreview" class="gradientPreview"></div><label class="coverUploadLabel">Изображение рубашки<input id="coverImageFile" type="file" accept="image/*"></label><label class="coverDefaultLabel"><input id="coverMakeDefault" type="checkbox"> Использовать как стандартную рубашку бренда</label><button type="button" class="btn secondary" id="coverRestoreDefault">Восстановить стандартную рубашку</button>';
 }
 function editorPreviewData(c){
   const base=Object.assign({},c||{});
@@ -943,9 +957,10 @@ function refreshEditorPreview(c){
   const p=editorPreviewData(c);
   const cover=coverForCard(p);
   const logo=p.image?'<img class="cardLogo" src="'+esc(p.image)+'" alt="">':brandMarkup(cover,p.name);
+  const coverImage=coverImageForCard(p);
   box.className="card editorPreview "+coverClass(p)+" "+cardStyleClass(p);
   box.innerHTML=logo+'<strong>'+esc(p.name)+'</strong>';
-  box.setAttribute("style","--card-color:"+esc(String(p.color||colors[0]))+";"+esc(cardStyleInline(p)));
+  box.setAttribute("style","--card-color:"+esc(String(p.color||colors[0]))+";"+esc(cardStyleInline(p))+(coverImage?"background-image:url(&quot;"+esc(coverImage)+"&quot;)!important;background-size:cover!important;background-position:center!important;background-repeat:no-repeat!important;":""));
   const previewTitle=box.querySelector("strong");
   if(previewTitle){
     const ps=cardStyle(p);
@@ -1057,7 +1072,9 @@ async function updateCard(id){
   c.code=newCode;
   c.format=newFormat;
   c.cover=newCover;
+  c.coverImage=String(previewCard.coverImage||"");
   c.style=newStyle;
+  if(document.getElementById("coverMakeDefault")&&document.getElementById("coverMakeDefault").checked&&c.coverImage){brandCovers[coverForCard(c)]=c.coverImage;saveBrandCovers();}
   const file=document.getElementById("cardImage")&&document.getElementById("cardImage").files[0];
   if(file)c.image=await readImage(file);
   save();
@@ -1072,7 +1089,7 @@ function delCard(id){
   closeModal();
 }
 function exportData(){
-  const blob=new Blob([JSON.stringify({version:1,cards:cards},null,2)],{type:"application/json"});
+  const blob=new Blob([JSON.stringify({version:2,cards:cards,brandCovers:brandCovers},null,2)],{type:"application/json"});
   const a=document.createElement("a");
   a.href=URL.createObjectURL(blob);
   a.download="CARD_backup.json";
@@ -1089,8 +1106,9 @@ function readImport(e){
       const d=JSON.parse(r.result);
       const list=Array.isArray(d)?d:d.cards;
       if(!Array.isArray(list))throw Error();
+      if(!Array.isArray(d)&&d.brandCovers&&typeof d.brandCovers==="object"&&!Array.isArray(d.brandCovers)){brandCovers=d.brandCovers;saveBrandCovers();}
       cards=list.filter(function(c){return c&&c.code;}).map(function(c){
-        return {id:String(c.id||Date.now()+Math.random()),name:String(c.name||"Моя карта"),code:String(c.code),format:String(c.format||"CODE_128"),image:String(c.image||""),color:String(c.color||colors[0]),cover:String(c.cover||"AUTO"),style:(c.style&&typeof c.style==="object")?c.style:{}};
+        return {id:String(c.id||Date.now()+Math.random()),name:String(c.name||"Моя карта"),code:String(c.code),format:String(c.format||"CODE_128"),image:String(c.image||""),color:String(c.color||colors[0]),cover:String(c.cover||"AUTO"),coverImage:String(c.coverImage||""),style:(c.style&&typeof c.style==="object")?c.style:{}};
       });
       save();
       closeModal();
