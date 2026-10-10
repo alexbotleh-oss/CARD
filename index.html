@@ -682,6 +682,7 @@ function addMenu(){
 }
 function manual(data){
   data=data||{};
+  window.__editorPreviewCard={style:{}};
   const fmt=data.format||"CODE_128";
   openModal('<button class="close" onclick="addMenu()">×</button><h2>Новая скидочная карта</h2>'+
     '<input id="name" name="discount_name" autocomplete="off" placeholder="Название карты" value="'+esc(data.name)+'">'+
@@ -957,16 +958,17 @@ function setEditorTab(tab){
   document.querySelectorAll(".editorPanel").forEach(function(p){p.classList.toggle("active",p.getAttribute("data-panel")===tab);});
 }
 function bindEditorPreview(c){
-  window.__editorPreviewCard=c||{};
+  const previewCard=Object.assign({},c||{},{style:Object.assign({},(c&&c.style)||{})});
+  window.__editorPreviewCard=previewCard;
   const name=document.getElementById("name"),code=document.getElementById("code");
-  [name,code].forEach(function(el){if(el)el.addEventListener("input",function(){refreshEditorPreview(c);if(el===code)refreshEditorCodePreview(c);});});
-  ["cardPalette","titlePosition","titleBackground","titleColor","titleSize","titleFont","titleVisible"].forEach(function(id){const el=document.getElementById(id);if(el)el.addEventListener("input",function(){refreshEditorPreview(c);});el&&el.addEventListener("change",function(){refreshEditorPreview(c);});});
+  [name,code].forEach(function(el){if(el)el.addEventListener("input",function(){refreshEditorPreview(previewCard);if(el===code)refreshEditorCodePreview(previewCard);});});
+  ["cardPalette","titlePosition","titleBackground","titleColor","titleSize","titleFont","titleVisible"].forEach(function(id){const el=document.getElementById(id);if(el)el.addEventListener("input",function(){refreshEditorPreview(previewCard);});el&&el.addEventListener("change",function(){refreshEditorPreview(previewCard);});});
   document.querySelectorAll(".editorTab").forEach(function(btn){btn.onclick=function(){setEditorTab(btn.getAttribute("data-tab"));};});
   const grid=document.getElementById("editorCoverGrid")||document.getElementById("coverGrid"),input=document.getElementById("cover");
-  if(grid&&input)grid.addEventListener("click",function(e){const b=e.target.closest(".coverOption");if(b)setTimeout(function(){refreshEditorPreview(c);},0);});
+  if(grid&&input)grid.addEventListener("click",function(e){const b=e.target.closest(".coverOption");if(b)setTimeout(function(){refreshEditorPreview(previewCard);},0);});
   const cat=document.getElementById("coverCategoryGrid");
   if(cat)cat.querySelectorAll(".coverCategory").forEach(function(btn){btn.onclick=function(){cat.querySelectorAll(".coverCategory").forEach(function(x){x.classList.remove("active");});btn.classList.add("active");const value=btn.getAttribute("data-cover-category");document.querySelectorAll("#editorCoverGrid .coverOption").forEach(function(x){const k=x.getAttribute("data-cover")||"AUTO";x.style.display=(value==="ALL"||editorCoverCategory(k)===value)?"":"none";});};});
-  refreshEditorPreview(c);
+  refreshEditorPreview(previewCard);
 }
 function manualEdit(id){
   const c=cards.find(function(x){return String(x.id)===String(id);});
