@@ -74,7 +74,7 @@ h1{margin:0;font-size:28px}.sub{color:#737780;font-size:14px;margin-top:4px}.btn
 .card.palette-red:before,.card.palette-blue:before,.card.palette-green:before,.card.palette-purple:before,.card.palette-amber:before,.card.palette-graphite:before,.card.palette-light:before{opacity:.28}.card.palette-light strong{background:#ffffffd9!important;text-shadow:none!important}
 .cardStylePicker{margin-top:14px;padding:14px;border:1px solid #e4e6eb;border-radius:18px;background:#fafbfc}.styleBlockTitle{margin-top:14px}.styleGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:7px}.positionGrid{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}.positionGrid .positionChoice{min-height:52px;padding:7px 4px;font-size:12px;line-height:1.15}.styleOption{min-height:42px;border:2px solid #e2e3e8;border-radius:12px;background:#fff;padding:8px 10px;font:inherit;font-weight:700;color:#30333a}.styleOption.selected{border-color:#1677ff;box-shadow:0 0 0 1px #1677ff inset}
 .palette-choice-red{background:linear-gradient(135deg,#ef3340,#b30f30);color:#fff}.palette-choice-blue{background:linear-gradient(135deg,#1767d8,#163c91);color:#fff}.palette-choice-green{background:linear-gradient(135deg,#0aa66d,#087557);color:#fff}.palette-choice-purple{background:linear-gradient(135deg,#7b3fe4,#45218b);color:#fff}.palette-choice-amber{background:linear-gradient(135deg,#f5bd2e,#c47708);color:#17181c}.palette-choice-graphite{background:linear-gradient(135deg,#4a5058,#17181c);color:#fff}.palette-choice-light{background:linear-gradient(135deg,#fff,#e7e9ed);color:#17181c}
-.textColorGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin-top:7px}.styleColorChoice{min-height:42px;border:2px solid #e2e3e8;border-radius:12px;background:#fff;padding:5px 3px;font:11px inherit;font-weight:700;color:#30333a}.styleColorChoice span{display:block;width:20px;height:20px;border-radius:50%;margin:0 auto 3px;border:1px solid #c9cbd0}.styleColorChoice b{font-weight:650}.styleColorChoice.selected{border-color:#1677ff;box-shadow:0 0 0 1px #1677ff inset}.style-color-white span{background:#fff}.style-color-black span{background:#17181c}.style-color-yellow span{background:#ffd43b}.style-color-red span{background:#e03131}.style-color-green span{background:#159447}.style-color-blue span{background:#1767d8}
+.textColorGrid{display:flex;gap:9px;margin-top:7px;overflow-x:auto;overflow-y:hidden;padding:3px 2px 9px;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch;touch-action:pan-x}.textColorGrid::-webkit-scrollbar{height:5px}.textColorGrid::-webkit-scrollbar-thumb{background:#c8cbd2;border-radius:9px}.styleColorChoice{flex:0 0 82px;min-width:82px;min-height:66px;scroll-snap-align:start;border:2px solid #e2e3e8;border-radius:12px;background:#fff;padding:7px 5px;font:11px inherit;font-weight:700;color:#30333a;touch-action:manipulation}.styleColorChoice span{display:block;width:20px;height:20px;border-radius:50%;margin:0 auto 3px;border:1px solid #c9cbd0}.styleColorChoice b{font-weight:650}.styleColorChoice.selected{border-color:#1677ff;box-shadow:0 0 0 1px #1677ff inset}.card.title-hidden>strong,.editorPreview.title-hidden>strong{display:none!important}.style-color-white span{background:#fff}.style-color-black span{background:#17181c}.style-color-yellow span{background:#ffd43b}.style-color-red span{background:#e03131}.style-color-green span{background:#159447}.style-color-blue span{background:#1767d8}
 .styleRange{width:100%;margin-top:7px;accent-color:#1677ff}.fontGrid .styleOption{font-size:15px}
 
  
@@ -260,6 +260,71 @@ header{padding:18px 20px 10px;background:#f6f7fbf5}
   .editorPreview{width:min(220px,100%)!important;aspect-ratio:1.48/1!important}
 }
 
+
+/* CARD111 nine-point title-position picker */
+.titlePositionOpen{display:block;width:100%;margin-top:8px}
+.titlePositionCurrent{margin-top:6px}
+.titlePositionOverlay{position:fixed;inset:0;z-index:80;background:#111a;display:flex;align-items:center;justify-content:center;padding:18px}
+.titlePositionDialog{width:min(440px,100%);max-height:92dvh;overflow:auto;background:#fff;border-radius:24px;padding:18px;box-shadow:0 24px 70px #0004}
+.titlePositionDialog h3{font-size:20px;margin:2px 46px 6px 0}
+.titlePositionDialog>.hint{margin:0 0 14px}
+.titlePositionMap{position:relative;width:min(360px,100%);margin:0 auto;aspect-ratio:1.48/1;border-radius:18px;border:2px solid #aeb5c0;overflow:hidden;background:linear-gradient(135deg,var(--card-color,#1767d8),#00000018);box-shadow:inset 0 0 0 1px #ffffff55}
+.titlePositionMap:before{content:none}.titlePositionMapPlain{background:#f7f8fa!important;box-shadow:none!important}.titlePositionMapPlain .titlePositionMapTitle{color:#242832;text-shadow:none;border:1px dashed #b9bec8;border-radius:6px;padding:3px 6px;max-width:84%}.titlePositionMapBrand{display:none}
+.titlePositionMapTitle{position:absolute;z-index:1;left:8%;right:8%;top:50%;transform:translateY(-50%);font-size:clamp(12px,4vw,20px);line-height:1.12;text-align:center;overflow-wrap:anywhere;pointer-events:none;text-shadow:0 1px 3px #0005;color:#fff}
+.titlePositionMapTitle.title-position-top_left,.titlePositionMapTitle.title-position-middle_left,.titlePositionMapTitle.title-position-bottom_left{text-align:left;left:5%;right:5%}
+.titlePositionMapTitle.title-position-top_center,.titlePositionMapTitle.title-position-center,.titlePositionMapTitle.title-position-bottom_center{text-align:center}
+.titlePositionMapTitle.title-position-top_right,.titlePositionMapTitle.title-position-middle_right,.titlePositionMapTitle.title-position-bottom_right{text-align:right;left:5%;right:5%}
+.titlePositionMapTitle.title-position-top_left,.titlePositionMapTitle.title-position-top_center,.titlePositionMapTitle.title-position-top_right{top:6%;transform:none}
+.titlePositionMapTitle.title-position-middle_left,.titlePositionMapTitle.title-position-center,.titlePositionMapTitle.title-position-middle_right{top:50%;transform:translateY(-50%)}
+.titlePositionMapTitle.title-position-bottom_left,.titlePositionMapTitle.title-position-bottom_center,.titlePositionMapTitle.title-position-bottom_right{top:auto;bottom:6%;transform:none}
+.titlePositionCells{position:absolute;inset:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:repeat(3,minmax(0,1fr));z-index:2}
+.titlePositionCell{border:1px solid #ffffffa8;background:#ffffff08;color:transparent;padding:0;min-width:0;touch-action:manipulation}
+.titlePositionCell span{display:none}
+.titlePositionCell.selected{background:#1677ff36;box-shadow:inset 0 0 0 3px #1677ff}
+.titlePositionCell:focus-visible{outline:3px solid #1677ff;outline-offset:-4px}
+.titlePositionDialogActions{display:flex;gap:10px;margin-top:14px}
+.titlePositionDialogActions>*{flex:1;margin-top:0}
+.titlePositionDialog .close{float:right}
+@media(max-width:420px){.titlePositionOverlay{padding:12px}.titlePositionDialog{padding:15px}.titlePositionMap{width:100%}}
+/* CARD111 brand cover expansion — consistent brand wordmarks for all listed networks */
+.brandArtwork{left:9px;right:9px;top:8px;bottom:37px;gap:6px;text-shadow:none}
+.brandArtwork b{flex:0 0 auto;max-width:44%;font-size:clamp(12px,2.5vw,21px);letter-spacing:-.5px}
+.brandArtwork i{font-size:clamp(10px,2.15vw,16px);overflow-wrap:anywhere}
+.card.cover-globus{background:linear-gradient(135deg,#f4f5f6,#fff 62%,#e4e8eb)!important;box-shadow:inset 0 0 0 2px #dfe2e6,0 8px 22px #00000018!important;color:#183d79}
+.card.cover-globus .brandArtwork{color:#183d79}
+.card.cover-rigla{background:linear-gradient(135deg,#087f50,#075b42)!important}
+.card.cover-budzorov{background:linear-gradient(135deg,#0b7b59,#07543f)!important}
+.card.cover-zdravcity{background:linear-gradient(135deg,#13a5a4,#087e87)!important}
+.card.cover-gorzdrav{background:linear-gradient(135deg,#1675bd,#064b91)!important}
+.card.cover-apteka366{background:linear-gradient(135deg,#f5f7f8,#fff)!important;box-shadow:inset 0 0 0 2px #dfe5e9,0 8px 22px #00000018!important}
+.card.cover-apteka366 .brandArtwork{color:#1871b8}
+.card.cover-neofarm{background:linear-gradient(135deg,#fff,#eaf4ee)!important;box-shadow:inset 0 0 0 2px #dfe8e2,0 8px 22px #00000018!important}
+.card.cover-neofarm .brandArtwork{color:#13845b}
+.card.cover-planeta_zdorovya{background:linear-gradient(135deg,#e9f3fa,#fff)!important;box-shadow:inset 0 0 0 2px #dce8f0,0 8px 22px #00000018!important}
+.card.cover-planeta_zdorovya .brandArtwork{color:#1268a7}
+.card.cover-maxavit{background:linear-gradient(135deg,#eaf5e7,#fff)!important;box-shadow:inset 0 0 0 2px #dce9d8,0 8px 22px #00000018!important}
+.card.cover-maxavit .brandArtwork{color:#347c36}
+.card.cover-ostin{background:linear-gradient(135deg,#22252b,#42464d)!important}
+.card.cover-rendezvous{background:linear-gradient(135deg,#1d252c,#46525a)!important}
+.card.cover-hc{background:linear-gradient(135deg,#fff,#f1f2f4)!important;box-shadow:inset 0 0 0 2px #dfe2e6,0 8px 22px #00000018!important}
+.card.cover-hc .brandArtwork{color:#313944}
+.card.cover-lcwaikiki{background:linear-gradient(135deg,#c9162b,#9d1020)!important}
+.card.cover-maxidom{background:linear-gradient(135deg,#168d8d,#086c70)!important}
+.card.cover-mvideo{background:linear-gradient(135deg,#ef2d32,#b90f20)!important}
+.card.cover-eldorado{background:linear-gradient(135deg,#f8d328,#f2a900)!important;color:#202020}
+.card.cover-eldorado .brandArtwork{color:#202020}
+.card.cover-rigla .brandArtwork,.card.cover-budzorov .brandArtwork,.card.cover-zdravcity .brandArtwork,.card.cover-gorzdrav .brandArtwork,.card.cover-ostin .brandArtwork,.card.cover-rendezvous .brandArtwork,.card.cover-lcwaikiki .brandArtwork,.card.cover-maxidom .brandArtwork,.card.cover-mvideo .brandArtwork{color:#fff}
+.coverOption.cover-globus{background:#f5f6f7!important;color:#183d79!important;box-shadow:inset 0 0 0 2px #dfe2e6}
+.coverOption.cover-rigla{background:#087f50!important;color:#fff!important}
+.coverOption.cover-budzorov{background:#0b7b59!important;color:#fff!important}
+.coverOption.cover-zdravcity{background:#13a5a4!important;color:#fff!important}
+.coverOption.cover-gorzdrav{background:#1675bd!important;color:#fff!important}
+.coverOption.cover-apteka366,.coverOption.cover-neofarm,.coverOption.cover-planeta_zdorovya,.coverOption.cover-maxavit,.coverOption.cover-hc{background:#f8fafb!important;color:#1768a0!important;box-shadow:inset 0 0 0 2px #dfe5e9}
+.coverOption.cover-ostin,.coverOption.cover-rendezvous,.coverOption.cover-lcwaikiki{background:#252a31!important;color:#fff!important}
+.coverOption.cover-maxidom{background:#168d8d!important;color:#fff!important}
+.coverOption.cover-mvideo{background:#ef2d32!important;color:#fff!important}
+.coverOption.cover-eldorado{background:#f8d328!important;color:#202020!important}
+
 </style>
 </head>
 <body>
@@ -285,26 +350,18 @@ window.addEventListener("unhandledrejection",function(e){diagError("unhandledrej
 diagLog("app.start",{version:"diagnostics-v2",build:CARD111_BUILD,online:navigator.onLine});
 
 const colors=["#17181c","#3157d5","#16845b","#a35b17","#7b3db7","#c23b55"];
-const COVER_LABELS={AUTO:"Автоматически по магазину",MAGNIT:"Магнит",PYATEROCHKA:"Пятёрочка",STOLICHKI:"Столички",PEREKRESTOK:"Перекрёсток",LENTA:"Лента",VkusVill:"ВкусВилл",OKEI:"О'КЕЙ",ASHAN:"АШАН",DIKSI:"Дикси",CHIZHIK:"Чижик",ANTEY:"Аптека Антей",RODINA_UDACHA:"Родина / УДАЧА / Высшая лига",DETMIR:"Детский мир",KARI:"kari CLUB",DNS:"ДНС",BRISTOL:"Бристоль",K_B:"Красное & Белое",CUSTOM:"Свой вариант"};
+const COVER_LABELS={AUTO:"Автоматически по магазину",MAGNIT:"Магнит",PYATEROCHKA:"Пятёрочка",PEREKRESTOK:"Перекрёсток",LENTA:"Лента",OKEI:"О’КЕЙ",DIKSI:"Дикси",CHIZHIK:"Чижик",ASHAN:"Ашан",GLOBUS:"Глобус",VkusVill:"ВкусВилл",RIGLA:"Ригла",BUDZOROV:"Будь Здоров",ZDRAVCITY:"Здравсити",STOLICHKI:"Столички",GORZDRAV:"Горздрав",APTEKA366:"36,6",NEOFARM:"Неофарм",PLANETA_ZDOROVYA:"Планета здоровья",MAXAVIT:"Максавит",OSTIN:"O’STIN",KARI:"Kari",RENDEZVOUS:"Rendez-Vous",HC:"ХЦ",LCWAIKIKI:"LC Waikiki",MAXIDOM:"Максидом",MVIDEO:"М.Видео",ELDORADO:"Эльдорадо",DETMIR:"Детский мир",DNS:"DNS",ANTEY:"Аптека Антей",RODINA_UDACHA:"Родина / УДАЧА / Высшая лига",BRISTOL:"Бристоль",K_B:"Красное & Белое",CUSTOM:"Свой вариант"};
 function coverForName(name){
-  const n=String(name||"").toLowerCase().replace(/ё/g,"е");
-  if(n.includes("магнит"))return "MAGNIT";
-  if(n.includes("пятероч")||n.includes("пятерка")||n.includes("5ка")||n.includes("5-ка"))return "PYATEROCHKA";
-  if(n.includes("столичк"))return "STOLICHKI";
-  if(n.includes("перекрест"))return "PEREKRESTOK";
-  if(n.includes("лента"))return "LENTA";
-  if(n.includes("вкусвилл"))return "VkusVill";
-  if(n.includes("окей")||n.includes("o'кей")||n.includes("o'kei"))return "OKEI";
-  if(n.includes("ашан"))return "ASHAN";
-  if(n.includes("дикси"))return "DIKSI";
-  if(n.includes("чижик"))return "CHIZHIK";
-  if(n.includes("антей")||n.includes("аптека антей"))return "ANTEY";
-  if(n.includes("родина")||n.includes("удача")||n.includes("высшая лига")||n.includes("лига гранд"))return "RODINA_UDACHA";
-  if(n.includes("детский мир")||n.includes("детскиймир"))return "DETMIR";
-  if(n.includes("kari")||n.includes("кари"))return "KARI";
-  if(n.includes("днс")||n.includes("dns"))return "DNS";
-  if(n.includes("бристоль"))return "BRISTOL";
-  if(n.includes("красное белое")||n.includes("красное&белое")||n.includes("красное и белое"))return "K_B";
+  const n=String(name||"").toLowerCase().replace(/ё/g,"е").replace(/[’']/g,"");
+  const rules=[
+    ["магнит","MAGNIT"],["пятероч","PYATEROCHKA"],["пятерка","PYATEROCHKA"],["5ка","PYATEROCHKA"],["5-ка","PYATEROCHKA"],
+    ["перекрест","PEREKRESTOK"],["лента","LENTA"],["вкусвилл","VkusVill"],["окей","OKEI"],["okei","OKEI"],["ашан","ASHAN"],["дикси","DIKSI"],["чижик","CHIZHIK"],["глобус","GLOBUS"],
+    ["ригла","RIGLA"],["будь здоров","BUDZOROV"],["здравсити","ZDRAVCITY"],["столичк","STOLICHKI"],["горздрав","GORZDRAV"],["36,6","APTEKA366"],["36.6","APTEKA366"],["неофарм","NEOFARM"],["планета здоровья","PLANETA_ZDOROVYA"],["максавит","MAXAVIT"],
+    ["o’stin","OSTIN"],["ostin","OSTIN"],["карі","KARI"],["kari","KARI"],["рендез","RENDEZVOUS"],["rendez-vous","RENDEZVOUS"],["хц","HC"],["lc waikiki","LCWAIKIKI"],["lcwaikiki","LCWAIKIKI"],
+    ["максидом","MAXIDOM"],["м.видео","MVIDEO"],["мвидео","MVIDEO"],["эльдорадо","ELDORADO"],["детский мир","DETMIR"],["детскиймир","DETMIR"],["днс","DNS"],["dns","DNS"],
+    ["антей","ANTEY"],["родина","RODINA_UDACHA"],["удача","RODINA_UDACHA"],["высшая лига","RODINA_UDACHA"],["лига гранд","RODINA_UDACHA"],["бристоль","BRISTOL"],["красное белое","K_B"],["красное&белое","K_B"],["красное и белое","K_B"]
+  ];
+  for(let i=0;i<rules.length;i++){if(n.includes(rules[i][0]))return rules[i][1];}
   return "CUSTOM";
 }
 
@@ -318,9 +375,9 @@ const CARD_FONTS={SYSTEM:'system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",
 const CARD_FONT_LABELS={SYSTEM:"Системный",ARIAL:"Arial",TREBUCHET:"Trebuchet",GEORGIA:"Georgia",COURIER:"Courier"};
 function cardStyle(c){
   const s=(c&&c.style&&typeof c.style==="object")?c.style:{};
-  return {palette:CARD_PALETTES[s.palette]?s.palette:"AUTO",textColor:CARD_TEXT_COLORS[s.textColor]?s.textColor:"WHITE",position:CARD_TEXT_POSITIONS[s.position]?s.position:"CENTER",background:CARD_TEXT_BACKGROUNDS[s.background]?s.background:"PILL",size:Math.max(14,Math.min(28,Number(s.size)||19)),font:CARD_FONTS[s.font]?s.font:"SYSTEM"};
+  return {palette:CARD_PALETTES[s.palette]?s.palette:"AUTO",textColor:CARD_TEXT_COLORS[s.textColor]?s.textColor:"WHITE",position:CARD_TEXT_POSITIONS[s.position]?s.position:"CENTER",background:CARD_TEXT_BACKGROUNDS[s.background]?s.background:"PILL",size:Math.max(14,Math.min(28,Number(s.size)||19)),font:CARD_FONTS[s.font]?s.font:"SYSTEM",visible:s.visible!==false};
 }
-function cardStyleClass(c){const s=cardStyle(c);return "palette-"+s.palette.toLowerCase()+" title-"+s.position.toLowerCase()+" titlebg-"+s.background.toLowerCase();}
+function cardStyleClass(c){const s=cardStyle(c);return "palette-"+s.palette.toLowerCase()+" title-"+s.position.toLowerCase()+" titlebg-"+s.background.toLowerCase()+(s.visible?"":" title-hidden");}
 function cardStyleInline(c){const s=cardStyle(c);return "--title-color:"+CARD_TEXT_COLORS[s.textColor]+";--title-size:"+s.size+";--title-font:"+CARD_FONTS[s.font]+";"}
 function paletteOptions(selected){return Object.keys(CARD_PALETTES).map(function(k){return '<button type="button" class="styleOption paletteChoice palette-choice-'+k.toLowerCase()+(k===selected?" selected":"")+'" data-palette="'+k+'">'+esc(CARD_PALETTES[k])+'</button>';}).join("");}
 function textColorOptions(selected){return Object.keys(CARD_TEXT_COLORS).map(function(k){return '<button type="button" class="styleColorChoice style-color-'+k.toLowerCase()+(k===selected?" selected":"")+'" data-text-color="'+k+'" title="'+esc(CARD_TEXT_COLOR_LABELS[k])+'"><span></span><b>'+esc(CARD_TEXT_COLOR_LABELS[k])+'</b></button>';}).join("");}
@@ -330,31 +387,70 @@ function backgroundOptions(selected){return Object.keys(CARD_TEXT_BACKGROUNDS).m
 function styleEditor(c){
   const s=cardStyle(c);
   return '<div class="cardStylePicker"><div class="hint">Цветовая палитра</div><input id="cardPalette" type="hidden" value="'+esc(s.palette)+'"><div id="paletteGrid" class="styleGrid">'+paletteOptions(s.palette)+'</div>'+
-    '<div class="hint styleBlockTitle">Расположение названия</div><input id="titlePosition" type="hidden" value="'+esc(s.position)+'"><div id="positionGrid" class="styleGrid positionGrid">'+positionOptions(s.position)+'</div>'+
+    '<div class="hint styleBlockTitle">Надпись на карте</div><input id="titleVisible" type="hidden" value="'+(s.visible?"true":"false")+'"><button type="button" class="btn secondary titleVisibleToggle" id="titleVisibleToggle" aria-pressed="'+(s.visible?"true":"false")+'">'+(s.visible?"Без надписи":"Показывать название")+'</button><div class="hint">Скрывается только название поверх рубашки; изображение и код карты сохраняются.</div>'+
+    '<div class="hint styleBlockTitle">Расположение надписи</div><input id="titlePosition" type="hidden" value="'+esc(s.position)+'"><button type="button" class="btn secondary titlePositionOpen" id="titlePositionOpen" aria-label="Выбрать положение надписи" title="Выбрать положение надписи">⌗</button><div class="hint titlePositionCurrent" id="titlePositionCurrent">Текущее положение: '+esc(CARD_TEXT_POSITIONS[s.position]||"По центру")+'</div>'+
     '<div class="hint styleBlockTitle">Стиль фона для названия</div><input id="titleBackground" type="hidden" value="'+esc(s.background)+'"><div id="backgroundGrid" class="styleGrid">'+backgroundOptions(s.background)+'</div>'+
     '<div class="hint styleBlockTitle">Цвет текста</div><input id="titleColor" type="hidden" value="'+esc(s.textColor)+'"><div id="textColorGrid" class="textColorGrid">'+textColorOptions(s.textColor)+'</div>'+
     '<div class="hint styleBlockTitle">Размер текста: <b id="titleSizeValue">'+s.size+' px</b></div><input id="titleSize" type="range" min="14" max="28" step="1" value="'+s.size+'" class="styleRange">'+
     '<div class="hint styleBlockTitle">Шрифт</div><input id="titleFont" type="hidden" value="'+esc(s.font)+'"><div id="fontGrid" class="styleGrid fontGrid">'+fontOptions(s.font)+'</div></div>';
 }
+function openTitlePositionPicker(){
+  const input=document.getElementById("titlePosition");
+  if(!input)return;
+  const selected=input.value||"CENTER";
+  const preview=document.getElementById("editorPreview");
+  const name=(document.getElementById("name")&&document.getElementById("name").value)||"Моя карта";
+  const positionLabels=CARD_TEXT_POSITIONS;
+  const positions=Object.keys(positionLabels);
+  const cardColor=preview?(preview.style.getPropertyValue("--card-color")||"#1767d8"):"#1767d8";
+  const markup='<div class="titlePositionOverlay" id="titlePositionModal" role="dialog" aria-modal="true" aria-labelledby="titlePositionHeading">'+
+    '<div class="titlePositionDialog"><button type="button" class="close" id="titlePositionClose" aria-label="Закрыть">×</button>'+
+    '<h3 id="titlePositionHeading">Положение надписи</h3><p class="hint">Выберите одну из девяти зон на простой схеме карты.</p>'+
+    '<div class="titlePositionMap titlePositionMapPlain" id="titlePositionMap" style="--card-color:'+esc(cardColor)+'">'+
+    '<strong id="titlePositionMapTitle" class="titlePositionMapTitle title-position-'+selected.toLowerCase()+'">'+esc(name)+'</strong>'+
+    '<div class="titlePositionCells">'+positions.map(function(k){return '<button type="button" class="titlePositionCell '+(k===selected?"selected":"")+'" data-position="'+k+'" aria-label="'+esc(positionLabels[k])+'" title="'+esc(positionLabels[k])+'"><span>'+esc(positionLabels[k])+'</span></button>';}).join("")+'</div></div>'+
+    '<div class="titlePositionDialogActions"><button type="button" class="btn secondary" id="titlePositionCancel">Отмена</button><button type="button" class="btn primary" id="titlePositionConfirm">Подтвердить</button></div></div></div>';
+  document.body.insertAdjacentHTML("beforeend",markup);
+  const overlay=document.getElementById("titlePositionModal");
+  let pending=selected;
+  function choose(k){
+    pending=k;
+    overlay.querySelectorAll(".titlePositionCell").forEach(function(cell){cell.classList.toggle("selected",cell.getAttribute("data-position")===k);});
+    const title=overlay.querySelector("#titlePositionMapTitle");
+    if(title)title.className="titlePositionMapTitle title-position-"+k.toLowerCase();
+  }
+  overlay.querySelectorAll(".titlePositionCell").forEach(function(cell){cell.addEventListener("click",function(){choose(cell.getAttribute("data-position"));});});
+  const close=function(){overlay.remove();};
+  overlay.querySelector("#titlePositionClose").onclick=close;
+  overlay.querySelector("#titlePositionCancel").onclick=close;
+  overlay.addEventListener("click",function(e){if(e.target===overlay)close();});
+  overlay.querySelector("#titlePositionConfirm").onclick=function(){
+    input.value=pending;
+    const current=document.getElementById("titlePositionCurrent");
+    if(current)current.textContent="Текущее положение: "+(positionLabels[pending]||pending);
+    close();
+    if(typeof refreshEditorPreview==="function")refreshEditorPreview(window.__editorPreviewCard||{});
+  };
+}
 function bindStyleEditor(){
   function bindGrid(id,inputId,attr){const grid=document.getElementById(id),input=document.getElementById(inputId);if(!grid||!input)return;grid.querySelectorAll("button").forEach(function(btn){btn.onclick=function(){input.value=btn.getAttribute(attr)||"";grid.querySelectorAll("button").forEach(function(x){x.classList.remove("selected");});btn.classList.add("selected");if(typeof refreshEditorPreview==="function")refreshEditorPreview(window.__editorPreviewCard||{});};});}
-  bindGrid("paletteGrid","cardPalette","data-palette");bindGrid("positionGrid","titlePosition","data-position");bindGrid("backgroundGrid","titleBackground","data-background");bindGrid("textColorGrid","titleColor","data-text-color");bindGrid("fontGrid","titleFont","data-font");
+  bindGrid("paletteGrid","cardPalette","data-palette");bindGrid("backgroundGrid","titleBackground","data-background");bindGrid("textColorGrid","titleColor","data-text-color");bindGrid("fontGrid","titleFont","data-font");
+  const visibleInput=document.getElementById("titleVisible"),visibleButton=document.getElementById("titleVisibleToggle");
+  if(visibleInput&&visibleButton)visibleButton.onclick=function(){const visible=visibleInput.value!=="true";visibleInput.value=visible?"true":"false";visibleButton.textContent=visible?"Без надписи":"Показывать название";visibleButton.setAttribute("aria-pressed",String(visible));if(typeof refreshEditorPreview==="function")refreshEditorPreview(window.__editorPreviewCard||{});};
+  const positionOpen=document.getElementById("titlePositionOpen");
+  if(positionOpen)positionOpen.onclick=openTitlePositionPicker;
   const range=document.getElementById("titleSize"),out=document.getElementById("titleSizeValue");if(range&&out)range.oninput=function(){out.textContent=range.value+" px";};
 }
 function brandMarkup(cover,name){
-  const n=esc(name||"");
-  const map={
-    MAGNIT:'<span class="brandArtwork magnit"><b>М</b><i>Магнит</i></span>',
-    PYATEROCHKA:'<span class="brandArtwork pyat"><b>5</b><i>Пятёрочка</i></span>',
-    STOLICHKI:'<span class="brandArtwork stol"><b>+</b><i>Столички</i></span>',
-    ANTEY:'<span class="brandArtwork antey"><b>+</b><i>Аптека Антей</i></span>',
-    RODINA_UDACHA:'<span class="brandArtwork rodina"><b>V</b><i>Родина</i></span>',
-    BRISTOL:'<span class="brandArtwork bristol"><b>B</b><i>Бристоль</i></span>',
-    K_B:'<span class="brandArtwork kb"><b>K&amp;Б</b><i>Красное &amp; Белое</i></span>',
-    LENTA:'<span class="brandArtwork lenta"><b>2</b><i>Лента</i></span>',
-    PEREKRESTOK:'<span class="brandArtwork perek"><b>•</b><i>Перекрёсток</i></span>'
+  const labels={
+    MAGNIT:["М","Магнит"],PYATEROCHKA:["5","Пятёрочка"],PEREKRESTOK:["✚","Перекрёсток"],LENTA:["Л","Лента"],OKEI:["О’","О’КЕЙ"],DIKSI:["Д","Дикси"],CHIZHIK:["Ч","Чижик"],ASHAN:["A","Ашан"],GLOBUS:["G","Глобус"],VkusVill:["v","ВкусВилл"],
+    RIGLA:["R","Ригла"],BUDZOROV:["+","Будь Здоров"],ZDRAVCITY:["+","Здравсити"],STOLICHKI:["+","Столички"],GORZDRAV:["+","Горздрав"],APTEKA366:["36,6","Аптека 36,6"],NEOFARM:["+","Неофарм"],PLANETA_ZDOROVYA:["+","Планета здоровья"],MAXAVIT:["+","Максавит"],
+    OSTIN:["O","O’STIN"],KARI:["K","Kari"],RENDEZVOUS:["R","Rendez-Vous"],HC:["ХЦ","ХЦ"],LCWAIKIKI:["LC","LC Waikiki"],MAXIDOM:["М","Максидом"],MVIDEO:["M","М.Видео"],ELDORADO:["Э","Эльдорадо"],DETMIR:["ДМ","Детский мир"],DNS:["DNS","DNS"],
+    ANTEY:["+","Аптека Антей"],RODINA_UDACHA:["V","Родина"],BRISTOL:["B","Бристоль"],K_B:["K&Б","Красное & Белое"]
   };
-  return map[cover]||'';
+  const item=labels[cover];
+  if(!item)return "";
+  return '<span class="brandArtwork brand-'+String(cover).toLowerCase()+'"><b>'+esc(item[0])+'</b><i>'+esc(item[1])+'</i></span>';
 }
 function coverForCard(c){const v=String(c.cover||"AUTO");return v==="AUTO"?coverForName(c.name):COVER_LABELS[v]?v:"CUSTOM";}
 function coverClass(c){return "cover-"+coverForCard(c).toLowerCase();}
@@ -576,7 +672,7 @@ async function addCard(){
     const code=codeEl.value.trim();
     const format=formatEl.value||"CODE_128";
     const cover=(document.getElementById("cover")&&document.getElementById("cover").value)||"AUTO";
-    const style={palette:(document.getElementById("cardPalette")&&document.getElementById("cardPalette").value)||"AUTO",textColor:(document.getElementById("titleColor")&&document.getElementById("titleColor").value)||"WHITE",position:(document.getElementById("titlePosition")&&document.getElementById("titlePosition").value)||"CENTER",size:Math.max(14,Math.min(28,Number(document.getElementById("titleSize")&&document.getElementById("titleSize").value)||19)),font:(document.getElementById("titleFont")&&document.getElementById("titleFont").value)||"SYSTEM"};
+    const style={palette:(document.getElementById("cardPalette")&&document.getElementById("cardPalette").value)||"AUTO",textColor:(document.getElementById("titleColor")&&document.getElementById("titleColor").value)||"WHITE",position:(document.getElementById("titlePosition")&&document.getElementById("titlePosition").value)||"CENTER",size:Math.max(14,Math.min(28,Number(document.getElementById("titleSize")&&document.getElementById("titleSize").value)||19)),font:(document.getElementById("titleFont")&&document.getElementById("titleFont").value)||"SYSTEM",visible:!(document.getElementById("titleVisible")&&document.getElementById("titleVisible").value==="false")};
     const file=document.getElementById("cardImage")&&document.getElementById("cardImage").files[0];
     if(!code){alert("Введите код карты");return;}
     let image="";
@@ -776,15 +872,14 @@ function openCard(id){
 }
 function editorCoverCategory(k){
   const v=String(k||"").toUpperCase();
-  if(["MAGNIT","PYATEROCHKA","STOLICHKI","PEREKRESTOK","LENTA","VKUSVILL","OKEИ","OKEI","ASHAN","DIKSI","CHIZHIK"].indexOf(v)>=0)return "PRODUCTS";
-  if(["ANTEY"].indexOf(v)>=0)return "PHARMACY";
-  if(["DETMIR","KARI"].indexOf(v)>=0)return "OTHER";
-  if(["DNS","BRISTOL","K_B","RODINA_UDACHA"].indexOf(v)>=0)return "OTHER";
-  if(v==="CUSTOM"||v==="AUTO")return "OTHER";
+  if(["MAGNIT","PYATEROCHKA","PEREKRESTOK","LENTA","OKEI","DIKSI","CHIZHIK","ASHAN","GLOBUS","VkusVill".toUpperCase()].indexOf(v)>=0)return "PRODUCTS";
+  if(["RIGLA","BUDZOROV","ZDRAVCITY","STOLICHKI","GORZDRAV","APTEKA366","NEOFARM","PLANETA_ZDOROVYA","MAXAVIT","ANTEY"].indexOf(v)>=0)return "PHARMACY";
+  if(["OSTIN","KARI","RENDEZVOUS","HC","LCWAIKIKI"].indexOf(v)>=0)return "CLOTHING";
+  if(["MAXIDOM","MVIDEO","ELDORADO","DETMIR","DNS","BRISTOL","K_B","RODINA_UDACHA"].indexOf(v)>=0)return "OTHER";
   return "OTHER";
 }
 function editorCoverCatalog(selected){
-  const cats=[["ALL","Все"],["PRODUCTS","Продукты"],["PHARMACY","Аптеки"],["OTHER","Другое"]];
+  const cats=[["ALL","Все"],["PRODUCTS","Продукты"],["PHARMACY","Аптеки"],["CLOTHING","Одежда"],["OTHER","Другое"]];
   return '<div class="coverCategoryGrid" id="coverCategoryGrid">'+cats.map(function(x,i){return '<button type="button" class="coverCategory '+(i===0?"active":"")+'" data-cover-category="'+x[0]+'">'+x[1]+'</button>';}).join("")+'</div>'+
     '<div id="editorCoverGrid" class="coverGrid">'+coverOptions(selected)+'</div>';
 }
@@ -798,7 +893,8 @@ function editorPreviewData(c){
     position:(document.getElementById("titlePosition")&&document.getElementById("titlePosition").value)||"BOTTOM",
     background:(document.getElementById("titleBackground")&&document.getElementById("titleBackground").value)||"PILL",
     size:Math.max(14,Math.min(28,Number(document.getElementById("titleSize")&&document.getElementById("titleSize").value)||19)),
-    font:(document.getElementById("titleFont")&&document.getElementById("titleFont").value)||"SYSTEM"
+    font:(document.getElementById("titleFont")&&document.getElementById("titleFont").value)||"SYSTEM",
+    visible:!(document.getElementById("titleVisible")&&document.getElementById("titleVisible").value==="false")
   };
   return base;
 }
@@ -826,7 +922,7 @@ function bindEditorPreview(c){
   window.__editorPreviewCard=c||{};
   const name=document.getElementById("name"),code=document.getElementById("code");
   [name,code].forEach(function(el){if(el)el.addEventListener("input",function(){refreshEditorPreview(c);if(el===code)refreshEditorCodePreview(c);});});
-  ["cardPalette","titlePosition","titleBackground","titleColor","titleSize","titleFont"].forEach(function(id){const el=document.getElementById(id);if(el)el.addEventListener("input",function(){refreshEditorPreview(c);});el&&el.addEventListener("change",function(){refreshEditorPreview(c);});});
+  ["cardPalette","titlePosition","titleBackground","titleColor","titleSize","titleFont","titleVisible"].forEach(function(id){const el=document.getElementById(id);if(el)el.addEventListener("input",function(){refreshEditorPreview(c);});el&&el.addEventListener("change",function(){refreshEditorPreview(c);});});
   document.querySelectorAll(".editorTab").forEach(function(btn){btn.onclick=function(){setEditorTab(btn.getAttribute("data-tab"));};});
   const grid=document.getElementById("editorCoverGrid")||document.getElementById("coverGrid"),input=document.getElementById("cover");
   if(grid&&input)grid.addEventListener("click",function(e){const b=e.target.closest(".coverOption");if(b)setTimeout(function(){refreshEditorPreview(c);},0);});
@@ -913,7 +1009,7 @@ async function updateCard(id){
   const newCode=document.getElementById("code").value.trim();
   const newFormat=document.getElementById("format").value;
   const newCover=document.getElementById("cover")&&document.getElementById("cover").value||"AUTO";
-  const newStyle={palette:(document.getElementById("cardPalette")&&document.getElementById("cardPalette").value)||"AUTO",textColor:(document.getElementById("titleColor")&&document.getElementById("titleColor").value)||"WHITE",position:(document.getElementById("titlePosition")&&document.getElementById("titlePosition").value)||"BOTTOM",background:(document.getElementById("titleBackground")&&document.getElementById("titleBackground").value)||"PILL",size:Math.max(14,Math.min(28,Number(document.getElementById("titleSize")&&document.getElementById("titleSize").value)||19)),font:(document.getElementById("titleFont")&&document.getElementById("titleFont").value)||"SYSTEM"};
+  const newStyle={palette:(document.getElementById("cardPalette")&&document.getElementById("cardPalette").value)||"AUTO",textColor:(document.getElementById("titleColor")&&document.getElementById("titleColor").value)||"WHITE",position:(document.getElementById("titlePosition")&&document.getElementById("titlePosition").value)||"BOTTOM",background:(document.getElementById("titleBackground")&&document.getElementById("titleBackground").value)||"PILL",size:Math.max(14,Math.min(28,Number(document.getElementById("titleSize")&&document.getElementById("titleSize").value)||19)),font:(document.getElementById("titleFont")&&document.getElementById("titleFont").value)||"SYSTEM",visible:!(document.getElementById("titleVisible")&&document.getElementById("titleVisible").value==="false")};
   if(!newCode){alert("Введите код карты");return;}
   if(!confirm("Сохранить изменения карты «"+newName+"»?"))return;
   c.name=newName;
