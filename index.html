@@ -205,6 +205,28 @@ header{padding:18px 20px 10px;background:#f6f7fbf5}
 .editorExtra .hint{margin-top:4px}
 .editorTabs .editorTab{font-size:14px}
 @media(max-width:520px){.grid{padding-left:20px;padding-right:20px}.addBtn{min-width:136px}.bottomNav{bottom:10px}.card{aspect-ratio:1.48/1!important}}
+
+/* CARD111: keep card title geometry and typography identical in editor preview and saved cards */
+.card strong{
+  font-size:var(--title-size,19px)!important;
+  font-family:var(--title-font,system-ui,-apple-system,"Segoe UI",sans-serif)!important;
+  line-height:1.08!important;
+  box-sizing:border-box!important;
+}
+.card.title-center strong{
+  left:50%!important;right:auto!important;top:50%!important;bottom:auto!important;
+  transform:translate(-50%,-50%)!important;
+}
+.card.title-top strong{
+  left:50%!important;right:auto!important;top:12px!important;bottom:auto!important;
+  transform:translateX(-50%)!important;
+}
+.card.title-bottom strong{
+  left:50%!important;right:auto!important;top:auto!important;bottom:12px!important;
+  transform:translateX(-50%)!important;
+}
+.card.title-hide strong{display:none!important}
+.editorPreview strong{font-size:var(--title-size,19px)!important}
 </style>
 </head>
 <body>
