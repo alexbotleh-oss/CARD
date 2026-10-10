@@ -496,7 +496,9 @@ function brandMarkup(cover,name){
   };
   const item=labels[cover];
   if(!item)return "";
-  return '<span class="brandArtwork brand-'+String(cover).toLowerCase()+'"><b>'+esc(item[0])+'</b><i>'+esc(item[1])+'</i></span>';
+  const aliases={MAGNIT:"magnit",PYATEROCHKA:"pyat",PEREKRESTOK:"perek",LENTA:"lenta",STOLICHKI:"stol",ANTEY:"antey",RODINA_UDACHA:"rodina",BRISTOL:"bristol",K_B:"kb"};
+  const family=aliases[cover]||"generic";
+  return '<span class="brandArtwork brand-'+String(cover).toLowerCase()+' '+family+'"><b>'+esc(item[0])+'</b><i>'+esc(item[1])+'</i></span>';
 }
 function coverForCard(c){const v=String(c.cover||"AUTO");return v==="AUTO"?coverForName(c.name):COVER_LABELS[v]?v:"CUSTOM";}
 function coverClass(c){return "cover-"+coverForCard(c).toLowerCase();}
