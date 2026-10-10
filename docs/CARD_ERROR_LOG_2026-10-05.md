@@ -230,3 +230,19 @@ Cause identified in source: HTML entities were inserted into a CSS style string 
 Commit: `5ed80be69efe62b01ab3f647bf133118d60ef9a9`.
 
 Evidence: changed source re-read from the work branch. Visual confirmation in browser/device has not yet been performed.
+
+
+## 2026-10-11 — editor code preview and persistent rollback for backup import
+
+**Change:** commit b048ad02b2d3716ba71541530b5882d3cfd3d65e updates index.html on candidate/CARD111-ui-2xN-20261006.
+
+- The editor preview now has explicit paths for QR, PDF417, Data Matrix and supported linear barcodes.
+- Unsupported formats show a notice instead of silently previewing as Code 128.
+- Human-readable code text is hidden under the editor preview.
+- Backup restore now snapshots the current storage keys and attempts to restore their previous persisted values if a write fails; if rollback itself fails, the user is alerted instead of being told the data was restored.
+
+**Static checks:** re-read the saved index.html from GitHub; both inline JavaScript blocks passed V8 new Function parsing. The file is 133,444 bytes / 1,389 lines.
+
+**Still unverified:** camera/gallery scanning and rendering in a real browser, localStorage quota/rollback simulation, backup round-trip, browser UI, and actual Android phone behavior. Static parsing does not prove runtime correctness.
+
+**Next:** complete local/faithful brand cover assets and continue the remaining editor-menu items; only mark browser/device items complete after performing the corresponding tests.
