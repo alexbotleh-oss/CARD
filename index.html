@@ -1173,21 +1173,57 @@ function manualEdit(id){
   refreshEditorCodePreview(c);
 }
 function refreshEditorCodePreview(c){
-  const el=document.getElementById("editorBarcode"), code=document.getElementById("code"), fmt=document.getElementById("format");
-  if(!el)return;
-  const value=String(code&&code.value||c&&c.code||"");
+  const host=document.querySelector(".editorCodePreview");
+  const el=document.getElementById("editorBarcode");
+  const qr=document.getElementById("editorQrPreview");
+  const code=document.getElementById("code");
+  const fmt=document.getElementById("format");
+  if(!host||!el)return;
+  const value=String(code&&code.value||c&&c.code||"").trim();
   const format=normalizeFormat(fmt&&fmt.value||c&&c.format||"CODE_128");
+  el.style.display="none";
+  el.innerHTML="";
+  if(qr){qr.innerHTML="";qr.style.display="none";}
+  host.querySelectorAll("canvas.editorCodeCanvas,.editorCodePreviewStatus").forEach(function(n){n.remove();});
+  function showStatus(message){
+    const status=document.createElement("div");
+    status.className="editorCodePreviewStatus hint";
+    status.style.cssText="padding:12px;text-align:center";
+    status.textContent=message;
+    host.appendChild(status);
+  }
+  if(!value){showStatus("Введите код, чтобы увидеть предпросмотр.");return;}
   if(format==="QR_CODE"){
-    el.style.display="none";
+    if(!qr){showStatus("Поле предпросмотра QR-кода недоступно.");return;}
+    qr.style.display="flex";
+    try{
+      if(typeof QRCode!=="function")throw Error("QRCode unavailable");
+      new QRCode(qr,{text:value,width:190,height:190,correctLevel:(QRCode.CorrectLevel&&QRCode.CorrectLevel.M)||2});
+    }catch(e){qr.textContent="Не удалось построить QR-код. Проверьте подключение генератора.";}
     return;
   }
-  el.style.display="";
+  if(format==="PDF417"||format==="DATA_MATRIX"){
+    if(!qr){showStatus("Поле предпросмотра 2D-кода недоступно.");return;}
+    qr.style.display="flex";
+    try{
+      if(typeof bwipjs==="undefined")throw Error("bwip-js unavailable");
+      const canvas=document.createElement("canvas");
+      canvas.className="editorCodeCanvas";
+      canvas.style.cssText="display:block;max-width:100%;height:auto;margin:0 auto";
+      qr.appendChild(canvas);
+      bwipjs.toCanvas(canvas,{bcid:format==="PDF417"?"pdf417":"datamatrix",text:value,scale:3,includetext:false,backgroundcolor:"FFFFFF",barcolor:"000000",padding:8});
+    }catch(e){qr.textContent="Не удалось построить "+format+". Проверьте подключение генератора и значение кода.";}
+    return;
+  }
+  const formats={CODE_128:"CODE128",CODE_39:"CODE39",CODE_93:"CODE93",EAN_13:"EAN13",EAN_8:"EAN8",ITF:"ITF",UPC_A:"UPC",UPC_E:"UPCE"};
+  const jsFormat=formats[format];
+  if(!jsFormat){showStatus("Предпросмотр формата "+format+" не поддерживается. Код не будет подменён другим форматом.");return;}
   try{
-    JsBarcode(el,value,{
-      format:format==="EAN_13"?"ean13":format==="EAN_8"?"ean8":format==="CODE_39"?"CODE39":format==="ITF"?"ITF":format==="UPC_A"?"upc":format==="UPC_E"?"upce":"CODE128",
-      displayValue:true,height:64,width:2,margin:4,fontSize:12
-    });
-  }catch(e){el.innerHTML="";}
+    JsBarcode(el,value,{format:jsFormat,displayValue:false,height:64,width:2,margin:4});
+    el.style.display="";
+  }catch(e){
+    showStatus("Значение не соответствует формату "+format+". Проверьте код или выберите корректный формат.");
+  }
 }
 function rescanEdit(id){
   const draft=captureEditorDraft();
@@ -1277,7 +1313,8 @@ function exportData(){
 }
 function importData(){const input=document.getElementById("importFile");if(!input){alert("Не найдено поле выбора резервной копии");return;}input.onchange=readImport;input.value="";input.click();}
 function readImport(e){
-  const f=e.target.files&&e.target.files[0];
+  const input=e&&e.target;
+  const f=input&&input.files&&input.files[0];
   if(!f)return;
   const reader=new FileReader();
   reader.onload=function(){
@@ -1291,18 +1328,33 @@ function readImport(e){
       if(!importedCards.length)throw new Error("В резервной копии нет пригодных карт.");
       const importedCovers=(!Array.isArray(d)&&d.brandCovers&&typeof d.brandCovers==="object"&&!Array.isArray(d.brandCovers))?d.brandCovers:null;
       if(!confirm("Восстановить "+importedCards.length+" карт? Текущий набор карт будет заменён."))return;
-      const previousCards=cards,previousCovers=brandCovers;
-      cards=importedCards;
-      if(importedCovers)brandCovers=importedCovers;
+      const oldCardsRaw=localStorage.getItem(KEY);
+      const oldSafeRaw=localStorage.getItem(SAFE_KEY);
+      const oldCoversRaw=localStorage.getItem(COVER_DEFAULTS_KEY);
+      const nextCardsRaw=JSON.stringify(importedCards);
+      const nextCoversRaw=importedCovers?JSON.stringify(importedCovers):oldCoversRaw;
       try{
-        localStorage.setItem(KEY,JSON.stringify(cards));
-        if(importedCovers)localStorage.setItem(COVER_DEFAULTS_KEY,JSON.stringify(brandCovers));
-        storageState="ok";storageError="";
+        try{localStorage.setItem(SAFE_KEY,oldCardsRaw!==null?oldCardsRaw:JSON.stringify(cards));}catch(snapshotError){}
+        localStorage.setItem(KEY,nextCardsRaw);
+        if(importedCovers)localStorage.setItem(COVER_DEFAULTS_KEY,nextCoversRaw);
       }catch(saveError){
-        cards=previousCards;brandCovers=previousCovers;
-        alert("Не удалось восстановить резервную копию: данные не сохранены. Освободи место в памяти браузера и повтори попытку.");
+        const rollbackErrors=[];
+        function restoreStorageKey(key,raw){
+          try{
+            localStorage.removeItem(key);
+            if(raw!==null)localStorage.setItem(key,raw);
+          }catch(rollbackError){rollbackErrors.push(key+": "+String(rollbackError&&rollbackError.message||rollbackError));}
+        }
+        restoreStorageKey(KEY,oldCardsRaw);
+        restoreStorageKey(COVER_DEFAULTS_KEY,oldCoversRaw);
+        restoreStorageKey(SAFE_KEY,oldSafeRaw);
+        const suffix=rollbackErrors.length?" ОШИБКА отката для "+rollbackErrors.join(", ")+". Не закрывайте страницу; попробуйте экспортировать данные для восстановления.":" Старые сохранённые данные восстановлены.";
+        alert("Не удалось восстановить резервную копию. "+String(saveError&&saveError.message||saveError)+"."+suffix);
         return;
       }
+      cards=importedCards;
+      if(importedCovers)brandCovers=importedCovers;
+      storageState="ok";storageError="";
       render();
       closeModal();
       alert("Карты восстановлены: "+cards.length);
@@ -1310,7 +1362,7 @@ function readImport(e){
   };
   reader.onerror=function(){alert("Не удалось прочитать файл резервной копии.");};
   reader.readAsText(f);
-  e.target.value="";
+  if(input)input.value="";
 }
 if("serviceWorker" in navigator){
   window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js?v=16").catch(function(){});});
