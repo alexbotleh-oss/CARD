@@ -466,7 +466,7 @@ function openModal(html){
   document.getElementById("sheet").innerHTML=html;
   document.getElementById("modal").classList.add("open");
 }
-function closeModal(){diagLog("ui.modal.close",{});document.getElementById("modal").classList.remove("open");}
+function closeModal(){diagLog("ui.modal.close",{});try{if(typeof window.__card111StopScanner==="function")window.__card111StopScanner("modal-close");}catch(e){diagError("scanner.stop.on-modal-close",e);}document.getElementById("modal").classList.remove("open");}
 function showWallet(){
   document.querySelectorAll(".bottomNavItem").forEach((b,i)=>b.classList.toggle("active",i===0));
   closeModal();
@@ -481,7 +481,7 @@ function showSettings(){
 }
 function showDiagnostics(){diagLog("diagnostics.open",{});openModal('<button class="close" onclick="showSettings()">×</button><h2>Диагностический код</h2><p class="hint">Последние события и ошибки. Значения штрихкодов, изображения и номера карт не записываются.</p><textarea id="diagnosticText" readonly spellcheck="false" style="width:100%;min-height:42vh;box-sizing:border-box;font:12px/1.45 monospace;white-space:pre;overflow:auto"></textarea><button class="btn primary" onclick="copyDiagnostics()">Скопировать диагностический код</button><button class="btn secondary" onclick="refreshDiagnostics()">Обновить журнал</button><button class="btn secondary" onclick="clearDiagnostics()">Очистить журнал</button>');refreshDiagnostics();}
 function refreshDiagnostics(){const el=document.getElementById("diagnosticText");if(el)el.value=diagExportText();}
-async function copyDiagnostics(){const el=document.getElementById("diagnosticText");if(!el)return;el.value=diagExportText();el.focus();el.select();try{if(navigator.clipboard&&navigator.clipboard.writeText){await navigator.clipboard.writeText(el.value);alert("Диагностический код скопирован. Пришлите его в чат.");}else{document.execCommand("copy");alert("Попробовал скопировать журнал. Если не скопировался, выделите текст и выберите «Копировать».");}}catch(e){diagError("diagnostics.copy",e);alert("Не удалось скопировать автоматически. Выделите текст журнала и скопируйте вручную.");}}
+async function copyDiagnostics(){const el=document.getElementById("diagnosticText");if(!el)return;const text=diagExportText();el.value=text;try{if(navigator.clipboard&&navigator.clipboard.writeText){await navigator.clipboard.writeText(text);diagLog("diagnostics.copy.success",{method:"clipboard",characters:text.length});alert("Диагностический код скопирован. Пришлите его в чат.");}else{el.focus();el.select();const ok=document.execCommand("copy");diagLog("diagnostics.copy.fallback",{success:!!ok,characters:text.length});alert(ok?"Попробовал скопировать журнал. Пришлите его в чат.":"Автокопирование недоступно. Выделите текст журнала и выберите «Копировать».");}}catch(e){diagError("diagnostics.copy",e);try{el.focus();el.select();}catch(ignore){}alert("Не удалось скопировать автоматически. Выделите текст журнала и скопируйте вручную.");}}
 function clearDiagnostics(){if(!confirm("Очистить диагностический журнал? Сохранённые карты не затрагиваются."))return;try{localStorage.removeItem(DIAG_KEY);}catch(e){}diagLog("diagnostics.cleared",{});showDiagnostics();}
 function addMenu(){
   openModal('<button class="close" onclick="closeModal()">×</button><h2>Добавить карту</h2>'+
@@ -545,7 +545,8 @@ function scanner(onResult){
   let controls=null,handled=false,reader=null,detector=null,raf=0,video=null,lastKey="",stableHits=0;
   const formats=["qr_code","code_128","ean_13","ean_8","upc_a","upc_e"];
   function mapFormat(raw){const s=String(raw||"").toUpperCase();if(s.indexOf("QR")>=0)return "QR_CODE";if(s.indexOf("DATA_MATRIX")>=0)return "DATA_MATRIX";if(s.indexOf("EAN_13")>=0)return "EAN_13";if(s.indexOf("EAN_8")>=0)return "EAN_8";if(s.indexOf("CODE_128")>=0)return "CODE_128";if(s.indexOf("CODE_39")>=0)return "CODE_39";if(s.indexOf("CODE_93")>=0)return "CODE_93";if(s.indexOf("UPC_A")>=0)return "UPC_A";if(s.indexOf("UPC_E")>=0)return "UPC_E";if(s.indexOf("ITF")>=0)return "ITF";if(s.indexOf("PDF_417")>=0||s.indexOf("PDF417")>=0)return "PDF417";return "CODE_128";}
-  function cleanup(){diagLog("scanner.cleanup",{handled:handled});if(raf)cancelAnimationFrame(raf);try{if(controls)controls.stop();}catch(e){}try{if(reader&&reader.reset)reader.reset();}catch(e){}try{if(video&&video.srcObject){video.srcObject.getTracks().forEach(function(t){t.stop();});video.srcObject=null;}}catch(e){}}
+  function cleanup(reason){diagLog("scanner.cleanup",{handled:handled,reason:reason||"unspecified"});if(window.__card111StopScanner===cleanup)window.__card111StopScanner=null;if(raf){cancelAnimationFrame(raf);raf=0;}try{if(controls)controls.stop();}catch(e){diagError("scanner.cleanup.controls",e);}try{if(reader&&reader.reset)reader.reset();}catch(e){diagError("scanner.cleanup.reader",e);}try{if(video&&video.srcObject){const tracks=video.srcObject.getTracks();tracks.forEach(function(t){t.stop();});diagLog("scanner.camera.tracks.stopped",{count:tracks.length});video.srcObject=null;}}catch(e){diagError("scanner.cleanup.tracks",e);}}
+  window.__card111StopScanner=cleanup;
   function finish(text,raw,fromImage){if(handled||!text){diagLog("scanner.result.ignored",{source:fromImage?"gallery":"camera",handled:handled,hasText:!!text});return;}const code=String(text).trim();if(!code){diagLog("scanner.result.empty",{source:fromImage?"gallery":"camera"});return;}const format=mapFormat(raw),key=format+"|"+code;diagLog("scanner.result.detected",{source:fromImage?"gallery":"camera",format:format,codeLength:code.length});if(!fromImage){if(key!==lastKey){lastKey=key;stableHits=1;return;}stableHits++;if(stableHits<2)return;}handled=true;cleanup();closeModal();const resultData={code:code,format:format};setTimeout(function(){if(typeof onResult==="function")onResult(resultData);else manual(resultData);},100);}
   async function nativeLoop(){if(!detector||!video||handled)return;try{const found=await detector.detect(video);if(found&&found.length)finish(found[0].rawValue,found[0].format);else{lastKey="";stableHits=0;}}catch(e){}if(!handled)raf=requestAnimationFrame(nativeLoop);}
   const readerBox=document.getElementById("reader");video=document.createElement("video");video.setAttribute("playsinline","");video.setAttribute("autoplay","");video.setAttribute("muted","");video.muted=true;video.style.width="100%";video.style.height="100%";video.style.objectFit="cover";readerBox.appendChild(video);
@@ -627,7 +628,7 @@ function showCropper(file,reader,finish){
           const detector=new BarcodeDetector({formats:await BarcodeDetector.getSupportedFormats()});
           const found=await detector.detect(ci);
           diagLog("scanner.crop.native.result",{count:found?found.length:0});if(found&&found.length){finish(found[0].rawValue,found[0].format,true);return;}
-        }catch(e){}
+        }catch(e){diagError("scanner.crop.native.detect",e);}
       }
       if(reader){
         const ci=new Image();ci.src=dataUrl;await new Promise(function(r,j){ci.onload=r;ci.onerror=j;});
