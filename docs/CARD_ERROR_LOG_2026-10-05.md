@@ -118,3 +118,22 @@ FIX3 прошёл `py_compile`. Native scanner extension между FIX1/FIX2/FI
 **Checks:** latest `index.html` re-read from the target branch; both inline JavaScript blocks passed syntax compilation via `new Function`. Presence checks passed for the cover gradient entry point, edit-save persistence, settings function, card-detail/QR rendering function and 2-column grid. Browser interaction, reload persistence in an actual browser, and mobile-device behavior are **not verified**. The working-copy git status is unavailable because this session uses the remote GitHub API.
 
 **Remaining:** review actual gradient behavior in browser; implement and verify real cover images, upload/replace/restore, brand defaults and backup/restore compatibility. Do not treat this correction as full design completion.
+
+
+## 2026-10-10 — CARD111 design work — cover image upload and brand defaults
+
+**Implemented in `index.html`:**
+- separate cover-image upload in both new-card and edit-card cover pickers;
+- resize uploaded cover artwork to a maximum of 1400×900 before local storage;
+- per-card `coverImage` overrides the brand default;
+- optional checkbox to set the uploaded image as the brand's default cover;
+- restore-to-standard action removes the individual override;
+- brand defaults stored in `card_cover_defaults_v1`;
+- JSON backup exports `brandCovers`, and import restores it when present;
+- legacy recovery normalization retains `coverImage`.
+
+**Commit:** `6167d0951ff2d1e50d9799e5617086cb4ba3e4c8` (cover upload/defaults); follow-up `ad8c76521c656feecca1f3c870f1ed0e6e85c233` (legacy recovery field).
+
+**Checks:** latest `index.html` read back from branch; both inline JavaScript blocks passed syntax compilation; static checks confirm upload controls, default-map persistence, backup/restore wiring, QR/detail function, settings function and 2-column grid. Browser upload, actual image persistence after restart, backup/restore round-trip, and phone behavior remain unverified.
+
+**Open requirement:** real local brand-cover image assets are not yet in the repository. The current catalog still contains CSS artwork/color treatments. Do not call the cover-design work complete until real images are added and tested.
