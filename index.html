@@ -546,7 +546,7 @@ function scanner(onResult){
   const formats=["qr_code","code_128","ean_13","ean_8","upc_a","upc_e"];
   function mapFormat(raw){const s=String(raw||"").toUpperCase();if(s.indexOf("QR")>=0)return "QR_CODE";if(s.indexOf("DATA_MATRIX")>=0)return "DATA_MATRIX";if(s.indexOf("EAN_13")>=0)return "EAN_13";if(s.indexOf("EAN_8")>=0)return "EAN_8";if(s.indexOf("CODE_128")>=0)return "CODE_128";if(s.indexOf("CODE_39")>=0)return "CODE_39";if(s.indexOf("CODE_93")>=0)return "CODE_93";if(s.indexOf("UPC_A")>=0)return "UPC_A";if(s.indexOf("UPC_E")>=0)return "UPC_E";if(s.indexOf("ITF")>=0)return "ITF";if(s.indexOf("PDF_417")>=0||s.indexOf("PDF417")>=0)return "PDF417";return "CODE_128";}
   function cleanup(){diagLog("scanner.cleanup",{handled:handled});if(raf)cancelAnimationFrame(raf);try{if(controls)controls.stop();}catch(e){}try{if(reader&&reader.reset)reader.reset();}catch(e){}try{if(video&&video.srcObject){video.srcObject.getTracks().forEach(function(t){t.stop();});video.srcObject=null;}}catch(e){}}
-  function finish(text,raw){if(handled||!text){diagLog("scanner.result.ignored",{handled:handled,hasText:!!text});return;}const code=String(text).trim();if(!code){diagLog("scanner.result.empty",{});return;}const format=mapFormat(raw),key=format+"|"+code;diagLog("scanner.result.detected",{source:"camera",format:format,codeLength:code.length});if(key!==lastKey){lastKey=key;stableHits=1;return;}stableHits++;if(stableHits<2)return;handled=true;cleanup();closeModal();const resultData={code:code,format:format};setTimeout(function(){if(typeof onResult==="function")onResult(resultData);else manual(resultData);},100);}
+  function finish(text,raw,fromImage){if(handled||!text){diagLog("scanner.result.ignored",{source:fromImage?"gallery":"camera",handled:handled,hasText:!!text});return;}const code=String(text).trim();if(!code){diagLog("scanner.result.empty",{source:fromImage?"gallery":"camera"});return;}const format=mapFormat(raw),key=format+"|"+code;diagLog("scanner.result.detected",{source:fromImage?"gallery":"camera",format:format,codeLength:code.length});if(!fromImage){if(key!==lastKey){lastKey=key;stableHits=1;return;}stableHits++;if(stableHits<2)return;}handled=true;cleanup();closeModal();const resultData={code:code,format:format};setTimeout(function(){if(typeof onResult==="function")onResult(resultData);else manual(resultData);},100);}
   async function nativeLoop(){if(!detector||!video||handled)return;try{const found=await detector.detect(video);if(found&&found.length)finish(found[0].rawValue,found[0].format);else{lastKey="";stableHits=0;}}catch(e){}if(!handled)raf=requestAnimationFrame(nativeLoop);}
   const readerBox=document.getElementById("reader");video=document.createElement("video");video.setAttribute("playsinline","");video.setAttribute("autoplay","");video.setAttribute("muted","");video.muted=true;video.style.width="100%";video.style.height="100%";video.style.objectFit="cover";readerBox.appendChild(video);
   navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:"environment"},width:{ideal:1280,max:1280},height:{ideal:720,max:720},focusMode:"continuous"},audio:false}).then(function(stream){video.srcObject=stream;return video.play();}).then(function(){if("BarcodeDetector" in window){return BarcodeDetector.getSupportedFormats().then(function(supported){const use=formats.filter(function(x){return supported.indexOf(x)>=0;});if(use.length)detector=new BarcodeDetector({formats:use});if(detector)nativeLoop();else throw Error("BarcodeDetector unavailable");});}throw Error("BarcodeDetector unavailable");}).catch(function(){try{reader=new ZXingBrowser.BrowserMultiFormatReader();}catch(e){reader=null;}if(!reader){readerBox.innerHTML='<p style="padding:30px;color:white;text-align:center">Камера недоступна. Можно выбрать фото из галереи.</p>';return;}reader.decodeFromVideoElement(video,function(result){if(result){const text=result.getText?result.getText():result.text;const fmt=result.getBarcodeFormat?result.getBarcodeFormat():"CODE_128";finish(text,fmt);}}).then(function(c){controls=c;}).catch(function(){});});
@@ -567,14 +567,14 @@ async function decodeGalleryFile(file,reader,finish){
         const supported=await BarcodeDetector.getSupportedFormats();
         const detector=new BarcodeDetector({formats:supported});
         const found=await detector.detect(img);
-        diagLog("scanner.gallery.native.result",{count:found?found.length:0});if(found&&found.length){finish(found[0].rawValue,found[0].format);return;}
+        diagLog("scanner.gallery.native.result",{count:found?found.length:0});if(found&&found.length){finish(found[0].rawValue,found[0].format,true);return;}
       }catch(e){diagError("scanner.gallery.native.detect",e);}
     }
     if(reader){
       try{
         const result=await reader.decodeFromImageElement(img);
         diagLog("scanner.gallery.zxing.result",{found:!!result});if(result){
-          finish(result.getText?result.getText():result.text,result.getBarcodeFormat?result.getBarcodeFormat():"QR_CODE");
+          finish(result.getText?result.getText():result.text,result.getBarcodeFormat?result.getBarcodeFormat():"QR_CODE",true);
           return;
         }
       }catch(e){diagError("scanner.gallery.zxing.detect",e);}
@@ -625,7 +625,7 @@ function showCropper(file,reader,finish){
           const ci=new Image();ci.src=dataUrl;await new Promise(function(r,j){ci.onload=r;ci.onerror=j;});
           const detector=new BarcodeDetector({formats:await BarcodeDetector.getSupportedFormats()});
           const found=await detector.detect(ci);
-          if(found&&found.length){finish(found[0].rawValue,found[0].format);return;}
+          if(found&&found.length){finish(found[0].rawValue,found[0].format,true);return;}
         }catch(e){}
       }
       if(reader){
