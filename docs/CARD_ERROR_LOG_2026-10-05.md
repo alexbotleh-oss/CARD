@@ -163,3 +163,12 @@ Resolution order: individual card image > user-defined brand default > built-in 
 **Не проверено:** запуск на реальном браузере/телефоне, фактическое считывание камерой, рендер каждого типа кода, перезапуск и полный экспорт/импорт. Поэтому задача пока не считается end-to-end проверенной.
 
 **Риск:** текущая работа через GitHub API не предоставляет состояние локальной рабочей копии и сама по себе не доказывает визуальную корректность. Handoff-файл отдельным поиском в репозитории не обнаружен; контекст и следующий шаг зафиксированы в `docs/CARD111_DESIGN_PROGRESS.md`.
+
+
+## 2026-10-10 — code display mismatch found in mobile screenshot
+
+**Наблюдение пользователя:** in the CARD111 screenshot, the toggle labels said “Основной код / Второй код”, unlike the reference “QR-код / Штрихкод”; the displayed linear code did not prove that its format was valid/readable.
+
+**Corrections:** labels now reflect each saved code's format (QR vs linear barcode). Unsupported formats no longer silently fall back to Code 128; the UI displays an explicit unsupported-format message instead. Commits: `113bbf8`, `9e12eec`.
+
+**Static verification:** both inline JavaScript blocks pass syntax checks after the latest change. No browser/device scan test has been performed. Do not mark barcode readability or visual parity as verified.
