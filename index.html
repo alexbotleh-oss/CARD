@@ -1101,7 +1101,7 @@ function manualEdit(id){
       '<button type="button" class="formatOption" onclick="chooseFormat(\'EAN_13\',\'Штрихкод — EAN-13\')">Штрихкод — EAN-13</button>'+
       '<button type="button" class="formatOption" onclick="chooseFormat(\'EAN_8\',\'Штрихкод — EAN-8\')">Штрихкод — EAN-8</button>'+
       '<button type="button" class="formatOption" onclick="chooseFormat(\'QR_CODE\',\'QR-код\')">QR-код</button></div></div>'+
-      '<div class="editorCodePreview"><svg id="editorBarcode"></svg></div>'+
+      '<div class="editorCodePreview"><svg id="editorBarcode"></svg><div id="editorQrPreview" style="display:none;align-items:center;justify-content:center;min-height:192px;padding:8px;background:#fff;border-radius:12px"></div></div>'+
       '<button type="button" class="btn secondary" id="rescanEdit">Пересканировать код</button>'+
       '<div class="editorSectionTitle" style="margin-top:18px">Дополнительный код</div>'+
       '<label class="secondCodeToggle"><input id="secondCodeEnabled" type="checkbox" '+(String(c.secondCode||"").trim()?'checked':'')+'> Второй код (QR или штрихкод)</label>'+
