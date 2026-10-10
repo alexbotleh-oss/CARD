@@ -509,6 +509,9 @@ async function decodeGalleryFile(file,reader,finish){
     const ctx=canvas.getContext("2d");
     if(!ctx)throw Error("canvas-unavailable");
     ctx.drawImage(img,0,0,canvas.width,canvas.height);
+    // Сразу показываем выбранное фото: на медленных телефонах распознавание может занять время.
+    // Это не даёт пользователю видеть пустую чёрную область, пока проверяются декодеры.
+    showCropper(file,reader,finish);
     if("BarcodeDetector" in window){
       try{
         const supported=await BarcodeDetector.getSupportedFormats();
@@ -529,7 +532,6 @@ async function decodeGalleryFile(file,reader,finish){
         }
       }catch(e){}
     }
-    showCropper(file,reader,finish);
   }finally{
     setTimeout(function(){URL.revokeObjectURL(url);},1000);
   }
