@@ -67,3 +67,11 @@
 - Safely applied the diagnostic journal to the configured Pages branch without switching the deployment source. Also adjusted the gallery path to show the selected photo/cropper immediately after image load, before automatic decode attempts.
 - Commits on `candidate/CARD111-ui-2xN-20261006`: index `f851328f19ea3db05b0c9a5a38bc715fdfa44f8d`; SW cache v12 `880b8531c156305ac4a60215eee74037a53eccea`; SW registration v12 `8be10d2dec3a31d0f29be6b6446c62296f47ed3c`.
 - Static checks: both inline JS blocks parse; diagnostic button/export/handlers present; SW cache and registration align at v12. Runtime still needs confirmation after GitHub Pages deployment and mobile refresh.
+
+
+## 2026-10-10 — CARD111 — gallery decode rule confirmed by phone diagnostics
+- User-provided Android log shows gallery JPEG (450,192 bytes; 1264×2736) loaded successfully; preview event emitted; native BarcodeDetector returned one QR result; `scanner.result.detected` was emitted with `source:"camera"` due to incorrect diagnostic labeling. No JS exception appears in the supplied event list.
+- Code inspection found a likely functional defect: gallery decoding called the same `finish(text, raw)` path as live camera, which requires two identical detections. A still image is decoded once, so the successful result can be ignored after the first hit and leave the gallery view hanging/looking black. This aligns with the observed one-result log and is the strongest supported cause so far, though the exact visual black screen has not yet been independently reproduced.
+- Fixed on Pages source branch `candidate/CARD111-ui-2xN-20261006`: gallery/native and gallery/ZXing/crop detections now pass `fromImage=true` and bypass the camera-only two-hit threshold; camera still requires two identical hits. Corrected diagnostic source field to `gallery`.
+- Commits: index logic `95739dab4c987e100b393d838ce07365bf84de1d`; SW cache v13 `1cef84c87643624756704cdc177f9ff052f5921b`; SW registration v13 `20f187254ac38e69bcd9a40e6b825a23464854c3`.
+- Both inline scripts pass syntax parsing. Needs real Android retest after Pages deployment; not yet runtime-verified.
