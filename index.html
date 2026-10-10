@@ -817,27 +817,46 @@ async function addCard(){
     if(!nameEl||!codeEl||!formatEl){alert("Не удалось открыть форму добавления карты.");return;}
     const name=nameEl.value.trim()||"Моя карта";
     const code=codeEl.value.trim();
-    const format=formatEl.value||"CODE_128";
+    const format=normalizeFormat(formatEl.value||"CODE_128");
     const cover=(document.getElementById("cover")&&document.getElementById("cover").value)||"AUTO";
+    if(!code){alert("Введите код карты");return;}
     const style={palette:(document.getElementById("cardPalette")&&document.getElementById("cardPalette").value)||"AUTO",textColor:(document.getElementById("titleColor")&&document.getElementById("titleColor").value)||"WHITE",position:(document.getElementById("titlePosition")&&document.getElementById("titlePosition").value)||"CENTER",background:(document.getElementById("titleBackground")&&document.getElementById("titleBackground").value)||"PILL",size:Math.max(14,Math.min(28,Number(document.getElementById("titleSize")&&document.getElementById("titleSize").value)||19)),font:(document.getElementById("titleFont")&&document.getElementById("titleFont").value)||"SYSTEM",visible:!(document.getElementById("titleVisible")&&document.getElementById("titleVisible").value==="false"),customGradient:(window.__editorPreviewCard&&window.__editorPreviewCard.style&&window.__editorPreviewCard.style.customGradient)||null};
     const file=document.getElementById("cardImage")&&document.getElementById("cardImage").files[0];
-    if(!code){alert("Введите код карты");return;}
     let image="";
     if(file)image=await readImage(file);
     if(!Array.isArray(cards))cards=[];
     const draft=window.__editorPreviewCard||{};
     const card={id:String(Date.now()),name:name,code:code,format:format,image:image,color:colors[cards.length%colors.length],cover:cover,coverImage:String(draft.coverImage||""),style:style};
-    if(document.getElementById("coverMakeDefault")&&document.getElementById("coverMakeDefault").checked&&card.coverImage){brandCovers[coverForCard(card)]=card.coverImage;saveBrandCovers();}
-    cards.unshift(card);
-    localStorage.setItem(KEY,JSON.stringify(cards));
+    const makeDefault=!!(document.getElementById("coverMakeDefault")&&document.getElementById("coverMakeDefault").checked&&card.coverImage);
+    const nextBrandCovers=makeDefault?Object.assign({},brandCovers):brandCovers;
+    if(makeDefault)nextBrandCovers[coverForCard(card)]=card.coverImage;
+    const nextCards=[card].concat(cards);
+    const oldCardsRaw=localStorage.getItem(KEY),oldSafeRaw=localStorage.getItem(SAFE_KEY),oldCoversRaw=localStorage.getItem(COVER_DEFAULTS_KEY);
+    const rollbackErrors=[];
+    function restoreKey(key,raw){
+      try{localStorage.removeItem(key);if(raw!==null)localStorage.setItem(key,raw);}
+      catch(rollbackError){rollbackErrors.push(key+": "+String(rollbackError&&rollbackError.message||rollbackError));}
+    }
+    try{
+      try{localStorage.setItem(SAFE_KEY,oldCardsRaw!==null?oldCardsRaw:JSON.stringify(cards));}catch(snapshotError){}
+      if(makeDefault)localStorage.setItem(COVER_DEFAULTS_KEY,JSON.stringify(nextBrandCovers));
+      localStorage.setItem(KEY,JSON.stringify(nextCards));
+    }catch(saveError){
+      restoreKey(KEY,oldCardsRaw);
+      restoreKey(COVER_DEFAULTS_KEY,oldCoversRaw);
+      restoreKey(SAFE_KEY,oldSafeRaw);
+      const suffix=rollbackErrors.length?" Не удалось полностью восстановить ключи: "+rollbackErrors.join(", ")+".": " Исходные значения ключей восстановлены.";
+      alert("Не удалось сохранить новую карту: "+String(saveError&&saveError.message||saveError)+"."+suffix);
+      return;
+    }
+    cards=nextCards;
+    if(makeDefault)brandCovers=nextBrandCovers;
     storageState="ok";
     storageError="";
     render();
     closeModal();
   }catch(e){
-    storageState="error";
-    storageError=String(e&&e.message||e);
-    alert("Не удалось добавить карту: "+storageError);
+    alert("Не удалось добавить карту: "+String(e&&e.message||e));
   }
 }
 function scanner(onResult){
