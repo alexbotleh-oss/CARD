@@ -805,14 +805,21 @@ function manual(data){
     '<div class="formatPicker"><input id="format" type="hidden" value="'+esc(fmt)+'"><button type="button" class="formatButton" onclick="toggleFormatMenu()">'+esc(formatLabel(fmt))+'</button><div id="formatMenu" class="formatMenu">'+
     '<button type="button" class="formatOption" onclick="chooseFormat(\'CODE_128\',\'Штрихкод — CODE 128\')">Штрихкод — CODE 128</button>'+
     '<button type="button" class="formatOption" onclick="chooseFormat(\'EAN_13\',\'Штрихкод — EAN-13\')">Штрихкод — EAN-13</button>'+
-    '<button type="button" class="formatOption" onclick="chooseFormat(\'EAN_8\',\'Штрихкод — EAN-8\')">Штрихкод — EAN-8</button>'+
-    '<button type="button" class="formatOption" onclick="chooseFormat(\'QR_CODE\',\'QR-код\')">QR-код</button></div></div>'+
+    '<button type="button" class="formatOption" onclick="chooseFormat(&#39;EAN_8&#39;,&#39;Штрихкод — EAN-8&#39;)">Штрихкод — EAN-8</button></button>'+
+    '<button type="button" class="formatOption" onclick="chooseFormat(&#39;CODE_39&#39;,&#39;Штрихкод — CODE 39&#39;)">Штрихкод — CODE 39</button></button>'+
+    '<button type="button" class="formatOption" onclick="chooseFormat(&#39;CODE_93&#39;,&#39;Штрихкод — CODE 93&#39;)">Штрихкод — CODE 93</button></button>'+
+    '<button type="button" class="formatOption" onclick="chooseFormat(&#39;ITF&#39;,&#39;Штрихкод — ITF&#39;)">Штрихкод — ITF</button></button>'+
+    '<button type="button" class="formatOption" onclick="chooseFormat(&#39;UPC_A&#39;,&#39;Штрихкод — UPC-A&#39;)">Штрихкод — UPC-A</button></button>'+
+    '<button type="button" class="formatOption" onclick="chooseFormat(&#39;UPC_E&#39;,&#39;Штрихкод — UPC-E&#39;)">Штрихкод — UPC-E</button></button>'+
+    '<button type="button" class="formatOption" onclick="chooseFormat(&#39;PDF417&#39;,&#39;Штрихкод — PDF417&#39;)">Штрихкод — PDF417</button></button>'+
+    '<button type="button" class="formatOption" onclick="chooseFormat(&#39;DATA_MATRIX&#39;,&#39;Код Data Matrix&#39;)">Код Data Matrix</button></button>'+
+    '<button type="button" class="formatOption" onclick="chooseFormat(&#39;QR_CODE&#39;,&#39;QR-код&#39;)">QR-код</button></button></div></div>'+
     '<div class="editorCodePreview"><svg id="editorBarcode"></svg><div id="editorQrPreview" style="display:none;align-items:center;justify-content:center;min-height:192px;padding:8px;background:#fff;border-radius:12px"></div></div>'+
     '<div class="editorSectionTitle" style="margin-top:16px">Дополнительный код</div>'+
     '<label class="secondCodeToggle"><input id="secondCodeEnabled" type="checkbox"> Второй код (QR или штрихкод)</label>'+
     '<div id="secondCodeSettings" style="display:none;margin-top:10px">'+
       '<div class="editorFieldLabel">Содержимое второго кода</div><input id="secondCode" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" value="">'+
-      '<input id="secondFormat" type="hidden" value="CODE_128"><div class="hint" id="secondFormatLabel">Штрихкод — CODE 128</div>'+
+      '<input id="secondFormat" type="hidden" value="CODE_128"><div class="editorFieldLabel">Формат второго кода</div><select id="secondFormatSelect" class="formatSelect" onchange="chooseSecondFormat(this.value)">'+secondFormatOptions("CODE_128")+'</select><div class="hint" id="secondFormatLabel">Штрихкод — CODE 128</div>'+
       '<button type="button" class="btn secondary" id="scanSecondCode" style="margin-top:8px">Сканировать второй код</button></div>'+
     '<div class="coverPicker"><div class="hint">Рубашка карты</div><input id="cover" type="hidden" value="AUTO">'+editorCoverCatalog("AUTO")+
     '<div class="coverHint">Автоматически выберется вариант по названию магазина. Рубашку можно заменить, загрузить и сохранить как стандартную для бренда.</div></div>'+
@@ -833,6 +840,7 @@ function manual(data){
       if(panel)panel.style.display="block";
       if(value)value.value=data.code;
       if(format)format.value=data.format;
+      const formatSelect=document.getElementById("secondFormatSelect");if(formatSelect)formatSelect.value=data.format;
       if(label)label.textContent=formatLabel(data.format);
       refreshEditorCodePreview(window.__editorPreviewCard||{});
     });
@@ -843,6 +851,16 @@ function manual(data){
   refreshEditorCodePreview(window.__editorPreviewCard);
 }
 function formatLabel(v){return ({CODE_128:"Штрихкод — CODE 128",CODE_39:"Штрихкод — CODE 39",CODE_93:"Штрихкод — CODE 93",EAN_13:"Штрихкод — EAN-13",EAN_8:"Штрихкод — EAN-8",ITF:"Штрихкод — ITF",UPC_A:"Штрихкод — UPC-A",UPC_E:"Штрихкод — UPC-E",PDF417:"Штрихкод — PDF417",DATA_MATRIX:"Код Data Matrix",QR_CODE:"QR-код"})[v]||"Штрихкод — "+String(v||"неизвестный формат");}
+function secondFormatOptions(selected){
+  const formats=["CODE_128","CODE_39","CODE_93","EAN_13","EAN_8","ITF","UPC_A","UPC_E","QR_CODE","PDF417","DATA_MATRIX"];
+  return formats.map(function(format){return '<option value="'+format+'"'+(format===selected?' selected':'')+'>'+esc(formatLabel(format))+'</option>';}).join("");
+}
+function chooseSecondFormat(value){
+  const format=normalizeFormat(value||"CODE_128");
+  const hidden=document.getElementById("secondFormat"),label=document.getElementById("secondFormatLabel");
+  if(hidden)hidden.value=format;
+  if(label)label.textContent=formatLabel(format);
+}
 function toggleFormatMenu(){const m=document.getElementById("formatMenu");if(m)m.classList.toggle("open");}
 function chooseFormat(v,label){const f=document.getElementById("format");const btn=document.querySelector(".formatButton");const m=document.getElementById("formatMenu");if(f)f.value=v;if(btn)btn.textContent=label;if(m)m.classList.remove("open");if(typeof refreshEditorCodePreview==="function")refreshEditorCodePreview(window.__editorPreviewCard||{});}
 async function addCard(){
@@ -1149,7 +1167,7 @@ function bindEditorPreview(c){
   refreshEditorPreview(previewCard);
 }
 function captureEditorDraft(){
-  const ids=["name","code","format","secondCodeEnabled","secondCode","secondFormat","cover","cardPalette","titlePosition","titleBackground","titleColor","titleSize","titleFont","titleVisible"];
+  const ids=["name","code","format","secondCodeEnabled","secondCode","secondFormat","secondFormatSelect","cover","cardPalette","titlePosition","titleBackground","titleColor","titleSize","titleFont","titleVisible"];
   const fields={};
   ids.forEach(function(id){const el=document.getElementById(id);if(el)fields[id]=el.type==="checkbox"?{checked:!!el.checked}:{value:el.value};});
   const preview=window.__editorPreviewCard||{};
@@ -1166,7 +1184,7 @@ function restoreEditorDraft(draft){
   if(draft.gradient)preview.style.customGradient=draft.gradient;else delete preview.style.customGradient;
   const def=document.getElementById("coverMakeDefault");if(def)def.checked=draft.makeDefault;
   const format=document.getElementById("format"),button=document.querySelector(".formatButton");if(format&&button)button.textContent=formatLabel(format.value);
-  const sf=document.getElementById("secondFormat"),sl=document.getElementById("secondFormatLabel");if(sf&&sl)sl.textContent=formatLabel(sf.value);
+  const sf=document.getElementById("secondFormat"),sfSelect=document.getElementById("secondFormatSelect"),sl=document.getElementById("secondFormatLabel");if(sfSelect&&sf)sfSelect.value=sf.value;if(sf&&sl)sl.textContent=formatLabel(sf.value);
   const cover=document.getElementById("cover");document.querySelectorAll("#editorCoverGrid .coverOption").forEach(function(b){b.classList.toggle("selected",!!cover&&b.getAttribute("data-cover")===cover.value);});
   [["paletteGrid","data-palette","cardPalette"],["backgroundGrid","data-background","titleBackground"],["textColorGrid","data-text-color","titleColor"],["fontGrid","data-font","titleFont"]].forEach(function(a){const grid=document.getElementById(a[0]),input=document.getElementById(a[2]);if(grid&&input)grid.querySelectorAll("button").forEach(function(b){b.classList.toggle("selected",b.getAttribute(a[1])===input.value);});});
   const on=document.getElementById("titleVisible"),toggle=document.getElementById("titleVisibleToggle");if(on&&toggle){toggle.textContent=on.value==="true"?"Без надписи":"Показывать название";toggle.setAttribute("aria-pressed",on.value==="true");}
@@ -1188,8 +1206,15 @@ function manualEdit(id){
       '<div class="formatPicker" style="margin-top:10px"><input id="format" type="hidden" value="'+esc(c.format||"CODE_128")+'"><button type="button" class="formatButton" onclick="toggleFormatMenu()">'+esc(formatLabel(c.format||"CODE_128"))+'</button><div id="formatMenu" class="formatMenu">'+
       '<button type="button" class="formatOption" onclick="chooseFormat(\'CODE_128\',\'Штрихкод — CODE 128\')">Штрихкод — CODE 128</button>'+
       '<button type="button" class="formatOption" onclick="chooseFormat(\'EAN_13\',\'Штрихкод — EAN-13\')">Штрихкод — EAN-13</button>'+
-      '<button type="button" class="formatOption" onclick="chooseFormat(\'EAN_8\',\'Штрихкод — EAN-8\')">Штрихкод — EAN-8</button>'+
-      '<button type="button" class="formatOption" onclick="chooseFormat(\'QR_CODE\',\'QR-код\')">QR-код</button></div></div>'+
+      '<button type="button" class="formatOption" onclick="chooseFormat(&#39;EAN_8&#39;,&#39;Штрихкод — EAN-8&#39;)">Штрихкод — EAN-8</button></button>'+
+    '<button type="button" class="formatOption" onclick="chooseFormat(&#39;CODE_39&#39;,&#39;Штрихкод — CODE 39&#39;)">Штрихкод — CODE 39</button></button>'+
+    '<button type="button" class="formatOption" onclick="chooseFormat(&#39;CODE_93&#39;,&#39;Штрихкод — CODE 93&#39;)">Штрихкод — CODE 93</button></button>'+
+    '<button type="button" class="formatOption" onclick="chooseFormat(&#39;ITF&#39;,&#39;Штрихкод — ITF&#39;)">Штрихкод — ITF</button></button>'+
+    '<button type="button" class="formatOption" onclick="chooseFormat(&#39;UPC_A&#39;,&#39;Штрихкод — UPC-A&#39;)">Штрихкод — UPC-A</button></button>'+
+    '<button type="button" class="formatOption" onclick="chooseFormat(&#39;UPC_E&#39;,&#39;Штрихкод — UPC-E&#39;)">Штрихкод — UPC-E</button></button>'+
+    '<button type="button" class="formatOption" onclick="chooseFormat(&#39;PDF417&#39;,&#39;Штрихкод — PDF417&#39;)">Штрихкод — PDF417</button></button>'+
+    '<button type="button" class="formatOption" onclick="chooseFormat(&#39;DATA_MATRIX&#39;,&#39;Код Data Matrix&#39;)">Код Data Matrix</button></button>'+
+    '<button type="button" class="formatOption" onclick="chooseFormat(&#39;QR_CODE&#39;,&#39;QR-код&#39;)">QR-код</button></button></div></div>'+
       '<div class="editorCodePreview"><svg id="editorBarcode"></svg><div id="editorQrPreview" style="display:none;align-items:center;justify-content:center;min-height:192px;padding:8px;background:#fff;border-radius:12px"></div></div>'+
       '<button type="button" class="btn secondary" id="rescanEdit">Пересканировать код</button>'+
       '<div class="editorSectionTitle" style="margin-top:18px">Дополнительный код</div>'+
@@ -1197,7 +1222,7 @@ function manualEdit(id){
       '<div id="secondCodeSettings" style="display:'+(String(c.secondCode||"").trim()?'block':'none')+';margin-top:10px">'+
         '<div class="editorFieldLabel">Содержимое второго кода</div><input id="secondCode" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" value="'+esc(c.secondCode||'')+'">'+
         '<input id="secondFormat" type="hidden" value="'+esc(c.secondFormat||"CODE_128")+'">'+
-        '<div class="hint" id="secondFormatLabel">'+esc(formatLabel(c.secondFormat||"CODE_128"))+'</div>'+
+        '<div class="editorFieldLabel">Формат второго кода</div><select id="secondFormatSelect" class="formatSelect" onchange="chooseSecondFormat(this.value)">'+secondFormatOptions(c.secondFormat||"CODE_128")+'</select><div class="hint" id="secondFormatLabel">'+esc(formatLabel(c.secondFormat||"CODE_128"))+'</div>'+
         '<button type="button" class="btn secondary" id="scanSecondCode" style="margin-top:8px">Сканировать второй код</button>'+
       '</div>'+
       '<label class="hint" style="display:block;margin-top:12px">Заменить фото карты<input id="cardImage" type="file" accept="image/*" style="width:100%;margin-top:6px"></label>'+
@@ -1223,7 +1248,7 @@ function manualEdit(id){
     manualEdit(String(id));restoreEditorDraft(draft);
     const enabled=document.getElementById("secondCodeEnabled"),value=document.getElementById("secondCode"),fmt=document.getElementById("secondFormat"),label=document.getElementById("secondFormatLabel"),settings=document.getElementById("secondCodeSettings");
     if(enabled)enabled.checked=true;if(settings)settings.style.display="block";
-    if(value)value.value=data.code;if(fmt)fmt.value=data.format;if(label)label.textContent=formatLabel(data.format);
+    if(value)value.value=data.code;if(fmt)fmt.value=data.format;const formatSelect=document.getElementById("secondFormatSelect");if(formatSelect)formatSelect.value=data.format;if(label)label.textContent=formatLabel(data.format);
     refreshEditorCodePreview(window.__editorPreviewCard||{});
   });};
   document.getElementById("editSave").onclick=function(){updateCard(String(id));};
