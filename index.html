@@ -619,6 +619,7 @@ function syncCardsFromStorage(){
         image:String(x.image||x.logo||""),
         color:String(x.color||colors[0]),
         cover:String(x.cover||"AUTO"),
+        coverImage:String(x.coverImage||""),
         style:(x.style&&typeof x.style==="object")?x.style:{}
       };
     });
