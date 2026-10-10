@@ -893,7 +893,8 @@ function editorPreviewData(c){
     position:(document.getElementById("titlePosition")&&document.getElementById("titlePosition").value)||"BOTTOM",
     background:(document.getElementById("titleBackground")&&document.getElementById("titleBackground").value)||"PILL",
     size:Math.max(14,Math.min(28,Number(document.getElementById("titleSize")&&document.getElementById("titleSize").value)||19)),
-    font:(document.getElementById("titleFont")&&document.getElementById("titleFont").value)||"SYSTEM"
+    font:(document.getElementById("titleFont")&&document.getElementById("titleFont").value)||"SYSTEM",
+    visible:!(document.getElementById("titleVisible")&&document.getElementById("titleVisible").value==="false")
   };
   return base;
 }
