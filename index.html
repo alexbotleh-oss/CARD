@@ -320,6 +320,43 @@ header{padding:18px 20px 10px;background:#f6f7fbf5}
 .coverOption.cover-mvideo{background:#ef2d32!important;color:#fff!important}
 .coverOption.cover-eldorado{background:#f8d328!important;color:#202020!important}
 
+
+/* CARD111 appearance menu — unified neutral style, 2026-10-10 */
+.cardStylePicker{
+  margin-top:12px;padding:14px;border:1px solid #e5e7eb;border-radius:18px;
+  background:#fff;box-shadow:0 1px 3px #17181c08
+}
+.cardStylePicker>.hint:first-child{margin-top:0}
+.cardStylePicker .styleBlockTitle{
+  display:block;margin:18px 0 0;color:#30333a;font-size:13px;font-weight:750;line-height:1.35
+}
+.cardStylePicker .styleGrid,.cardStylePicker .textColorGrid{margin-top:8px}
+.cardStylePicker .styleOption,.cardStylePicker .styleColorChoice{
+  border-color:#e2e3e8;border-radius:12px;transition:border-color .12s,box-shadow .12s;
+  -webkit-tap-highlight-color:transparent
+}
+.cardStylePicker .styleOption.selected,.cardStylePicker .styleColorChoice.selected{
+  border-color:#17181c;box-shadow:0 0 0 1px #17181c inset
+}
+.cardStylePicker .titleVisibleToggle,.cardStylePicker .titlePositionOpen{
+  min-height:44px;border:1px solid #e2e3e8;border-radius:12px;background:#f6f7f9;color:#17181c;
+  font-size:14px;font-weight:700
+}
+.cardStylePicker .titleVisibleToggle[aria-pressed="true"]{
+  background:#17181c;color:#fff;border-color:#17181c
+}
+.cardStylePicker .titlePositionOpen{width:100%;margin-top:8px;font-size:20px}
+.cardStylePicker .titlePositionCurrent{margin-top:7px}
+.cardStylePicker .styleRange{accent-color:#17181c;display:block;padding:0}
+.cardStylePicker .fontGrid .styleOption{min-height:44px}
+.editorAppearance .cardStylePicker{margin-top:12px}
+@media(max-width:380px){
+  .cardStylePicker{padding:11px}
+  .cardStylePicker .styleGrid{gap:7px}
+  .cardStylePicker .textColorGrid{gap:6px}
+  .cardStylePicker .styleColorChoice{min-height:62px;font-size:10px}
+}
+
 </style>
 </head>
 <body>
