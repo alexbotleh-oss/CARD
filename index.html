@@ -573,8 +573,25 @@ function saveBrandCovers(){try{localStorage.setItem(COVER_DEFAULTS_KEY,JSON.stri
 function coverImageForCard(c){return String((c&&c.coverImage)||brandCovers[coverForCard(c||{})]||"");}
 function bindCoverImagePicker(){
   const file=document.getElementById("coverImageFile"),makeDefault=document.getElementById("coverMakeDefault"),restore=document.getElementById("coverRestoreDefault");
-  if(file)file.onchange=async function(e){const f=e.target.files&&e.target.files[0];if(!f)return;if(!/^image\//i.test(f.type||"")){alert("Выберите файл изображения.");file.value="";return;}try{const data=await readImage(f),draft=window.__editorPreviewCard||{};draft.coverImage=data;window.__editorPreviewCard=draft;if(typeof refreshEditorPreview==="function")refreshEditorPreview(draft);const preview=document.getElementById("cardGradientPreview");if(preview){preview.classList.add("active");preview.style.backgroundImage='url("'+data+'")';preview.style.backgroundSize="cover";}}catch(err){alert("Не удалось прочитать изображение рубашки.");}file.value="";};
+  if(file)file.onchange=async function(e){const f=e.target.files&&e.target.files[0];if(!f)return;if(!/^image\//i.test(f.type||"")){alert("Выберите файл изображения.");file.value="";return;}try{const data=await readCoverImage(f),draft=window.__editorPreviewCard||{};draft.coverImage=data;window.__editorPreviewCard=draft;if(typeof refreshEditorPreview==="function")refreshEditorPreview(draft);const preview=document.getElementById("cardGradientPreview");if(preview){preview.classList.add("active");preview.style.backgroundImage='url("'+data+'")';preview.style.backgroundSize="cover";}}catch(err){alert("Не удалось прочитать изображение рубашки.");}file.value="";};
   if(restore)restore.onclick=function(){const draft=window.__editorPreviewCard||{};delete draft.coverImage;window.__editorPreviewCard=draft;if(makeDefault)makeDefault.checked=false;const preview=document.getElementById("cardGradientPreview");if(preview){const g=draft.style&&draft.style.customGradient;if(g&&g.colors)preview.style.background="linear-gradient("+Number(g.angle||135)+"deg,"+g.colors.join(",")+")";else{preview.classList.remove("active");preview.style.background="";preview.style.backgroundImage="";}}if(typeof refreshEditorPreview==="function")refreshEditorPreview(draft);};
+}
+function readCoverImage(file){
+  return new Promise(function(resolve,reject){
+    const url=URL.createObjectURL(file),img=new Image();
+    img.onload=function(){
+      try{
+        const maxW=1400,maxH=900,scale=Math.min(1,maxW/img.naturalWidth,maxH/img.naturalHeight);
+        const canvas=document.createElement("canvas");
+        canvas.width=Math.max(1,Math.round(img.naturalWidth*scale));canvas.height=Math.max(1,Math.round(img.naturalHeight*scale));
+        canvas.getContext("2d").drawImage(img,0,0,canvas.width,canvas.height);
+        const data=canvas.toDataURL("image/webp",0.86);
+        URL.revokeObjectURL(url);resolve(data.indexOf("data:image/webp")===0?data:canvas.toDataURL("image/png"));
+      }catch(err){URL.revokeObjectURL(url);reject(err);}
+    };
+    img.onerror=function(){URL.revokeObjectURL(url);reject(Error("cover-image-decode-failed"));};
+    img.src=url;
+  });
 }
 function readImage(file){
   return new Promise(function(resolve,reject){
