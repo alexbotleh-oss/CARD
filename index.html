@@ -570,7 +570,13 @@ function exportStorageRecovery(){
   }catch(e){alert("Не удалось выгрузить данные локальной памяти");}
 }
 function saveBrandCovers(){try{localStorage.setItem(COVER_DEFAULTS_KEY,JSON.stringify(brandCovers));}catch(e){alert("Не удалось сохранить стандартные рубашки брендов.");}}
-function coverImageForCard(c){return String((c&&c.coverImage)||brandCovers[coverForCard(c||{})]||"");}
+const BUILTIN_COVER_IMAGES={
+  PYATEROCHKA:"https://xn----7sbavphe5ahhetd7ezf.xn--p1ai/pic/card.png",
+  MAGNIT:"https://anapagorkogo11.ru/karta-magnit-aktivirovat.JPG",
+  PEREKRESTOK:"https://papik.pro/grafic/uploads/posts/2023-04/1681503399_papik-pro-p-logotip-perekrestok-vektor-50.jpg",
+  LENTA:"https://imgproxy.kuper.ru/imgproxy/size-500-500/czM6Ly9jb250ZW50LWltYWdlcy1wcm9kL3Byb2R1Y3RzLzQ0NjkyNjU1L29yaWdpbmFsLzEvMjAyNS0wMi0wMyUyMDEyJTNBNTQlM0E1NS44MjcwNzklMkIwMCUzQTAwLzQ0NjkyNjU1XzEuanBn.jpg"
+};
+function coverImageForCard(c){const key=coverForCard(c||{});return String((c&&c.coverImage)||brandCovers[key]||BUILTIN_COVER_IMAGES[key]||"");}
 function bindCoverImagePicker(){
   const file=document.getElementById("coverImageFile"),makeDefault=document.getElementById("coverMakeDefault"),restore=document.getElementById("coverRestoreDefault");
   if(file)file.onchange=async function(e){const f=e.target.files&&e.target.files[0];if(!f)return;if(!/^image\//i.test(f.type||"")){alert("Выберите файл изображения.");file.value="";return;}try{const data=await readCoverImage(f),draft=window.__editorPreviewCard||{};draft.coverImage=data;window.__editorPreviewCard=draft;if(typeof refreshEditorPreview==="function")refreshEditorPreview(draft);const preview=document.getElementById("cardGradientPreview");if(preview){preview.classList.add("active");preview.style.backgroundImage='url("'+data+'")';preview.style.backgroundSize="cover";}}catch(err){alert("Не удалось прочитать изображение рубашки.");}file.value="";};
