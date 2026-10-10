@@ -267,3 +267,12 @@ Evidence: changed source re-read from the work branch. Visual confirmation in br
 **Static checks:** current index.html re-read from the target branch; both inline JS blocks passed V8 parsing. Presence checks passed for the second-format select, primary PDF417/Data Matrix choices, gradient deletion marker in updateCard, and brand-style aliases.
 
 **Remaining issues:** actual official/local SVG logos for all listed retailers have not been integrated; browser/mobile interaction, code scanning per format, and backup end-to-end round-trip still need real runtime verification.
+## 2026-10-11 — safe deletion and PWA cache update
+
+**Commits:** f3151286d469a3bef1ab129b4596238cfa09b95b (mobile styling for second-format select), 3de57dc54b6326801a3a8f6374ba4cec4172059e (service worker query bump), e4f748aa4a9d7f87336a50157cb778d897f008a4 (cache version v17), 1a401ca98d3c0d86042935252aad5d3b405e01df (safe card deletion).
+
+**Change:** Delete now stages the filtered card list and only swaps the in-memory array after the localStorage write succeeds. It snapshots the old card key, attempts to update the recovery key, and rolls both persisted keys back on write failure. Failure keeps the card and modal intact and reports the storage error. Service worker cache version increased to card-pwa-v17 and registration now requests sw.js?v=17.
+
+**Verification:** both inline JS blocks parse in V8. A V8-injected harness exercised delete success and one-time localStorage write failure; success removed the intended card and preserved the old full list as recovery snapshot; failure left memory and persisted cards intact, reported an error and did not close the modal. This is a mocked storage test, not a browser test.
+
+**Still unverified:** installed PWA update on Android, actual browser-localStorage quota behavior, image selection/cropping on device, barcode scanning and backup end-to-end round-trip.
