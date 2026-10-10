@@ -200,3 +200,13 @@ Resolution order: individual card image > user-defined brand default > built-in 
 **Risk identified (not yet modified):** import overwrites the active card array, and the code does not appear to validate before replacing it that at least one valid card remains. An empty/invalid-but-parseable `cards` array can therefore replace the current set. The import also applies `brandCovers` before the card mapping/save completes, so a later failure could leave defaults changed while card data was not restored. This needs a separate minimal defensive patch and explicit malformed/empty backup tests.
 
 **Verification level:** source inspection only; no browser or physical-device round-trip test performed. No claim of end-to-end backup safety.
+
+## 2026-10-11 — backup import guard implemented
+
+**Change:** `readImport` now rejects malformed backup shapes and backups without at least one usable card before mutating active state; asks for explicit confirmation before replacing the active set; builds imported card/cover data separately; and reports file-read or storage-write errors. If writing imported state fails, in-memory card/cover values are restored.
+
+**Commit:** `86c2aef6e016355a0574340a1f02d16daaafe704`.
+
+**Static verification:** both inline JavaScript blocks pass `new Function(...)` syntax compilation after the change.
+
+**Still unverified:** browser tests for valid/empty/invalid backups, localStorage quota failure, and full cover/second-code round trip. There is no physical-device validation yet. Also, browser localStorage updates are not a true cross-key transaction; if the cards key write succeeds and the cover-defaults write fails, persistent state may be partially updated even though in-memory values are restored. Follow-up should make the recovery path resilient to this storage-quota scenario.
