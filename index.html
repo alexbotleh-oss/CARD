@@ -72,7 +72,7 @@ h1{margin:0;font-size:28px}.sub{color:#737780;font-size:14px;margin-top:4px}.btn
 .coverCategory.active{background:#1677ff;color:#fff}@media(max-width:420px){.editorAppearance .coverGrid{grid-template-columns:repeat(4,minmax(0,1fr))}.editorAppearance .coverOption{min-height:64px;font-size:10px}}
 .card.palette-red{background:linear-gradient(135deg,#ef3340,#b30f30)!important}.card.palette-blue{background:linear-gradient(135deg,#1767d8,#163c91)!important}.card.palette-green{background:linear-gradient(135deg,#0aa66d,#087557)!important}.card.palette-purple{background:linear-gradient(135deg,#7b3fe4,#45218b)!important}.card.palette-amber{background:linear-gradient(135deg,#f5bd2e,#c47708)!important}.card.palette-graphite{background:linear-gradient(135deg,#4a5058,#17181c)!important}.card.palette-light{background:linear-gradient(135deg,#fff,#e7e9ed)!important}
 .card.palette-red:before,.card.palette-blue:before,.card.palette-green:before,.card.palette-purple:before,.card.palette-amber:before,.card.palette-graphite:before,.card.palette-light:before{opacity:.28}.card.palette-light strong{background:#ffffffd9!important;text-shadow:none!important}
-.cardStylePicker{margin-top:14px;padding:14px;border:1px solid #e4e6eb;border-radius:18px;background:#fafbfc}.styleBlockTitle{margin-top:14px}.styleGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:7px}.styleOption{min-height:42px;border:2px solid #e2e3e8;border-radius:12px;background:#fff;padding:8px 10px;font:inherit;font-weight:700;color:#30333a}.styleOption.selected{border-color:#1677ff;box-shadow:0 0 0 1px #1677ff inset}
+.cardStylePicker{margin-top:14px;padding:14px;border:1px solid #e4e6eb;border-radius:18px;background:#fafbfc}.styleBlockTitle{margin-top:14px}.styleGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:7px}.positionGrid{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}.positionGrid .positionChoice{min-height:52px;padding:7px 4px;font-size:12px;line-height:1.15}.styleOption{min-height:42px;border:2px solid #e2e3e8;border-radius:12px;background:#fff;padding:8px 10px;font:inherit;font-weight:700;color:#30333a}.styleOption.selected{border-color:#1677ff;box-shadow:0 0 0 1px #1677ff inset}
 .palette-choice-red{background:linear-gradient(135deg,#ef3340,#b30f30);color:#fff}.palette-choice-blue{background:linear-gradient(135deg,#1767d8,#163c91);color:#fff}.palette-choice-green{background:linear-gradient(135deg,#0aa66d,#087557);color:#fff}.palette-choice-purple{background:linear-gradient(135deg,#7b3fe4,#45218b);color:#fff}.palette-choice-amber{background:linear-gradient(135deg,#f5bd2e,#c47708);color:#17181c}.palette-choice-graphite{background:linear-gradient(135deg,#4a5058,#17181c);color:#fff}.palette-choice-light{background:linear-gradient(135deg,#fff,#e7e9ed);color:#17181c}
 .textColorGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin-top:7px}.styleColorChoice{min-height:42px;border:2px solid #e2e3e8;border-radius:12px;background:#fff;padding:5px 3px;font:11px inherit;font-weight:700;color:#30333a}.styleColorChoice span{display:block;width:20px;height:20px;border-radius:50%;margin:0 auto 3px;border:1px solid #c9cbd0}.styleColorChoice b{font-weight:650}.styleColorChoice.selected{border-color:#1677ff;box-shadow:0 0 0 1px #1677ff inset}.style-color-white span{background:#fff}.style-color-black span{background:#17181c}.style-color-yellow span{background:#ffd43b}.style-color-red span{background:#e03131}.style-color-green span{background:#159447}.style-color-blue span{background:#1767d8}
 .styleRange{width:100%;margin-top:7px;accent-color:#1677ff}.fontGrid .styleOption{font-size:15px}
@@ -208,22 +208,30 @@ header{padding:18px 20px 10px;background:#f6f7fbf5}
   bottom:4.8cqw!important;
   transform:translateX(-50%)!important;
 }
-.card.title-top strong{
-  top:4.8cqw!important;
-  bottom:auto!important;
-  transform:translateX(-50%)!important;
+/* Nine-point title anchoring: each position uses the same proportional inset */
+.card[class*="title-top_"] strong{
+  top:4.8cqw!important;bottom:auto!important;
 }
-.card.title-center strong{
-  top:50%!important;
-  bottom:auto!important;
-  transform:translate(-50%,-50%)!important;
+.card.title-top_left strong,.card.title-middle_left strong,.card.title-bottom_left strong{
+  left:4.8cqw!important;right:auto!important;transform:none!important;text-align:left!important;
 }
-.card.title-bottom strong{
-  top:auto!important;
-  bottom:4.8cqw!important;
-  transform:translateX(-50%)!important;
+.card.title-top_center strong,.card.title-center strong,.card.title-bottom_center strong{
+  left:50%!important;right:auto!important;transform:translateX(-50%)!important;text-align:center!important;
 }
-.card.title-hide strong{display:none!important}
+.card.title-top_right strong,.card.title-middle_right strong,.card.title-bottom_right strong{
+  left:auto!important;right:4.8cqw!important;transform:none!important;text-align:right!important;
+}
+.card.title-middle_left strong,.card.title-middle_right strong{
+  top:50%!important;bottom:auto!important;transform:translateY(-50%)!important;
+}
+.card.title-center strong{top:50%!important;bottom:auto!important;transform:translate(-50%,-50%)!important}
+.card.title-bottom_left strong,.card.title-bottom_center strong,.card.title-bottom_right strong{
+  top:auto!important;bottom:4.8cqw!important;
+}
+.card.title-bottom_center strong{left:50%!important;right:auto!important;transform:translateX(-50%)!important}
+.card.title-top_right strong,.card.title-bottom_right strong{transform:none!important}
+.card.title-middle_right strong{transform:translateY(-50%)!important}
+
 .cardLogo{
   position:absolute!important;
   left:4.8cqw!important;
@@ -303,7 +311,7 @@ function coverForName(name){
 const CARD_PALETTES={AUTO:"Фирменная",RED:"Красная",BLUE:"Синяя",GREEN:"Зелёная",PURPLE:"Фиолетовая",AMBER:"Янтарная",GRAPHITE:"Графитовая",LIGHT:"Светлая"};
 const CARD_TEXT_COLORS={WHITE:"#ffffff",BLACK:"#17181c",YELLOW:"#ffd43b",RED:"#e03131",GREEN:"#159447",BLUE:"#1767d8"};
 const CARD_TEXT_COLOR_LABELS={WHITE:"Белый",BLACK:"Чёрный",YELLOW:"Жёлтый",RED:"Красный",GREEN:"Зелёный",BLUE:"Синий"};
-const CARD_TEXT_POSITIONS={HIDE:"Не показывать",TOP:"Сверху",CENTER:"По центру",BOTTOM:"Снизу"};
+const CARD_TEXT_POSITIONS={TOP_LEFT:"Сверху слева",TOP_CENTER:"Сверху по центру",TOP_RIGHT:"Сверху справа",MIDDLE_LEFT:"Посередине слева",CENTER:"По центру",MIDDLE_RIGHT:"Посередине справа",BOTTOM_LEFT:"Снизу слева",BOTTOM_CENTER:"Снизу по центру",BOTTOM_RIGHT:"Снизу справа"};
 const CARD_TEXT_BACKGROUNDS={NONE:"Нет",PILL:"Плашка",SHADOW:"Тень",OUTLINE:"Контур"};
 const CARD_TEXT_BACKGROUND_LABELS={NONE:"Нет",PILL:"Плашка",SHADOW:"Тень",OUTLINE:"Контур"};
 const CARD_FONTS={SYSTEM:'system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif',ARIAL:"Arial,Helvetica,sans-serif",TREBUCHET:'"Trebuchet MS",Arial,sans-serif',GEORGIA:'Georgia,"Times New Roman",serif',COURIER:'"Courier New",monospace'};
@@ -322,7 +330,7 @@ function backgroundOptions(selected){return Object.keys(CARD_TEXT_BACKGROUNDS).m
 function styleEditor(c){
   const s=cardStyle(c);
   return '<div class="cardStylePicker"><div class="hint">Цветовая палитра</div><input id="cardPalette" type="hidden" value="'+esc(s.palette)+'"><div id="paletteGrid" class="styleGrid">'+paletteOptions(s.palette)+'</div>'+
-    '<div class="hint styleBlockTitle">Расположение названия</div><input id="titlePosition" type="hidden" value="'+esc(s.position)+'"><div id="positionGrid" class="styleGrid">'+positionOptions(s.position)+'</div>'+
+    '<div class="hint styleBlockTitle">Расположение названия</div><input id="titlePosition" type="hidden" value="'+esc(s.position)+'"><div id="positionGrid" class="styleGrid positionGrid">'+positionOptions(s.position)+'</div>'+
     '<div class="hint styleBlockTitle">Стиль фона для названия</div><input id="titleBackground" type="hidden" value="'+esc(s.background)+'"><div id="backgroundGrid" class="styleGrid">'+backgroundOptions(s.background)+'</div>'+
     '<div class="hint styleBlockTitle">Цвет текста</div><input id="titleColor" type="hidden" value="'+esc(s.textColor)+'"><div id="textColorGrid" class="textColorGrid">'+textColorOptions(s.textColor)+'</div>'+
     '<div class="hint styleBlockTitle">Размер текста: <b id="titleSizeValue">'+s.size+' px</b></div><input id="titleSize" type="range" min="14" max="28" step="1" value="'+s.size+'" class="styleRange">'+
