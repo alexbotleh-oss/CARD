@@ -190,3 +190,13 @@ Resolution order: individual card image > user-defined brand default > built-in 
 **Change:** added a touch/pointer crop modal with scale slider and drag-to-position. Confirmation renders the selected area at 3× card dimensions and encodes a compressed WebP (JPEG fallback) data URL for the card draft. Commit: `dc2e7f09b69937c34a12ac2281d8ef48551cfe67`.
 
 **Verification:** static syntax checks pass for both inline scripts. Mobile gesture behavior and persistence/backup round-trip still require browser/device testing.
+
+## 2026-10-11 — audit of cover persistence and backup round-trip
+
+**Reviewed:** current `index.html` on `candidate/CARD111-ui-2xN-20261006`, especially `coverImageForCard`, `bindCoverImagePicker`, `exportData`, `readImport`, and second-code fields.
+
+**Confirmed from code:** backup export serializes `cards` and `brandCovers`; card objects include `coverImage`, `secondCode`, and `secondFormat` during import mapping.
+
+**Risk identified (not yet modified):** import overwrites the active card array, and the code does not appear to validate before replacing it that at least one valid card remains. An empty/invalid-but-parseable `cards` array can therefore replace the current set. The import also applies `brandCovers` before the card mapping/save completes, so a later failure could leave defaults changed while card data was not restored. This needs a separate minimal defensive patch and explicit malformed/empty backup tests.
+
+**Verification level:** source inspection only; no browser or physical-device round-trip test performed. No claim of end-to-end backup safety.
