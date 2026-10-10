@@ -792,21 +792,53 @@ function addMenu(){
 }
 function manual(data){
   data=data||{};
-  window.__editorPreviewCard={style:{}};
-  const fmt=data.format||"CODE_128";
+  const fmt=normalizeFormat(data.format||"CODE_128");
+  window.__editorPreviewCard={name:String(data.name||""),code:String(data.code||""),format:fmt,cover:"AUTO",style:{}};
   openModal('<button class="close" onclick="addMenu()">×</button><h2>Новая скидочная карта</h2>'+
-    '<input id="name" name="discount_name" autocomplete="off" placeholder="Название карты" value="'+esc(data.name)+'">'+
-    '<div class="row"><input id="code" name="discount_code" type="text" inputmode="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Код штрихкода или QR-кода" value="'+esc(data.code)+'">'+
+    '<div class="editorPreviewWrap"><div id="editorPreview" class="card editorPreview"></div></div>'+
+    '<div class="hint editorPreviewHint">Предпросмотр обновляется при выборе оформления</div>'+
+    '<div class="editorSectionTitle">Основная информация</div>'+
+    '<div class="editorFieldLabel">Название карты</div><input id="name" name="discount_name" autocomplete="off" placeholder="Название карты" value="'+esc(data.name||"")+'">'+
+    '<div class="editorFieldLabel">Номер / код карты</div><input id="code" name="discount_code" type="text" inputmode="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Код штрихкода или QR-кода" value="'+esc(data.code||"")+'">'+
     '<div class="formatPicker"><input id="format" type="hidden" value="'+esc(fmt)+'"><button type="button" class="formatButton" onclick="toggleFormatMenu()">'+esc(formatLabel(fmt))+'</button><div id="formatMenu" class="formatMenu">'+
     '<button type="button" class="formatOption" onclick="chooseFormat(\'CODE_128\',\'Штрихкод — CODE 128\')">Штрихкод — CODE 128</button>'+
     '<button type="button" class="formatOption" onclick="chooseFormat(\'EAN_13\',\'Штрихкод — EAN-13\')">Штрихкод — EAN-13</button>'+
     '<button type="button" class="formatOption" onclick="chooseFormat(\'EAN_8\',\'Штрихкод — EAN-8\')">Штрихкод — EAN-8</button>'+
-    '<button type="button" class="formatOption" onclick="chooseFormat(\'QR_CODE\',\'QR-код\')">QR-код</button></div></div></div>'+
-    '<div class="coverPicker"><div class="hint">Рубашка карты</div><input id="cover" type="hidden" value="AUTO"><div id="coverGrid" class="coverGrid">'+coverOptions("AUTO")+'</div><button type="button" class="styleOption gradientAdd coverGradientAdd" id="coverGradientAdd">＋ Создать рубашку с градиентом</button><div id="cardGradientPreview" class="gradientPreview"></div><div class="coverHint">Автоматически выберется знакомая рубашка по названию магазина. Её можно заменить вручную.</div><label class="coverUploadLabel">Изображение рубашки<input id="coverImageFile" type="file" accept="image/*"></label><label class="coverDefaultLabel"><input id="coverMakeDefault" type="checkbox"> Использовать как стандартную рубашку бренда</label><button type="button" class="btn secondary" id="coverRestoreDefault">Восстановить стандартную рубашку</button></div>'+styleEditor({style:{}})+''+
+    '<button type="button" class="formatOption" onclick="chooseFormat(\'QR_CODE\',\'QR-код\')">QR-код</button></div></div>'+
+    '<div class="editorCodePreview"><svg id="editorBarcode"></svg><div id="editorQrPreview" style="display:none;align-items:center;justify-content:center;min-height:192px;padding:8px;background:#fff;border-radius:12px"></div></div>'+
+    '<div class="editorSectionTitle" style="margin-top:16px">Дополнительный код</div>'+
+    '<label class="secondCodeToggle"><input id="secondCodeEnabled" type="checkbox"> Второй код (QR или штрихкод)</label>'+
+    '<div id="secondCodeSettings" style="display:none;margin-top:10px">'+
+      '<div class="editorFieldLabel">Содержимое второго кода</div><input id="secondCode" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" value="">'+
+      '<input id="secondFormat" type="hidden" value="CODE_128"><div class="hint" id="secondFormatLabel">Штрихкод — CODE 128</div>'+
+      '<button type="button" class="btn secondary" id="scanSecondCode" style="margin-top:8px">Сканировать второй код</button></div>'+
+    '<div class="coverPicker"><div class="hint">Рубашка карты</div><input id="cover" type="hidden" value="AUTO">'+editorCoverCatalog("AUTO")+
+    '<div class="coverHint">Автоматически выберется вариант по названию магазина. Рубашку можно заменить, загрузить и сохранить как стандартную для бренда.</div></div>'+
+    styleEditor(window.__editorPreviewCard)+
     '<label class="hint" style="display:block;margin-top:12px">Фото карты<input id="cardImage" type="file" accept="image/*" style="width:100%;margin-top:6px"></label>'+
-    '<button class="btn primary" onclick="addCard()">Сохранить карту</button>');
+    '<button type="button" class="btn primary" id="newCardSave" onclick="addCard()">Сохранить карту</button>');
+  const enabled=document.getElementById("secondCodeEnabled"),settings=document.getElementById("secondCodeSettings");
+  if(enabled)enabled.onchange=function(){if(settings)settings.style.display=enabled.checked?"block":"none";};
+  const scanSecond=document.getElementById("scanSecondCode");
+  if(scanSecond)scanSecond.onclick=function(){
+    const draft=captureEditorDraft();
+    scanner(function(data){
+      const base={name:String(draft.fields.name&&draft.fields.name.value||""),code:String(draft.fields.code&&draft.fields.code.value||""),format:String(draft.fields.format&&draft.fields.format.value||"CODE_128")};
+      manual(base);
+      restoreEditorDraft(draft);
+      const toggle=document.getElementById("secondCodeEnabled"),panel=document.getElementById("secondCodeSettings"),value=document.getElementById("secondCode"),format=document.getElementById("secondFormat"),label=document.getElementById("secondFormatLabel");
+      if(toggle)toggle.checked=true;
+      if(panel)panel.style.display="block";
+      if(value)value.value=data.code;
+      if(format)format.value=data.format;
+      if(label)label.textContent=formatLabel(data.format);
+      refreshEditorCodePreview(window.__editorPreviewCard||{});
+    });
+  };
   bindCoverPicker();
   bindStyleEditor();
+  bindEditorPreview(window.__editorPreviewCard);
+  refreshEditorCodePreview(window.__editorPreviewCard);
 }
 function formatLabel(v){return ({CODE_128:"Штрихкод — CODE 128",CODE_39:"Штрихкод — CODE 39",CODE_93:"Штрихкод — CODE 93",EAN_13:"Штрихкод — EAN-13",EAN_8:"Штрихкод — EAN-8",ITF:"Штрихкод — ITF",UPC_A:"Штрихкод — UPC-A",UPC_E:"Штрихкод — UPC-E",PDF417:"Штрихкод — PDF417",DATA_MATRIX:"Код Data Matrix",QR_CODE:"QR-код"})[v]||"Штрихкод — "+String(v||"неизвестный формат");}
 function toggleFormatMenu(){const m=document.getElementById("formatMenu");if(m)m.classList.toggle("open");}
@@ -819,6 +851,13 @@ async function addCard(){
     const code=codeEl.value.trim();
     const format=normalizeFormat(formatEl.value||"CODE_128");
     const cover=(document.getElementById("cover")&&document.getElementById("cover").value)||"AUTO";
+    const secondEnabled=document.getElementById("secondCodeEnabled");
+    let secondCode="",secondFormat="";
+    if(secondEnabled&&secondEnabled.checked){
+      secondCode=String(document.getElementById("secondCode")&&document.getElementById("secondCode").value||"").trim();
+      secondFormat=normalizeFormat(document.getElementById("secondFormat")&&document.getElementById("secondFormat").value||"CODE_128");
+      if(!secondCode){alert("Включён второй код, но он не добавлен. Введите его или отсканируйте.");return;}
+    }
     if(!code){alert("Введите код карты");return;}
     const style={palette:(document.getElementById("cardPalette")&&document.getElementById("cardPalette").value)||"AUTO",textColor:(document.getElementById("titleColor")&&document.getElementById("titleColor").value)||"WHITE",position:(document.getElementById("titlePosition")&&document.getElementById("titlePosition").value)||"CENTER",background:(document.getElementById("titleBackground")&&document.getElementById("titleBackground").value)||"PILL",size:Math.max(14,Math.min(28,Number(document.getElementById("titleSize")&&document.getElementById("titleSize").value)||19)),font:(document.getElementById("titleFont")&&document.getElementById("titleFont").value)||"SYSTEM",visible:!(document.getElementById("titleVisible")&&document.getElementById("titleVisible").value==="false"),customGradient:(window.__editorPreviewCard&&window.__editorPreviewCard.style&&window.__editorPreviewCard.style.customGradient)||null};
     const file=document.getElementById("cardImage")&&document.getElementById("cardImage").files[0];
@@ -827,6 +866,7 @@ async function addCard(){
     if(!Array.isArray(cards))cards=[];
     const draft=window.__editorPreviewCard||{};
     const card={id:String(Date.now()),name:name,code:code,format:format,image:image,color:colors[cards.length%colors.length],cover:cover,coverImage:String(draft.coverImage||""),style:style};
+    if(secondEnabled&&secondEnabled.checked){card.secondCode=secondCode;card.secondFormat=secondFormat;}
     const makeDefault=!!(document.getElementById("coverMakeDefault")&&document.getElementById("coverMakeDefault").checked&&card.coverImage);
     const nextBrandCovers=makeDefault?Object.assign({},brandCovers):brandCovers;
     if(makeDefault)nextBrandCovers[coverForCard(card)]=card.coverImage;
