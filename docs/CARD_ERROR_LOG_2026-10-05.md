@@ -95,3 +95,26 @@ FIX3 прошёл `py_compile`. Native scanner extension между FIX1/FIX2/FI
 8. Любое изменение, после которого исчезают карты/ломается render/add/import/save, немедленно считать REGRESSION и восстанавливать последний E3/WP-кандидат, а не продолжать поверх него.
 
 **Статус:** REGRESSION FIXED / E3 пользователя ещё требуется. Коммит `f6d82dd45b9137cad7b316ce7f16837a0a367dd2` считать восстановительным, а не новым WP до пользовательской проверки.
+
+
+## 2026-10-10 — CARD111 design work — gradient feature was attached to the wrong layer
+
+**Issue:** gradient controls were initially placed in the general card-color palette and implemented as the card element background. The user clarified that the gradient is intended for a card **cover/template** («рубашка»), not a separate background-color setting.
+
+**Correction in this session:**
+- moved the gradient entry point into the cover selection area for new and existing cards;
+- renamed the editor to «Рубашка с градиентом»;
+- choosing a gradient selects the «Свой вариант» cover, rather than a brand cover;
+- retained 2/3 colors, angle control and middle-color position control;
+- made editor preview preserve the gradient;
+- made edit-save take the draft gradient settings from the editor state;
+- isolated edit draft state from the stored card so Cancel does not mutate the saved card object in memory;
+- removed the misplaced gradient button from the color palette.
+
+**Code:** `index.html`, branch `candidate/CARD111-ui-2xN-20261006`, correction commits:
+- `a0f3f5dfa692120f415ec22a91d5fd8c1e6646ae`
+- `ac70d16b6fb8aba706a9154e8bcc20695c4bae4f`
+
+**Checks:** latest `index.html` re-read from the target branch; both inline JavaScript blocks passed syntax compilation via `new Function`. Presence checks passed for the cover gradient entry point, edit-save persistence, settings function, card-detail/QR rendering function and 2-column grid. Browser interaction, reload persistence in an actual browser, and mobile-device behavior are **not verified**. The working-copy git status is unavailable because this session uses the remote GitHub API.
+
+**Remaining:** review actual gradient behavior in browser; implement and verify real cover images, upload/replace/restore, brand defaults and backup/restore compatibility. Do not treat this correction as full design completion.
