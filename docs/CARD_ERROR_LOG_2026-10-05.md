@@ -181,3 +181,12 @@ Resolution order: individual card image > user-defined brand default > built-in 
 **Fix:** map numeric ZXing BarcodeFormat enum values (including PDF417), return an explicit unknown format instead of Code 128 for unknown values, request PDF417/Data Matrix in native camera formats when supported, and render PDF417/Data Matrix with bwip-js. Commit: `48bbe4b18579d2ce6120b63ab0b9c27cc5774a17`.
 
 **Verification:** both inline JavaScript blocks pass syntax checks. Real device scan/render and CDN availability are not yet verified.
+
+
+## 2026-10-10 — custom cover images need framing controls
+
+**Requirement:** user-supplied cover images must be movable and resizable inside a card-shaped frame before being compressed and saved.
+
+**Change:** added a touch/pointer crop modal with scale slider and drag-to-position. Confirmation renders the selected area at 3× card dimensions and encodes a compressed WebP (JPEG fallback) data URL for the card draft. Commit: `dc2e7f09b69937c34a12ac2281d8ef48551cfe67`.
+
+**Verification:** static syntax checks pass for both inline scripts. Mobile gesture behavior and persistence/backup round-trip still require browser/device testing.
