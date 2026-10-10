@@ -9,7 +9,7 @@
 <title>CARD — Мой кошелёк</title>
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script><script src="https://unpkg.com/@zxing/browser@0.2.1"></script>
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script><script src="https://cdn.jsdelivr.net/npm/bwip-js@4.5.1/dist/bwip-js-min.js"></script>
 <style>
 *{box-sizing:border-box}body{margin:0;background:#f6f7fb;color:#17181c;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
 .app{max-width:720px;margin:auto;min-height:100vh;padding-bottom:100px}header{padding:22px 18px 12px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:#f6f7fbf2;backdrop-filter:blur(15px);z-index:5}
@@ -740,7 +740,7 @@ function manual(data){
   bindCoverPicker();
   bindStyleEditor();
 }
-function formatLabel(v){return ({CODE_128:"Штрихкод — CODE 128",EAN_13:"Штрихкод — EAN-13",EAN_8:"Штрихкод — EAN-8",QR_CODE:"QR-код"})[v]||"Штрихкод — CODE 128";}
+function formatLabel(v){return ({CODE_128:"Штрихкод — CODE 128",CODE_39:"Штрихкод — CODE 39",CODE_93:"Штрихкод — CODE 93",EAN_13:"Штрихкод — EAN-13",EAN_8:"Штрихкод — EAN-8",ITF:"Штрихкод — ITF",UPC_A:"Штрихкод — UPC-A",UPC_E:"Штрихкод — UPC-E",PDF417:"Штрихкод — PDF417",DATA_MATRIX:"Код Data Matrix",QR_CODE:"QR-код"})[v]||"Штрихкод — "+String(v||"неизвестный формат");}
 function toggleFormatMenu(){const m=document.getElementById("formatMenu");if(m)m.classList.toggle("open");}
 function chooseFormat(v,label){const f=document.getElementById("format");const btn=document.querySelector(".formatButton");const m=document.getElementById("formatMenu");if(f)f.value=v;if(btn)btn.textContent=label;if(m)m.classList.remove("open");if(typeof refreshEditorCodePreview==="function")refreshEditorCodePreview(window.__editorPreviewCard||{});}
 async function addCard(){
@@ -776,8 +776,8 @@ function scanner(onResult){
   diagLog("scanner.open",{mode:"camera-and-gallery"});
   openModal('<button class="close" onclick="closeModal()">×</button><h2>Сканирование скидочной карты</h2><div id="reader"></div><div class="scanTools"><button class="btn primary galleryPrimary" onclick="document.getElementById(\'scanFile\').click()">▣ Сканировать фото из галереи</button><input id="scanFile" type="file" accept="image/*" style="display:none"><p class="hint">Наведите камеру на QR/штрихкод — распознавание происходит автоматически.</p></div>');
   let controls=null,handled=false,reader=null,detector=null,raf=0,video=null,lastKey="",stableHits=0;
-  const formats=["qr_code","code_128","ean_13","ean_8","upc_a","upc_e"];
-  function mapFormat(raw){const s=String(raw||"").toUpperCase();if(s.indexOf("QR")>=0)return "QR_CODE";if(s.indexOf("DATA_MATRIX")>=0)return "DATA_MATRIX";if(s.indexOf("EAN_13")>=0)return "EAN_13";if(s.indexOf("EAN_8")>=0)return "EAN_8";if(s.indexOf("CODE_128")>=0)return "CODE_128";if(s.indexOf("CODE_39")>=0)return "CODE_39";if(s.indexOf("CODE_93")>=0)return "CODE_93";if(s.indexOf("UPC_A")>=0)return "UPC_A";if(s.indexOf("UPC_E")>=0)return "UPC_E";if(s.indexOf("ITF")>=0)return "ITF";if(s.indexOf("PDF_417")>=0||s.indexOf("PDF417")>=0)return "PDF417";return "CODE_128";}
+  const formats=["qr_code","code_128","code_39","code_93","ean_13","ean_8","itf","upc_a","upc_e","pdf417","data_matrix"];
+  function mapFormat(raw){if(typeof raw==="number"){return ({0:"AZTEC",1:"CODABAR",2:"CODE_39",3:"CODE_93",4:"CODE_128",5:"DATA_MATRIX",6:"EAN_8",7:"EAN_13",8:"ITF",9:"MAXICODE",10:"PDF417",11:"QR_CODE",12:"RSS_14",13:"RSS_EXPANDED",14:"UPC_A",15:"UPC_E",16:"UPC_EAN_EXTENSION"})[raw]||"UNKNOWN_"+raw;}const s=String(raw||"").toUpperCase().replace(/[\\s-]+/g,"_");if(s.indexOf("QR")>=0)return "QR_CODE";if(s.indexOf("DATA_MATRIX")>=0||s==="DATAMATRIX")return "DATA_MATRIX";if(s.indexOf("EAN_13")>=0)return "EAN_13";if(s.indexOf("EAN_8")>=0)return "EAN_8";if(s.indexOf("CODE_128")>=0)return "CODE_128";if(s.indexOf("CODE_39")>=0)return "CODE_39";if(s.indexOf("CODE_93")>=0)return "CODE_93";if(s.indexOf("UPC_A")>=0)return "UPC_A";if(s.indexOf("UPC_E")>=0)return "UPC_E";if(s.indexOf("ITF")>=0)return "ITF";if(s.indexOf("PDF_417")>=0||s.indexOf("PDF417")>=0)return "PDF417";if(s==="CODE128")return "CODE_128";if(s==="EAN13")return "EAN_13";if(s==="EAN8")return "EAN_8";return s||"UNKNOWN_FORMAT";}
   function cleanup(reason){diagLog("scanner.cleanup",{handled:handled,reason:reason||"unspecified"});if(window.__card111StopScanner===cleanup)window.__card111StopScanner=null;if(raf){cancelAnimationFrame(raf);raf=0;}try{if(controls)controls.stop();}catch(e){diagError("scanner.cleanup.controls",e);}try{if(reader&&reader.reset)reader.reset();}catch(e){diagError("scanner.cleanup.reader",e);}try{if(video&&video.srcObject){const tracks=video.srcObject.getTracks();tracks.forEach(function(t){t.stop();});diagLog("scanner.camera.tracks.stopped",{count:tracks.length});video.srcObject=null;}}catch(e){diagError("scanner.cleanup.tracks",e);}}
   window.__card111StopScanner=cleanup;
   function finish(text,raw,fromImage){if(handled||!text){diagLog("scanner.result.ignored",{source:fromImage?"gallery":"camera",handled:handled,hasText:!!text});return;}const code=String(text).trim();if(!code){diagLog("scanner.result.empty",{source:fromImage?"gallery":"camera"});return;}const format=mapFormat(raw),key=format+"|"+code;diagLog("scanner.result.detected",{source:fromImage?"gallery":"camera",format:format,codeLength:code.length});if(!fromImage){if(key!==lastKey){lastKey=key;stableHits=1;return;}stableHits++;if(stableHits<2)return;}handled=true;diagLog("scanner.result.accepted",{source:fromImage?"gallery":"camera",format:format,codeLength:code.length});cleanup("result-accepted");closeModal();const resultData={code:code,format:format};setTimeout(function(){try{diagLog("scanner.result.dispatch",{source:fromImage?"gallery":"camera",target:typeof onResult==="function"?"onResult":"manual"});if(typeof onResult==="function")onResult(resultData);else manual(resultData);}catch(e){diagError("scanner.result.dispatch",e);alert("Код распознан, но не удалось открыть форму карты: "+String(e&&e.message||e));}},0);}
@@ -904,11 +904,17 @@ function renderPresentedCode(c,mode){
     box.appendChild(q);
     try{if(typeof QRCode!=="undefined"&&typeof QRCode==="function"){new QRCode(q,{text:code,width:230,height:230,correctLevel:(QRCode.CorrectLevel&&QRCode.CorrectLevel.M)||2});}else{q.innerHTML='<div class="hint">Модуль генерации QR-кода недоступен.</div>';}}
     catch(e){console.error("QR render:",e);q.innerHTML='<div class="hint">Не удалось построить QR-код из сохранённого значения.</div>';}
+  }else if(format==="PDF417"||format==="DATA_MATRIX"){
+    try{
+      if(typeof bwipjs==="undefined")throw Error("bwip-js unavailable");
+      const canvas=document.createElement("canvas");canvas.style.maxWidth="100%";canvas.style.height="auto";canvas.style.display="block";canvas.style.margin="0 auto";box.appendChild(canvas);
+      bwipjs.toCanvas(canvas,{bcid:format==="PDF417"?"pdf417":"datamatrix",text:code,scale:3,includetext:false,backgroundcolor:"FFFFFF",barcolor:"000000",padding:8});
+    }catch(e){console.error("2D code render:",format,e);box.innerHTML='<div class="hint">Не удалось построить код '+esc(format)+'. Проверьте значение и подключение генератора.</div>';}
   }else{
     const svg=document.createElementNS("http://www.w3.org/2000/svg","svg");svg.id="barcode";box.appendChild(svg);
     const jsBarcodeFormats={CODE_128:"CODE128",CODE_39:"CODE39",CODE_93:"CODE93",EAN_13:"EAN13",EAN_8:"EAN8",ITF:"ITF",UPC_A:"UPC",UPC_E:"UPCE"};
     const jsFormat=jsBarcodeFormats[format];
-    if(!jsFormat){box.innerHTML='<div class="hint">Формат '+esc(format)+' нельзя корректно отобразить этим генератором. Отсканируйте код повторно или выберите поддерживаемый формат.</div>';}
+    if(!jsFormat){box.innerHTML='<div class="hint">Формат '+esc(format)+' пока не поддерживается. Пересканируйте код или выберите корректный формат.</div>';}
     else try{JsBarcode(svg,code,{format:jsFormat,displayValue:false,height:90,margin:4});}
     catch(e){console.error("Barcode render:",format,e);box.innerHTML='<div class="hint">Значение не соответствует формату '+esc(format)+'. Проверьте результат сканирования и тип кода.</div>';}
   }
