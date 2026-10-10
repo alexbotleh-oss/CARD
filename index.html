@@ -260,6 +260,46 @@ header{padding:18px 20px 10px;background:#f6f7fbf5}
   .editorPreview{width:min(220px,100%)!important;aspect-ratio:1.48/1!important}
 }
 
+
+/* CARD111 brand cover expansion — consistent brand wordmarks for all listed networks */
+.brandArtwork{left:9px;right:9px;top:8px;bottom:37px;gap:6px;text-shadow:none}
+.brandArtwork b{flex:0 0 auto;max-width:44%;font-size:clamp(12px,2.5vw,21px);letter-spacing:-.5px}
+.brandArtwork i{font-size:clamp(10px,2.15vw,16px);overflow-wrap:anywhere}
+.card.cover-globus{background:linear-gradient(135deg,#f4f5f6,#fff 62%,#e4e8eb)!important;box-shadow:inset 0 0 0 2px #dfe2e6,0 8px 22px #00000018!important;color:#183d79}
+.card.cover-globus .brandArtwork{color:#183d79}
+.card.cover-rigla{background:linear-gradient(135deg,#087f50,#075b42)!important}
+.card.cover-budzorov{background:linear-gradient(135deg,#0b7b59,#07543f)!important}
+.card.cover-zdravcity{background:linear-gradient(135deg,#13a5a4,#087e87)!important}
+.card.cover-gorzdrav{background:linear-gradient(135deg,#1675bd,#064b91)!important}
+.card.cover-apteka366{background:linear-gradient(135deg,#f5f7f8,#fff)!important;box-shadow:inset 0 0 0 2px #dfe5e9,0 8px 22px #00000018!important}
+.card.cover-apteka366 .brandArtwork{color:#1871b8}
+.card.cover-neofarm{background:linear-gradient(135deg,#fff,#eaf4ee)!important;box-shadow:inset 0 0 0 2px #dfe8e2,0 8px 22px #00000018!important}
+.card.cover-neofarm .brandArtwork{color:#13845b}
+.card.cover-planeta_zdorovya{background:linear-gradient(135deg,#e9f3fa,#fff)!important;box-shadow:inset 0 0 0 2px #dce8f0,0 8px 22px #00000018!important}
+.card.cover-planeta_zdorovya .brandArtwork{color:#1268a7}
+.card.cover-maxavit{background:linear-gradient(135deg,#eaf5e7,#fff)!important;box-shadow:inset 0 0 0 2px #dce9d8,0 8px 22px #00000018!important}
+.card.cover-maxavit .brandArtwork{color:#347c36}
+.card.cover-ostin{background:linear-gradient(135deg,#22252b,#42464d)!important}
+.card.cover-rendezvous{background:linear-gradient(135deg,#1d252c,#46525a)!important}
+.card.cover-hc{background:linear-gradient(135deg,#fff,#f1f2f4)!important;box-shadow:inset 0 0 0 2px #dfe2e6,0 8px 22px #00000018!important}
+.card.cover-hc .brandArtwork{color:#313944}
+.card.cover-lcwaikiki{background:linear-gradient(135deg,#c9162b,#9d1020)!important}
+.card.cover-maxidom{background:linear-gradient(135deg,#168d8d,#086c70)!important}
+.card.cover-mvideo{background:linear-gradient(135deg,#ef2d32,#b90f20)!important}
+.card.cover-eldorado{background:linear-gradient(135deg,#f8d328,#f2a900)!important;color:#202020}
+.card.cover-eldorado .brandArtwork{color:#202020}
+.card.cover-rigla .brandArtwork,.card.cover-budzorov .brandArtwork,.card.cover-zdravcity .brandArtwork,.card.cover-gorzdrav .brandArtwork,.card.cover-ostin .brandArtwork,.card.cover-rendezvous .brandArtwork,.card.cover-lcwaikiki .brandArtwork,.card.cover-maxidom .brandArtwork,.card.cover-mvideo .brandArtwork{color:#fff}
+.coverOption.cover-globus{background:#f5f6f7!important;color:#183d79!important;box-shadow:inset 0 0 0 2px #dfe2e6}
+.coverOption.cover-rigla{background:#087f50!important;color:#fff!important}
+.coverOption.cover-budzorov{background:#0b7b59!important;color:#fff!important}
+.coverOption.cover-zdravcity{background:#13a5a4!important;color:#fff!important}
+.coverOption.cover-gorzdrav{background:#1675bd!important;color:#fff!important}
+.coverOption.cover-apteka366,.coverOption.cover-neofarm,.coverOption.cover-planeta_zdorovya,.coverOption.cover-maxavit,.coverOption.cover-hc{background:#f8fafb!important;color:#1768a0!important;box-shadow:inset 0 0 0 2px #dfe5e9}
+.coverOption.cover-ostin,.coverOption.cover-rendezvous,.coverOption.cover-lcwaikiki{background:#252a31!important;color:#fff!important}
+.coverOption.cover-maxidom{background:#168d8d!important;color:#fff!important}
+.coverOption.cover-mvideo{background:#ef2d32!important;color:#fff!important}
+.coverOption.cover-eldorado{background:#f8d328!important;color:#202020!important}
+
 </style>
 </head>
 <body>
@@ -285,26 +325,18 @@ window.addEventListener("unhandledrejection",function(e){diagError("unhandledrej
 diagLog("app.start",{version:"diagnostics-v2",build:CARD111_BUILD,online:navigator.onLine});
 
 const colors=["#17181c","#3157d5","#16845b","#a35b17","#7b3db7","#c23b55"];
-const COVER_LABELS={AUTO:"Автоматически по магазину",MAGNIT:"Магнит",PYATEROCHKA:"Пятёрочка",STOLICHKI:"Столички",PEREKRESTOK:"Перекрёсток",LENTA:"Лента",VkusVill:"ВкусВилл",OKEI:"О'КЕЙ",ASHAN:"АШАН",DIKSI:"Дикси",CHIZHIK:"Чижик",ANTEY:"Аптека Антей",RODINA_UDACHA:"Родина / УДАЧА / Высшая лига",DETMIR:"Детский мир",KARI:"kari CLUB",DNS:"ДНС",BRISTOL:"Бристоль",K_B:"Красное & Белое",CUSTOM:"Свой вариант"};
+const COVER_LABELS={AUTO:"Автоматически по магазину",MAGNIT:"Магнит",PYATEROCHKA:"Пятёрочка",PEREKRESTOK:"Перекрёсток",LENTA:"Лента",OKEI:"О’КЕЙ",DIKSI:"Дикси",CHIZHIK:"Чижик",ASHAN:"Ашан",GLOBUS:"Глобус",VkusVill:"ВкусВилл",RIGLA:"Ригла",BUDZOROV:"Будь Здоров",ZDRAVCITY:"Здравсити",STOLICHKI:"Столички",GORZDRAV:"Горздрав",APTEKA366:"36,6",NEOFARM:"Неофарм",PLANETA_ZDOROVYA:"Планета здоровья",MAXAVIT:"Максавит",OSTIN:"O’STIN",KARI:"Kari",RENDEZVOUS:"Rendez-Vous",HC:"ХЦ",LCWAIKIKI:"LC Waikiki",MAXIDOM:"Максидом",MVIDEO:"М.Видео",ELDORADO:"Эльдорадо",DETMIR:"Детский мир",DNS:"DNS",ANTEY:"Аптека Антей",RODINA_UDACHA:"Родина / УДАЧА / Высшая лига",BRISTOL:"Бристоль",K_B:"Красное & Белое",CUSTOM:"Свой вариант"};
 function coverForName(name){
-  const n=String(name||"").toLowerCase().replace(/ё/g,"е");
-  if(n.includes("магнит"))return "MAGNIT";
-  if(n.includes("пятероч")||n.includes("пятерка")||n.includes("5ка")||n.includes("5-ка"))return "PYATEROCHKA";
-  if(n.includes("столичк"))return "STOLICHKI";
-  if(n.includes("перекрест"))return "PEREKRESTOK";
-  if(n.includes("лента"))return "LENTA";
-  if(n.includes("вкусвилл"))return "VkusVill";
-  if(n.includes("окей")||n.includes("o'кей")||n.includes("o'kei"))return "OKEI";
-  if(n.includes("ашан"))return "ASHAN";
-  if(n.includes("дикси"))return "DIKSI";
-  if(n.includes("чижик"))return "CHIZHIK";
-  if(n.includes("антей")||n.includes("аптека антей"))return "ANTEY";
-  if(n.includes("родина")||n.includes("удача")||n.includes("высшая лига")||n.includes("лига гранд"))return "RODINA_UDACHA";
-  if(n.includes("детский мир")||n.includes("детскиймир"))return "DETMIR";
-  if(n.includes("kari")||n.includes("кари"))return "KARI";
-  if(n.includes("днс")||n.includes("dns"))return "DNS";
-  if(n.includes("бристоль"))return "BRISTOL";
-  if(n.includes("красное белое")||n.includes("красное&белое")||n.includes("красное и белое"))return "K_B";
+  const n=String(name||"").toLowerCase().replace(/ё/g,"е").replace(/[’']/g,"");
+  const rules=[
+    ["магнит","MAGNIT"],["пятероч","PYATEROCHKA"],["пятерка","PYATEROCHKA"],["5ка","PYATEROCHKA"],["5-ка","PYATEROCHKA"],
+    ["перекрест","PEREKRESTOK"],["лента","LENTA"],["вкусвилл","VkusVill"],["окей","OKEI"],["okei","OKEI"],["ашан","ASHAN"],["дикси","DIKSI"],["чижик","CHIZHIK"],["глобус","GLOBUS"],
+    ["ригла","RIGLA"],["будь здоров","BUDZOROV"],["здравсити","ZDRAVCITY"],["столичк","STOLICHKI"],["горздрав","GORZDRAV"],["36,6","APTEKA366"],["36.6","APTEKA366"],["неофарм","NEOFARM"],["планета здоровья","PLANETA_ZDOROVYA"],["максавит","MAXAVIT"],
+    ["o’stin","OSTIN"],["ostin","OSTIN"],["карі","KARI"],["kari","KARI"],["рендез","RENDEZVOUS"],["rendez-vous","RENDEZVOUS"],["хц","HC"],["lc waikiki","LCWAIKIKI"],["lcwaikiki","LCWAIKIKI"],
+    ["максидом","MAXIDOM"],["м.видео","MVIDEO"],["мвидео","MVIDEO"],["эльдорадо","ELDORADO"],["детский мир","DETMIR"],["детскиймир","DETMIR"],["днс","DNS"],["dns","DNS"],
+    ["антей","ANTEY"],["родина","RODINA_UDACHA"],["удача","RODINA_UDACHA"],["высшая лига","RODINA_UDACHA"],["лига гранд","RODINA_UDACHA"],["бристоль","BRISTOL"],["красное белое","K_B"],["красное&белое","K_B"],["красное и белое","K_B"]
+  ];
+  for(let i=0;i<rules.length;i++){if(n.includes(rules[i][0]))return rules[i][1];}
   return "CUSTOM";
 }
 
@@ -342,19 +374,15 @@ function bindStyleEditor(){
   const range=document.getElementById("titleSize"),out=document.getElementById("titleSizeValue");if(range&&out)range.oninput=function(){out.textContent=range.value+" px";};
 }
 function brandMarkup(cover,name){
-  const n=esc(name||"");
-  const map={
-    MAGNIT:'<span class="brandArtwork magnit"><b>М</b><i>Магнит</i></span>',
-    PYATEROCHKA:'<span class="brandArtwork pyat"><b>5</b><i>Пятёрочка</i></span>',
-    STOLICHKI:'<span class="brandArtwork stol"><b>+</b><i>Столички</i></span>',
-    ANTEY:'<span class="brandArtwork antey"><b>+</b><i>Аптека Антей</i></span>',
-    RODINA_UDACHA:'<span class="brandArtwork rodina"><b>V</b><i>Родина</i></span>',
-    BRISTOL:'<span class="brandArtwork bristol"><b>B</b><i>Бристоль</i></span>',
-    K_B:'<span class="brandArtwork kb"><b>K&amp;Б</b><i>Красное &amp; Белое</i></span>',
-    LENTA:'<span class="brandArtwork lenta"><b>2</b><i>Лента</i></span>',
-    PEREKRESTOK:'<span class="brandArtwork perek"><b>•</b><i>Перекрёсток</i></span>'
+  const labels={
+    MAGNIT:["М","Магнит"],PYATEROCHKA:["5","Пятёрочка"],PEREKRESTOK:["✚","Перекрёсток"],LENTA:["Л","Лента"],OKEI:["О’","О’КЕЙ"],DIKSI:["Д","Дикси"],CHIZHIK:["Ч","Чижик"],ASHAN:["A","Ашан"],GLOBUS:["G","Глобус"],VkusVill:["v","ВкусВилл"],
+    RIGLA:["R","Ригла"],BUDZOROV:["+","Будь Здоров"],ZDRAVCITY:["+","Здравсити"],STOLICHKI:["+","Столички"],GORZDRAV:["+","Горздрав"],APTEKA366:["36,6","Аптека 36,6"],NEOFARM:["+","Неофарм"],PLANETA_ZDOROVYA:["+","Планета здоровья"],MAXAVIT:["+","Максавит"],
+    OSTIN:["O","O’STIN"],KARI:["K","Kari"],RENDEZVOUS:["R","Rendez-Vous"],HC:["ХЦ","ХЦ"],LCWAIKIKI:["LC","LC Waikiki"],MAXIDOM:["М","Максидом"],MVIDEO:["M","М.Видео"],ELDORADO:["Э","Эльдорадо"],DETMIR:["ДМ","Детский мир"],DNS:["DNS","DNS"],
+    ANTEY:["+","Аптека Антей"],RODINA_UDACHA:["V","Родина"],BRISTOL:["B","Бристоль"],K_B:["K&Б","Красное & Белое"]
   };
-  return map[cover]||'';
+  const item=labels[cover];
+  if(!item)return "";
+  return '<span class="brandArtwork brand-'+String(cover).toLowerCase()+'"><b>'+esc(item[0])+'</b><i>'+esc(item[1])+'</i></span>';
 }
 function coverForCard(c){const v=String(c.cover||"AUTO");return v==="AUTO"?coverForName(c.name):COVER_LABELS[v]?v:"CUSTOM";}
 function coverClass(c){return "cover-"+coverForCard(c).toLowerCase();}
@@ -776,15 +804,14 @@ function openCard(id){
 }
 function editorCoverCategory(k){
   const v=String(k||"").toUpperCase();
-  if(["MAGNIT","PYATEROCHKA","STOLICHKI","PEREKRESTOK","LENTA","VKUSVILL","OKEИ","OKEI","ASHAN","DIKSI","CHIZHIK"].indexOf(v)>=0)return "PRODUCTS";
-  if(["ANTEY"].indexOf(v)>=0)return "PHARMACY";
-  if(["DETMIR","KARI"].indexOf(v)>=0)return "OTHER";
-  if(["DNS","BRISTOL","K_B","RODINA_UDACHA"].indexOf(v)>=0)return "OTHER";
-  if(v==="CUSTOM"||v==="AUTO")return "OTHER";
+  if(["MAGNIT","PYATEROCHKA","PEREKRESTOK","LENTA","OKEI","DIKSI","CHIZHIK","ASHAN","GLOBUS","VkusVill".toUpperCase()].indexOf(v)>=0)return "PRODUCTS";
+  if(["RIGLA","BUDZOROV","ZDRAVCITY","STOLICHKI","GORZDRAV","APTEKA366","NEOFARM","PLANETA_ZDOROVYA","MAXAVIT","ANTEY"].indexOf(v)>=0)return "PHARMACY";
+  if(["OSTIN","KARI","RENDEZVOUS","HC","LCWAIKIKI"].indexOf(v)>=0)return "CLOTHING";
+  if(["MAXIDOM","MVIDEO","ELDORADO","DETMIR","DNS","BRISTOL","K_B","RODINA_UDACHA"].indexOf(v)>=0)return "OTHER";
   return "OTHER";
 }
 function editorCoverCatalog(selected){
-  const cats=[["ALL","Все"],["PRODUCTS","Продукты"],["PHARMACY","Аптеки"],["OTHER","Другое"]];
+  const cats=[["ALL","Все"],["PRODUCTS","Продукты"],["PHARMACY","Аптеки"],["CLOTHING","Одежда"],["OTHER","Другое"]];
   return '<div class="coverCategoryGrid" id="coverCategoryGrid">'+cats.map(function(x,i){return '<button type="button" class="coverCategory '+(i===0?"active":"")+'" data-cover-category="'+x[0]+'">'+x[1]+'</button>';}).join("")+'</div>'+
     '<div id="editorCoverGrid" class="coverGrid">'+coverOptions(selected)+'</div>';
 }
