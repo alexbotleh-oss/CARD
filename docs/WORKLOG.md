@@ -75,3 +75,14 @@
 - Fixed on Pages source branch `candidate/CARD111-ui-2xN-20261006`: gallery/native and gallery/ZXing/crop detections now pass `fromImage=true` and bypass the camera-only two-hit threshold; camera still requires two identical hits. Corrected diagnostic source field to `gallery`.
 - Commits: index logic `95739dab4c987e100b393d838ce07365bf84de1d`; SW cache v13 `1cef84c87643624756704cdc177f9ff052f5921b`; SW registration v13 `20f187254ac38e69bcd9a40e6b825a23464854c3`.
 - Both inline scripts pass syntax parsing. Needs real Android retest after Pages deployment; not yet runtime-verified.
+
+
+## 2026-10-10 — CARD111: distinguish gallery result from camera stability checks
+
+- **User symptom:** a QR screenshot is decoded but only added after opening/selecting the same image again. User correctly suspected the camera path was waiting for another frame.
+- **Code finding:** the live-camera path intentionally requires two matching detections to avoid false positives. A still image must bypass that threshold. The Pages branch already contained the `fromImage=true` bypass in native, ZXing, and crop decode calls, but the user-provided journal still labeled the successful gallery result as `source:"camera"`; this conflicts with the current source and suggests a stale published/client build. Exact device-side cause remains unproven.
+- **Minimal follow-up patch on Pages source** `candidate/CARD111-ui-2xN-20261006`: added explicit build ID `CARD111-20261010-GALLERY-ACCEPT-2`; diagnostic export now contains only the latest 40 events and uses compact JSON; logs accepted result and dispatch target, and catches errors while opening the add-card form. The camera's two-frame stability check is unchanged; gallery decode remains single-result.
+- **Commits:** `index.html` `c5b832082c209d29c919d2252a3b07afbc981a78`; service worker cache v16 `b66f25bee2dc43130470e684825ed68996eed062`.
+- **Verification:** re-fetched both files from the configured Pages branch. Static markers confirm build ID, compact export, result accepted/dispatch logging, gallery bypass calls, and matching `sw.js?v=16` / `card-pwa-v16`. No Android runtime test or JavaScript parser run was performed in this step; publication/cache refresh and actual phone behavior remain unconfirmed.
+- **Data safety:** no card storage, localStorage contents, or saved cards were cleared or rewritten by this patch.
+- **Next:** verify the deployed page reports build ID `CARD111-20261010-GALLERY-ACCEPT-2` in its diagnostic export. If the build ID is present, one gallery selection should log `source:"gallery"`, `scanner.result.accepted`, then `scanner.result.dispatch`; if it is absent, the phone is still running an older cached build.
