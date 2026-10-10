@@ -1085,6 +1085,32 @@ function bindEditorPreview(c){
   if(cat)cat.querySelectorAll(".coverCategory").forEach(function(btn){btn.onclick=function(){cat.querySelectorAll(".coverCategory").forEach(function(x){x.classList.remove("active");});btn.classList.add("active");const value=btn.getAttribute("data-cover-category");document.querySelectorAll("#editorCoverGrid .coverOption").forEach(function(x){const k=x.getAttribute("data-cover")||"AUTO";x.style.display=(value==="ALL"||editorCoverCategory(k)===value)?"":"none";});};});
   refreshEditorPreview(previewCard);
 }
+function captureEditorDraft(){
+  const ids=["name","code","format","secondCodeEnabled","secondCode","secondFormat","cover","cardPalette","titlePosition","titleBackground","titleColor","titleSize","titleFont","titleVisible"];
+  const fields={};
+  ids.forEach(function(id){const el=document.getElementById(id);if(el)fields[id]=el.type==="checkbox"?{checked:!!el.checked}:{value:el.value};});
+  const preview=window.__editorPreviewCard||{};
+  const gradient=preview.style&&preview.style.customGradient?JSON.parse(JSON.stringify(preview.style.customGradient)):null;
+  const makeDefault=document.getElementById("coverMakeDefault");
+  return {fields:fields,coverImage:preview.coverImage,hasCoverImage:Object.prototype.hasOwnProperty.call(preview,"coverImage"),gradient:gradient,makeDefault:!!(makeDefault&&makeDefault.checked)};
+}
+function restoreEditorDraft(draft){
+  if(!draft)return;
+  Object.keys(draft.fields||{}).forEach(function(id){const el=document.getElementById(id),v=draft.fields[id];if(!el)return;if(Object.prototype.hasOwnProperty.call(v,"checked"))el.checked=v.checked;else el.value=v.value;});
+  const preview=window.__editorPreviewCard||(window.__editorPreviewCard={});
+  preview.style=Object.assign({},preview.style||{});
+  if(draft.hasCoverImage)preview.coverImage=draft.coverImage;else delete preview.coverImage;
+  if(draft.gradient)preview.style.customGradient=draft.gradient;else delete preview.style.customGradient;
+  const def=document.getElementById("coverMakeDefault");if(def)def.checked=draft.makeDefault;
+  const format=document.getElementById("format"),button=document.querySelector(".formatButton");if(format&&button)button.textContent=formatLabel(format.value);
+  const sf=document.getElementById("secondFormat"),sl=document.getElementById("secondFormatLabel");if(sf&&sl)sl.textContent=formatLabel(sf.value);
+  const cover=document.getElementById("cover");document.querySelectorAll("#editorCoverGrid .coverOption").forEach(function(b){b.classList.toggle("selected",!!cover&&b.getAttribute("data-cover")===cover.value);});
+  [["paletteGrid","data-palette","cardPalette"],["backgroundGrid","data-background","titleBackground"],["textColorGrid","data-text-color","titleColor"],["fontGrid","data-font","titleFont"]].forEach(function(a){const grid=document.getElementById(a[0]),input=document.getElementById(a[2]);if(grid&&input)grid.querySelectorAll("button").forEach(function(b){b.classList.toggle("selected",b.getAttribute(a[1])===input.value);});});
+  const on=document.getElementById("titleVisible"),toggle=document.getElementById("titleVisibleToggle");if(on&&toggle){toggle.textContent=on.value==="true"?"Без надписи":"Показывать название";toggle.setAttribute("aria-pressed",on.value==="true");}
+  const size=document.getElementById("titleSizeValue");if(size&&document.getElementById("titleSize"))size.textContent=document.getElementById("titleSize").value+" px";
+  const enabled=document.getElementById("secondCodeEnabled"),settings=document.getElementById("secondCodeSettings");if(enabled&&settings)settings.style.display=enabled.checked?"block":"none";
+  refreshEditorPreview(preview);refreshEditorCodePreview(preview);
+}
 function manualEdit(id){
   const c=cards.find(function(x){return String(x.id)===String(id);});
   if(!c)return;
@@ -1130,11 +1156,12 @@ function manualEdit(id){
   const secondEnabled=document.getElementById("secondCodeEnabled"),secondSettings=document.getElementById("secondCodeSettings");
   if(secondEnabled)secondEnabled.onchange=function(){if(secondSettings)secondSettings.style.display=secondEnabled.checked?"block":"none";};
   const scanSecond=document.getElementById("scanSecondCode");
-  if(scanSecond)scanSecond.onclick=function(){scanner(function(data){
-    manualEdit(String(id));
+  if(scanSecond)scanSecond.onclick=function(){const draft=captureEditorDraft();scanner(function(data){
+    manualEdit(String(id));restoreEditorDraft(draft);
     const enabled=document.getElementById("secondCodeEnabled"),value=document.getElementById("secondCode"),fmt=document.getElementById("secondFormat"),label=document.getElementById("secondFormatLabel"),settings=document.getElementById("secondCodeSettings");
     if(enabled)enabled.checked=true;if(settings)settings.style.display="block";
     if(value)value.value=data.code;if(fmt)fmt.value=data.format;if(label)label.textContent=formatLabel(data.format);
+    refreshEditorCodePreview(window.__editorPreviewCard||{});
   });};
   document.getElementById("editSave").onclick=function(){updateCard(String(id));};
   document.getElementById("editCancel").onclick=closeModal;
