@@ -612,6 +612,7 @@ function showCropper(file,reader,finish){
   img.addEventListener("touchend",function(e){if(e.touches.length<2)pinch=false;});
   document.getElementById("cropBack").onclick=function(){URL.revokeObjectURL(url);scanner();};
   document.getElementById("cropScan").onclick=async function(){
+    diagLog("scanner.crop.scan.clicked",{});
     const btn=this;btn.disabled=true;btn.textContent="Распознавание…";
     try{
       const br=box.getBoundingClientRect(),ir=img.getBoundingClientRect(),nw=img.naturalWidth,nh=img.naturalHeight;
@@ -625,16 +626,17 @@ function showCropper(file,reader,finish){
           const ci=new Image();ci.src=dataUrl;await new Promise(function(r,j){ci.onload=r;ci.onerror=j;});
           const detector=new BarcodeDetector({formats:await BarcodeDetector.getSupportedFormats()});
           const found=await detector.detect(ci);
-          if(found&&found.length){finish(found[0].rawValue,found[0].format,true);return;}
+          diagLog("scanner.crop.native.result",{count:found?found.length:0});if(found&&found.length){finish(found[0].rawValue,found[0].format,true);return;}
         }catch(e){}
       }
       if(reader){
         const ci=new Image();ci.src=dataUrl;await new Promise(function(r,j){ci.onload=r;ci.onerror=j;});
         const result=await reader.decodeFromImageElement(ci);
-        if(result){finish(result.getText?result.getText():result.text,result.getBarcodeFormat?result.getBarcodeFormat():"QR_CODE");return;}
+        diagLog("scanner.crop.zxing.result",{found:!!result});if(result){finish(result.getText?result.getText():result.text,result.getBarcodeFormat?result.getBarcodeFormat():"QR_CODE",true);return;}
       }
       throw Error("not-found");
     }catch(e){
+      diagError("scanner.crop.scan",e);
       btn.disabled=false;btn.textContent="Распознать выбранную область";
       alert("Код не найден в этой области. Увеличьте фото или передвиньте рамку точно на QR/штрихкод.");
     }
