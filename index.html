@@ -605,9 +605,32 @@ function openCoverCropEditor(file){
     function paint(){const w=img.naturalWidth*base*zoom,h=img.naturalHeight*base*zoom;offsetX=Math.min(0,Math.max(vw-w,offsetX));offsetY=Math.min(0,Math.max(vh-h,offsetY));picture.style.width=img.naturalWidth+"px";picture.style.height=img.naturalHeight+"px";picture.style.transform="translate("+offsetX+"px,"+offsetY+"px) scale("+(base*zoom)+")";}
     picture.src=url;picture.onload=paint;
     slider.oninput=function(){const old=zoom,cx=vw/2,cy=vh/2;zoom=Number(slider.value)||1;offsetX=cx-(cx-offsetX)*(zoom/old);offsetY=cy-(cy-offsetY)*(zoom/old);paint();};
-    viewport.onpointerdown=function(ev){drag={x:ev.clientX,y:ev.clientY,ox:offsetX,oy:offsetY};if(viewport.setPointerCapture)viewport.setPointerCapture(ev.pointerId);};
-    viewport.onpointermove=function(ev){if(!drag)return;offsetX=drag.ox+ev.clientX-drag.x;offsetY=drag.oy+ev.clientY-drag.y;paint();};
-    viewport.onpointerup=viewport.onpointercancel=function(){drag=null;};
+    const activePointers=new Map();let pinch=null;
+    function pointDistance(a,b){const dx=a.x-b.x,dy=a.y-b.y;return Math.sqrt(dx*dx+dy*dy);}
+    function pointMid(a,b){return{x:(a.x+b.x)/2,y:(a.y+b.y)/2};}
+    function beginGesture(){
+      const pts=Array.from(activePointers.values());
+      if(pts.length>=2){const mid=pointMid(pts[0],pts[1]);pinch={distance:Math.max(1,pointDistance(pts[0],pts[1])),zoom:zoom,midX:mid.x,midY:mid.y,ox:offsetX,oy:offsetY};drag=null;}
+      else if(pts.length===1){const p=pts[0];drag={x:p.x,y:p.y,ox:offsetX,oy:offsetY};pinch=null;}
+    }
+    viewport.onpointerdown=function(ev){
+      ev.preventDefault();activePointers.set(ev.pointerId,{x:ev.clientX,y:ev.clientY});
+      if(viewport.setPointerCapture)try{viewport.setPointerCapture(ev.pointerId);}catch(e){}
+      beginGesture();
+    };
+    viewport.onpointermove=function(ev){
+      if(!activePointers.has(ev.pointerId))return;
+      activePointers.set(ev.pointerId,{x:ev.clientX,y:ev.clientY});
+      const pts=Array.from(activePointers.values());
+      if(pts.length>=2&&pinch){
+        const mid=pointMid(pts[0],pts[1]),nextZoom=Math.max(1,Math.min(3.5,pinch.zoom*pointDistance(pts[0],pts[1])/pinch.distance));
+        offsetX=mid.x-(pinch.midX-pinch.ox)*(nextZoom/pinch.zoom)- (mid.x-pinch.midX);
+        offsetY=mid.y-(pinch.midY-pinch.oy)*(nextZoom/pinch.zoom)- (mid.y-pinch.midY);
+        zoom=nextZoom;slider.value=String(zoom);paint();
+      }else if(pts.length===1&&drag){offsetX=drag.ox+ev.clientX-drag.x;offsetY=drag.oy+ev.clientY-drag.y;paint();}
+    };
+    function endGesture(ev){activePointers.delete(ev.pointerId);if(activePointers.size){beginGesture();}else{drag=null;pinch=null;}}
+    viewport.onpointerup=endGesture;viewport.onpointercancel=endGesture;
     document.getElementById("cropClose").onclick=function(){URL.revokeObjectURL(url);closeModal();};
     document.getElementById("coverCropCancel").onclick=function(){URL.revokeObjectURL(url);closeModal();};
     document.getElementById("coverCropApply").onclick=function(){
