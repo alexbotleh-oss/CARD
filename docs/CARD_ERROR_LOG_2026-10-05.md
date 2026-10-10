@@ -137,3 +137,16 @@ FIX3 прошёл `py_compile`. Native scanner extension между FIX1/FIX2/FI
 **Checks:** latest `index.html` read back from branch; both inline JavaScript blocks passed syntax compilation; static checks confirm upload controls, default-map persistence, backup/restore wiring, QR/detail function, settings function and 2-column grid. Browser upload, actual image persistence after restart, backup/restore round-trip, and phone behavior remain unverified.
 
 **Open requirement:** real local brand-cover image assets are not yet in the repository. The current catalog still contains CSS artwork/color treatments. Do not call the cover-design work complete until real images are added and tested.
+
+
+## 2026-10-10 — Built-in retailer cover image sources
+
+**Commit:** `a891b5f72c594b1bcf5a15681c8be8b720f04c0f`
+
+Added `BUILTIN_COVER_IMAGES` URL fallbacks for:
+- Pyaterochka: `https://xn----7sbavphe5ahhetd7ezf.xn--p1ai/pic/card.png`
+- Magnit: `https://anapagorkogo11.ru/karta-magnit-aktivirovat.JPG`
+- Perekrestok: `https://papik.pro/grafic/uploads/posts/2023-04/1681503399_papik-pro-p-logotip-perekrestok-vektor-50.jpg`
+- Lenta: `https://imgproxy.kuper.ru/imgproxy/size-500-500/czM6Ly9jb250ZW50LWltYWdlcy1wcm9kL3Byb2R1Y3RzLzQ0NjkyNjU1L29yaWdpbmFsLzEvMjAyNS0wMi0wMyUyMDEyJTNBNTQlM0E1NS44MjcwNzklMkIwMCUzQTAwLzQ0NjkyNjU1XzEuanBn.jpg`
+
+Resolution order: individual card image > user-defined brand default > built-in image URL. These are external image sources, not repository-local assets. URL reachability, rendering, licensing, offline behavior and browser/device appearance have not been verified. Do not mark image integration fully tested until those checks pass.
