@@ -1188,17 +1188,16 @@ function refreshEditorCodePreview(c){
   }catch(e){el.innerHTML="";}
 }
 function rescanEdit(id){
+  const draft=captureEditorDraft();
   scanner(function(data){
     const c=cards.find(function(x){return String(x.id)===String(id);});
     if(!c)return;
-    manualEdit(id);
-    const code=document.getElementById("code");
-    const format=document.getElementById("format");
+    manualEdit(id);restoreEditorDraft(draft);
+    const code=document.getElementById("code"),format=document.getElementById("format"),btn=document.querySelector(".formatButton");
     if(code)code.value=data.code;
     if(format)format.value=data.format;
-    const btn=document.querySelector(".formatButton");
     if(btn)btn.textContent=formatLabel(data.format);
-    refreshEditorCodePreview(c);
+    refreshEditorCodePreview(window.__editorPreviewCard||c);
   });
 }
 async function updateCard(id){
