@@ -1060,7 +1060,9 @@ function refreshEditorPreview(c){
   const coverImage=coverImageForCard(p);
   box.className="card editorPreview "+coverClass(p)+" "+cardStyleClass(p);
   box.innerHTML=logo+'<strong>'+esc(p.name)+'</strong>';
-  box.setAttribute("style","--card-color:"+esc(String(p.color||colors[0]))+";"+esc(cardStyleInline(p))+(coverImage?"background-image:url(&quot;"+esc(coverImage)+"&quot;)!important;background-size:cover!important;background-position:center!important;background-repeat:no-repeat!important;":""));
+  box.setAttribute("style","--card-color:"+String(p.color||colors[0])+";"+cardStyleInline(p));
+  if(coverImage){box.style.setProperty("background-image",'url("'+String(coverImage).replace(/"/g,"%22")+'")',"important");box.style.setProperty("background-size","cover","important");box.style.setProperty("background-position","center","important");box.style.setProperty("background-repeat","no-repeat","important");}
+  else{box.style.removeProperty("background-image");box.style.removeProperty("background-size");box.style.removeProperty("background-position");box.style.removeProperty("background-repeat");}
   const previewTitle=box.querySelector("strong");
   if(previewTitle){
     const ps=cardStyle(p);
