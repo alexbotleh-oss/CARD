@@ -246,3 +246,14 @@ Evidence: changed source re-read from the work branch. Visual confirmation in br
 **Still unverified:** camera/gallery scanning and rendering in a real browser, localStorage quota/rollback simulation, backup round-trip, browser UI, and actual Android phone behavior. Static parsing does not prove runtime correctness.
 
 **Next:** complete local/faithful brand cover assets and continue the remaining editor-menu items; only mark browser/device items complete after performing the corresponding tests.
+
+## 2026-10-11 — editor menu completion pass: new-card preview, dual-code creation, and upload MIME validation
+
+**Commits:**
+- 23ad6e88d64549cc0d9d9ee2aa9adeee9acbdcf6 — fixed uploaded-cover MIME test so image/png and image/jpeg are accepted, while non-image MIME types are rejected.
+- 9db5d479de4185aba602beeccf105f4bc2270540 — staged new-card and optional brand-cover persistence before replacing in-memory state; on storage-write errors attempts to restore previous card, safe-copy, and cover-default keys.
+- f8343ff84e16b0aeba810550ba435f75efe51da9 — added live cover/code preview, category-filtered cover catalog, QR/2D/barcode preview host, and optional secondary-code scan/save controls to the new-card form. The second code is persisted as secondCode/secondFormat.
+
+**Checks:** latest index.html was re-read from the target branch; both inline JavaScript blocks passed V8 new Function parsing. The image-MIME expression was evaluated for image/png and text/plain. Static presence checks confirmed the new-card preview, secondary-code scan flow, secondary-code persistence, preview format handler and import rollback.
+
+**Still unverified:** UI interaction in a real browser, image selection/cropping on Android, camera/gallery scan of the second code, visual layout regression, actual localStorage quota failure, and complete backup/restore round-trip. Static checks do not establish runtime success.
