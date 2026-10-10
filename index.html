@@ -1394,11 +1394,38 @@ async function updateCard(id){
   storageState="ok";storageError="";render();closeModal();
 }
 function delCard(id){
-  const c=cards.find(function(x){return String(x.id)===String(id);});
-  if(!c)return;
-  if(!confirm("Удалить карту «"+String(c.name||"Моя карта")+"»?\n\nЭто действие нельзя отменить."))return;
-  cards=cards.filter(function(c){return String(c.id)!==String(id);});
-  save();
+  const card=cards.find(function(x){return String(x.id)===String(id);});
+  if(!card)return;
+  if(!confirm("Удалить карту «"+String(card.name||"Моя карта")+"»?\n\nЭто действие нельзя отменить."))return;
+  const nextCards=cards.filter(function(x){return String(x.id)!==String(id);});
+  let oldCardsRaw=null,oldSafeRaw=null;
+  try{
+    oldCardsRaw=localStorage.getItem(KEY);
+    oldSafeRaw=localStorage.getItem(SAFE_KEY);
+  }catch(readError){
+    alert("Не удалось проверить сохранённые данные; карта не удалена.");
+    return;
+  }
+  try{
+    if(oldCardsRaw!==null){
+      try{localStorage.setItem(SAFE_KEY,oldCardsRaw);}catch(snapshotError){}
+    }
+    localStorage.setItem(KEY,JSON.stringify(nextCards));
+  }catch(saveError){
+    const rollbackErrors=[];
+    function restoreKey(key,raw){
+      try{localStorage.removeItem(key);if(raw!==null)localStorage.setItem(key,raw);}
+      catch(rollbackError){rollbackErrors.push(key+": "+String(rollbackError&&rollbackError.message||rollbackError));}
+    }
+    restoreKey(KEY,oldCardsRaw);
+    restoreKey(SAFE_KEY,oldSafeRaw);
+    const detail=rollbackErrors.length?" Не удалось полностью восстановить: "+rollbackErrors.join(", ")+".":" Исходные значения сохранены.";
+    alert("Не удалось удалить карту: "+String(saveError&&saveError.message||saveError)+"."+detail);
+    return;
+  }
+  cards=nextCards;
+  storageState="ok";storageError="";
+  render();
   closeModal();
 }
 function exportData(){
