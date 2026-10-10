@@ -86,3 +86,15 @@
 - **Verification:** re-fetched both files from the configured Pages branch. Static markers confirm build ID, compact export, result accepted/dispatch logging, gallery bypass calls, and matching `sw.js?v=16` / `card-pwa-v16`. No Android runtime test or JavaScript parser run was performed in this step; publication/cache refresh and actual phone behavior remain unconfirmed.
 - **Data safety:** no card storage, localStorage contents, or saved cards were cleared or rewritten by this patch.
 - **Next:** verify the deployed page reports build ID `CARD111-20261010-GALLERY-ACCEPT-2` in its diagnostic export. If the build ID is present, one gallery selection should log `source:"gallery"`, `scanner.result.accepted`, then `scanner.result.dispatch`; if it is absent, the phone is still running an older cached build.
+
+## 2026-10-10 — CARD111 appearance menu visual consistency
+
+- **Задача:** привести меню оформления карты к уже используемому визуальному языку приложения, не меняя логику оформления, выбора рубашки, QR/штрихкода или хранения карт.
+- **Исходная точка:** `candidate/CARD111-ui-2xN-20261006`, `index.html` blob `42ec9e5320984cfd6f1ebfdbafa424ecd63e1dda`. Источник проверен повторным чтением через GitHub API; локальный Git status недоступен.
+- **Изменение:** только CSS в `index.html`: панель оформления стала визуально согласованной с нейтральной белой поверхностью приложения; состояния выбора в палитрах, цветах и вариантах оформления переведены на графитовый акцент; кнопки видимости/положения, ползунок размера и компактная мобильная раскладка унифицированы. Логика и HTML-контракт контролов не менялись.
+- **Коммит:** `ea217e56ebea8b2dcd4ded3e3e7dea9df352b7f9`; новый blob `ae6fc99f219e9d74031c88d5aa743ea2bea136c8`.
+- **Проверки:** файл повторно прочитан с ветки; CSS-патч и сохранение трёхколоночной сетки цветов, сетки 3×3 для выбора положения и вкладки оформления подтверждены статически. Оба inline JS-блока прошли синтаксический разбор в V8 (`new Function`) — E2. Визуальная проверка в реальном браузере/на телефоне не выполнялась; визуальный результат пока E2, не E3/E4.
+- **Ошибки/регрессии:** в статической проверке ошибок JS не обнаружено. Поведение на реальном устройстве неизвестно.
+- **Решение:** сохранить ранее выбранные сетки и логику; изменить только визуальный слой, чтобы не повторять прежние побочные изменения.
+- **Осталось:** проверить фактический вид меню в браузере на обычной и узкой ширине, а затем убедиться, что выбранные настройки сохраняются и корректно показываются после повторного открытия карты.
+- **Следующий шаг:** браузерная визуальная проверка именно этого коммита; не смешивать её с задачей реальных изображений рубашек.
