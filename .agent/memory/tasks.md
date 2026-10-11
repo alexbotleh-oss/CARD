@@ -20,12 +20,12 @@ Plan:
   - [x] Прочитать AGENTS.md, UNIVERSAL_PROJECT_INSTRUCTIONS.md, memory, history и canonical docs.
   - [x] Получить commit chain branch candidate и commit-level index blob.
   - [x] Сопоставить original /mnt/data/МакетКАРТ.html и current integrated index CSS.
-  - [x] Записать findings и следующий шаг в memory/history/WORKLOG/PROJECT_STATE/HANDOFF.
-  - [ ] Обновить design-progress дерево и перепроверить записи.
+  - [x] Записать findings и следующий шаг в memory/history/WORKLOG/PROJECT_STATE/HANDOFF/design progress.
+  - [x] Обновить design-progress дерево и перепроверить записи.
   - [ ] Определить точный source ref/SHA перед кодовой правкой.
   - [ ] Убрать конфликтующие width/max-width overrides минимальным patch.
   - [ ] Проверить syntax, reverse-diff и фактический render.
-Current state: Commit chain: 86266ce (scanner/JSON patch) → 22f1fd22 (Перенес полностью код из макета МакетКАРТ) → 0dea63a (Внес исправления) → 97f47a2 (последний listed update index). Commit-level API confirms latest listed commit 97f47a2 and blob index 2f0d203e18774463d1622543cafb8768e8079bd2. В CSS обнаружены повторные .editorPreviewWrap .editorPreview с max-width 210px/190px/224px плюс специфичное .sheet.cardEditorSheet .editorPreviewWrap .editorPreview до 224px и ограничение 200px на узких экранах. Это не даёт preview использовать исходную ширину до 340px и объясняет визуально маленькую карту на разных устройствах.
+Current state: Commit chain 86266ce (scanner/JSON patch) → 22f1fd22 (Перенес полностью код из макета МакетКАРТ) → 0dea63a (Внес исправления) → 97f47a2 (последний listed update index) подтверждена по parent pointers и commit API. Точный source blob текущего последнего коммита: 2f0d203e18774463d1622543cafb8768e8079bd2. В CSS обнаружены повторные .editorPreviewWrap .editorPreview с max-width 210px/190px/224px плюс специфичное .sheet.cardEditorSheet .editorPreviewWrap .editorPreview до 224px и ограничение 200px на узких экранах. Это не даёт preview использовать исходную ширину до 340px и объясняет визуально маленькую карту на разных устройствах. Результаты внесены в memory/history/WORKLOG/PROJECT_STATE/HANDOFF/design progress; файлы перечитаны после записи.
 Next action: Перед изменением кода подтвердить точный source SHA и затем удалить только конфликтующие preview width/max-width overrides, сохранив JS и интегрированные функции.
 Blockers: Browser/device visual test и GitHub Pages deployment не выполнялись; точный source target следует проверять на commit SHA перед изменениями.
 Related files: index.html; /mnt/data/МакетКАРТ.html; docs/CARD111_DESIGN_PROGRESS.md; docs/WORKLOG.md; docs/PROJECT_STATE.md; docs/HANDOFF.md; history/2026-10-11.md; .agent/memory/*.md.
