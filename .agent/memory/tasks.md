@@ -54,3 +54,12 @@ Next step: build the feature-parity/storage migration map from both actual HTML 
 3. Исправить сканирование QR: «камера» запускает камеру, «галерея/выбрать фото» открывает выбор изображения и не переходит в camera flow.
 4. Исправить несовместимость старых backup-файлов: импорт должен восстанавливать карты в актуальную модель и показывать их без ручного повторного добавления.
 Приоритет реализации: макет-first UI, минимальные функциональные дополнения, совместимость старых backup. Не подменять это повторным обоснованием архитектурных различий. Проверять реальные форматы backup и миграцию до отметки выполнено.
+
+
+## Реализация макет-first и восстановления backup — 2026-10-11
+Status: active, partial implementation committed.
+Commit on `candidate/CARD111-ui-2xN-20261006`: `d3d4dcd76fa8c477f77f7bdeb2ede6a2d2de8d5b`.
+Completed: (1) removed `capture="environment"` from target's image file input so gallery selection is not forced toward camera; (2) backup importer accepts root arrays and objects with `cards`, no longer requires `visits`; when visits are absent it preserves existing visits; (3) maps legacy `format` and alternate code fields into target `codeFormat`/code; maps old color/gradient/background into target shirt; (4) startup migrates legacy `card_wallet_v1`, its safe backup and `card111_business_cards_v1` into target key `card111.maketkart.v1` without deleting old keys; (5) import rolls in-memory state back if persistence fails.
+Checks: branch HEAD and index blob re-read; committed inline JS passed V8 compilation check via `new Function`; static markers for gallery, old backup formats and legacy storage migration passed; local Node syntax check passed; focused Node harness passed legacy storage/card/visit mapping tests.
+Not yet complete: full parity audit and port of current-only features not present in target (e.g. second code, diagnostic export, custom brand-cover presets, camera switch/torch) and actual browser/device visual check. Do not mark task complete until those are assessed/ported and backup import is verified end-to-end with representative real files.
+Next: implement the remaining required functions that are genuinely absent without changing the target visual layout; then test representative old backup payloads and desktop/mobile rendering.
