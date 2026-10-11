@@ -499,15 +499,41 @@ header{padding:18px 20px 10px;background:#f6f7fbf5}
 .sheet.cardEditorSheet .editorDataPanel .secondCodeToggle{margin-top:6px;padding:9px}
 .sheet.cardEditorSheet .editorDataPanel #rescanEdit{margin-top:6px}
 @media(max-width:380px){.sheet.cardEditorSheet{padding-left:9px;padding-right:9px}.sheet.cardEditorSheet>.close{right:9px}.sheet.cardEditorSheet .editorActionBar{margin-left:-9px;margin-right:-9px;padding-left:9px;padding-right:9px}.sheet.cardEditorSheet .editorPreviewWrap .editorPreview{width:min(52vw,200px)!important;max-width:200px!important}.sheet.cardEditorSheet .editorAppearance .coverGrid{max-height:15dvh}.sheet.cardEditorSheet .styleSection{padding:6px}}
+
+/* CARD111 home screen — coherent mobile-first composition based on the agreed sketch */
+.walletHeader{padding:calc(env(safe-area-inset-top) + 22px) 20px 13px;gap:14px;align-items:center;background:linear-gradient(180deg,#f7f8fc 0%,#f6f7fb 100%);border-bottom:1px solid #e9ebf1}
+.walletHeader .walletHead{min-width:0;flex:1}
+.walletHeader .eyebrow{font-size:10px;font-weight:800;letter-spacing:.13em;color:#7b8190;margin-bottom:5px}
+.walletHeader h1{font-size:clamp(25px,6.8vw,32px);letter-spacing:-.045em;line-height:1.05;font-weight:800}
+.walletHeader .sub{display:inline-flex;align-items:center;min-height:23px;margin-top:8px;padding:3px 9px;border-radius:999px;background:#e9edf5;color:#5d6574;font-size:12px;font-weight:650}
+.walletHeader .addBtn{display:flex;align-items:center;justify-content:center;gap:7px;min-width:0;min-height:48px;padding:0 14px;border-radius:16px;background:#1767e8;box-shadow:0 5px 13px #1767e82b;color:#fff;font-size:13px;font-weight:750;letter-spacing:-.01em}
+.walletHeader .addBtn span{font-size:24px;line-height:1;font-weight:400}
+.walletHeader .addBtn:active{transform:scale(.97)}
+.searchBar{position:relative;display:flex;align-items:center;gap:9px;padding:15px 20px 17px;background:#f6f7fb}
+.searchBar .searchIcon{position:absolute;left:34px;top:50%;transform:translateY(-50%);font-size:25px;line-height:1;color:#858b98;pointer-events:none}
+.searchBar input{height:48px;padding:0 38px 0 43px;border:1px solid #e3e7ef;border-radius:15px;background:#fff;box-shadow:0 2px 5px #1c27400a;font-size:15px;outline:none;transition:border-color .15s,box-shadow .15s}
+.searchBar input:focus{border-color:#8db5ff;box-shadow:0 0 0 3px #1767e814}
+.searchBar input::placeholder{color:#9aa0ac}
+.searchClear{position:absolute;right:29px;top:50%;transform:translateY(-50%);width:27px;height:27px;border:0;border-radius:50%;background:#eef1f6;color:#707787;font-size:18px;line-height:1;display:flex;align-items:center;justify-content:center}
+.grid{gap:12px;padding:0 20px 112px}
+.card{border-radius:19px!important;box-shadow:0 7px 18px #1c274014, inset 0 0 0 1px #ffffff1c;transition:transform .16s,box-shadow .16s}
+.card:active{transform:scale(.985);box-shadow:0 3px 9px #1c274018}
+.empty{padding:52px 24px;border:1px dashed #d8dde7;border-radius:20px;background:#ffffff9c;margin:2px 20px}
+.empty b{font-size:18px;letter-spacing:-.02em}
+.bottomNav{bottom:max(10px,env(safe-area-inset-bottom));width:min(440px,calc(100% - 28px));height:72px;border:1px solid #e1e5ed;border-radius:24px;box-shadow:0 10px 34px #18243b1c;background:#ffffffed;backdrop-filter:blur(18px);padding:6px}
+.bottomNavItem{gap:3px;font-size:12px}
+.bottomNavItem span{font-size:22px;line-height:23px}
+.bottomNavItem.active{color:#1767e8;background:#edf4ff}
+@media(max-width:380px){.walletHeader{padding-left:15px;padding-right:15px;gap:8px}.walletHeader .addBtn{padding:0 10px}.walletHeader .addBtn b{font-size:12px}.searchBar{padding-left:15px;padding-right:15px}.searchBar .searchIcon{left:29px}.searchClear{right:23px}.grid{padding-left:15px;padding-right:15px;gap:9px}}
 </style>
 </head>
 <body>
 <div class="app">
-<header><div class="walletHead"><h1>Мои карты<br>лояльности</h1><div class="sub" id="count">0 карт</div></div><button class="btn addBtn" onclick="addMenu()">Добавить карту</button></header>
-<div class="search"><input id="search" placeholder="Поиск карты" oninput="render()"></div>
+<header class="walletHeader"><div class="walletHead"><div class="eyebrow">CARD111 · КОШЕЛЁК</div><h1>Мои карты</h1><div class="sub" id="count">0 карт</div></div><button class="btn addBtn" aria-label="Добавить карту" title="Добавить карту" onclick="addMenu()"><span aria-hidden="true">＋</span><b>Добавить</b></button></header>
+<div class="search searchBar"><span class="searchIcon" aria-hidden="true">⌕</span><input id="search" aria-label="Поиск карты" placeholder="Найти карту" oninput="render()"><button class="searchClear" type="button" aria-label="Очистить поиск" onclick="clearCardSearch()">×</button></div>
 <main id="cards" class="grid"></main>
 </div>
-<nav class="bottomNav" aria-label="Навигация"><button class="bottomNavItem active" onclick="showWallet()"><span>▣</span><b>Кошелёк</b></button><button class="bottomNavItem" onclick="scanner()"><span>⌗</span><b>Сканер</b></button><button class="bottomNavItem" onclick="showSettings()"><span>⚙</span><b>Настройки</b></button></nav>
+<nav class="bottomNav" aria-label="Навигация"><button class="bottomNavItem active" onclick="showWallet()"><span>▣</span><b>Карты</b></button><button class="bottomNavItem" onclick="scanner()"><span>⌗</span><b>Сканер</b></button><button class="bottomNavItem" onclick="showSettings()"><span>⚙</span><b>Настройки</b></button></nav>
 <div id="modal" class="overlay" onclick="if(event.target===this)closeModal()"><div class="sheet" id="sheet"></div></div><input id="importFile" type="file" accept="application/json,.json" style="display:none">
 <script>
 const KEY="card_wallet_v1";
@@ -979,6 +1005,7 @@ function syncCardsFromStorage(){
     return false;
   }
 }
+function clearCardSearch(){const el=document.getElementById("search");if(el){el.value="";render();el.focus();}}
 function render(){
   if(!cards.length)syncCardsFromStorage();
   const search=document.getElementById("search");
