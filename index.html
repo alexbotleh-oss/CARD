@@ -299,7 +299,7 @@ header{padding:18px 20px 10px;background:#f6f7fbf5}
 }
 @media(max-width:520px){
   .card{aspect-ratio:1.48/1!important}
-  .editorPreview{width:min(220px,100%)!important;aspect-ratio:1.48/1!important}
+  .editorPreview{width:min(100%,340px)!important;max-width:340px!important;aspect-ratio:1.586/1!important}
 }
 
 
@@ -433,7 +433,7 @@ header{padding:18px 20px 10px;background:#f6f7fbf5}
 /* CARD111 editor re-layout pass: reduce the preview footprint and keep actions reachable */
 .editorTabs{grid-template-columns:repeat(2,minmax(0,1fr));position:sticky;top:0;z-index:5}
 .editorPreviewWrap{min-height:0;padding:5px 0 8px}
-.editorPreviewWrap .editorPreview{width:min(54vw,210px)!important;max-width:210px!important;min-height:0!important;aspect-ratio:1.48/1!important;height:auto!important;border-radius:17px!important;padding:10px!important}
+.editorPreviewWrap .editorPreview{width:min(100%,340px)!important;max-width:340px!important;min-height:0!important;aspect-ratio:1.586/1!important;height:auto!important;border-radius:17px!important;padding:10px!important}
 .editorPreviewWrap .editorPreview>strong{font-size:clamp(14px,4vw,20px)!important}
 .editorPreviewHint{font-size:11px;margin:0 0 7px}
 .editorAppearance{padding:9px!important;border-radius:14px!important}
@@ -452,7 +452,7 @@ header{padding:18px 20px 10px;background:#f6f7fbf5}
 .styleSection .titleVisibleToggle,.styleSection .titlePositionOpen{min-height:34px;font-size:11px}
 .editorActionBar{position:sticky;bottom:-18px;z-index:8;display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px -18px -18px;padding:10px 18px max(10px,env(safe-area-inset-bottom));background:#ffffffed;border-top:1px solid #e7e8ec;backdrop-filter:blur(12px)}
 .editorActionBar .btn{margin:0;min-height:44px;padding:10px;font-size:14px}
-@media(max-width:520px){.editorPreviewWrap .editorPreview{width:min(52vw,190px)!important;max-width:190px!important}.editorAppearance .coverGrid{max-height:22dvh;overflow-y:auto;overscroll-behavior:contain;align-content:start;padding:2px 2px 6px}.editorAppearance .coverOption{min-height:54px!important;padding:6px 3px!important;font-size:10px!important}.editorActionBar{gap:6px}}
+@media(max-width:520px){.editorAppearance .coverGrid{max-height:22dvh;overflow-y:auto;overscroll-behavior:contain;align-content:start;padding:2px 2px 6px}.editorAppearance .coverOption{min-height:54px!important;padding:6px 3px!important;font-size:10px!important}.editorActionBar{gap:6px}}
 
 
 /* CARD111 final mobile editor layout: fixed preview/tabs/actions, one internal content scroller */
@@ -462,7 +462,7 @@ header{padding:18px 20px 10px;background:#f6f7fbf5}
 .sheet.cardEditorSheet>.close{position:absolute;top:calc(env(safe-area-inset-top) + 8px);right:12px;z-index:15;float:none}
 .sheet.cardEditorSheet .editorPreviewWrap{position:relative;top:auto;z-index:1;min-height:0;height:auto;flex:none;padding:2px 0 5px;background:#fff}
 .sheet.cardEditorSheet .editorPreviewWrap:before{display:none}
-.sheet.cardEditorSheet .editorPreviewWrap .editorPreview{width:min(56vw,224px)!important;max-width:224px!important;min-height:0!important;aspect-ratio:1.48!important;flex:none}
+.sheet.cardEditorSheet .editorPreviewWrap .editorPreview{width:min(100%,340px)!important;max-width:340px!important;min-height:0!important;aspect-ratio:1.586/1!important;flex:none}
 .sheet.cardEditorSheet .editorPreviewHint{flex:none;margin:0 0 8px;font-size:11px;line-height:1.25}
 .sheet.cardEditorSheet .editorScrollArea{flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;scrollbar-gutter:stable;padding:0 0 8px}
 .sheet.cardEditorSheet .editorPanel.active{display:block;min-height:0}
@@ -498,7 +498,7 @@ header{padding:18px 20px 10px;background:#f6f7fbf5}
 .sheet.cardEditorSheet .editorDataPanel .editorSectionTitle{margin-top:10px!important}
 .sheet.cardEditorSheet .editorDataPanel .secondCodeToggle{margin-top:6px;padding:9px}
 .sheet.cardEditorSheet .editorDataPanel #rescanEdit{margin-top:6px}
-@media(max-width:380px){.sheet.cardEditorSheet{padding-left:9px;padding-right:9px}.sheet.cardEditorSheet>.close{right:9px}.sheet.cardEditorSheet .editorActionBar{margin-left:-9px;margin-right:-9px;padding-left:9px;padding-right:9px}.sheet.cardEditorSheet .editorPreviewWrap .editorPreview{width:min(52vw,200px)!important;max-width:200px!important}.sheet.cardEditorSheet .editorAppearance .coverGrid{max-height:15dvh}.sheet.cardEditorSheet .styleSection{padding:6px}}
+@media(max-width:380px){.sheet.cardEditorSheet{padding-left:9px;padding-right:9px}.sheet.cardEditorSheet>.close{right:9px}.sheet.cardEditorSheet .editorActionBar{margin-left:-9px;margin-right:-9px;padding-left:9px;padding-right:9px}.sheet.cardEditorSheet .editorAppearance .coverGrid{max-height:15dvh}.sheet.cardEditorSheet .styleSection{padding:6px}}
 
 /* CARD111 home screen — coherent mobile-first composition based on the agreed sketch */
 .walletHeader{padding:calc(env(safe-area-inset-top) + 22px) 20px 13px;gap:14px;align-items:center;background:linear-gradient(180deg,#f7f8fc 0%,#f6f7fb 100%);border-bottom:1px solid #e9ebf1}
