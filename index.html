@@ -202,6 +202,22 @@ header{padding:18px 20px 10px;background:#f6f7fbf5}
 .editorTabs .editorTab{font-size:14px}@media(max-width:520px){.grid{padding-left:20px;padding-right:20px}.addBtn{min-width:136px}.bottomNav{bottom:10px}.card{aspect-ratio:1.48/1!important}}
 
 
+/* Compact editor layout: paired controls reduce vertical scrolling on phones */
+.cardStylePicker.styleCompactGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:10px;padding:9px;background:#f6f7fa}
+.styleSection{min-width:0;border:1px solid #e4e6eb;border-radius:13px;background:#fff;padding:9px}
+.styleSectionTitle{font-size:13px;font-weight:800;line-height:1.2;margin:0 0 7px;color:#30333a}
+.styleSection .styleGrid{gap:5px;margin-top:0}
+.styleSection .styleOption{min-height:36px;padding:6px 5px;font-size:12px;border-radius:9px}
+.styleSection .styleColorChoice{min-height:48px;padding:4px 2px;font-size:10px;border-radius:9px}
+.styleSection .styleColorChoice span{width:16px;height:16px;margin-bottom:2px}
+.styleSection .titleVisibleToggle,.styleSection .titlePositionOpen{width:100%;min-height:38px;margin:0;padding:7px 5px;font-size:12px;border-radius:9px}
+.styleSection .styleHelp{font-size:10px;line-height:1.25;margin-top:5px}
+.styleSection .titlePositionCurrent{font-size:11px;line-height:1.2;margin-top:5px}
+.styleSection .styleRange{margin:3px 0 0}
+.styleSection-font{grid-column:1/-1}
+.styleSection-font .styleGrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+.styleSection-palette .styleGrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+@media(max-width:360px){.cardStylePicker.styleCompactGrid{gap:5px;padding:6px}.styleSection{padding:7px}.styleSectionTitle{font-size:12px}.styleSection .styleOption{font-size:11px}}
 /* CARD111 shared card standard: one geometry system for list cards and editor preview */
 .card{
   container-type:inline-size;
@@ -480,13 +496,14 @@ function fontOptions(selected){return Object.keys(CARD_FONTS).map(function(k){re
 function backgroundOptions(selected){return Object.keys(CARD_TEXT_BACKGROUNDS).map(function(k){return '<button type="button" class="styleOption backgroundChoice '+(k===selected?" selected":"")+'" data-background="'+k+'">'+esc(CARD_TEXT_BACKGROUND_LABELS[k])+'</button>';}).join("");}
 function styleEditor(c){
   const s=cardStyle(c);
-  return '<div class="cardStylePicker"><div class="hint">Цветовая палитра</div><input id="cardPalette" type="hidden" value="'+esc(s.palette)+'"><div id="paletteGrid" class="styleGrid">'+paletteOptions(s.palette)+'</div>'+
-    '<div class="hint styleBlockTitle">Надпись на карте</div><input id="titleVisible" type="hidden" value="'+(s.visible?"true":"false")+'"><button type="button" class="btn secondary titleVisibleToggle" id="titleVisibleToggle" aria-pressed="'+(s.visible?"true":"false")+'">'+(s.visible?"Без надписи":"Показывать название")+'</button><div class="hint">Скрывается только название поверх рубашки; изображение и код карты сохраняются.</div>'+
-    '<div class="hint styleBlockTitle">Расположение надписи</div><input id="titlePosition" type="hidden" value="'+esc(s.position)+'"><button type="button" class="btn secondary titlePositionOpen" id="titlePositionOpen" aria-label="Выбрать положение надписи" title="Выбрать положение надписи">⌗</button><div class="hint titlePositionCurrent" id="titlePositionCurrent">Текущее положение: '+esc(CARD_TEXT_POSITIONS[s.position]||"По центру")+'</div>'+
-    '<div class="hint styleBlockTitle">Стиль фона для названия</div><input id="titleBackground" type="hidden" value="'+esc(s.background)+'"><div id="backgroundGrid" class="styleGrid">'+backgroundOptions(s.background)+'</div>'+
-    '<div class="hint styleBlockTitle">Цвет текста</div><input id="titleColor" type="hidden" value="'+esc(s.textColor)+'"><div id="textColorGrid" class="textColorGrid">'+textColorOptions(s.textColor)+'</div>'+
-    '<div class="hint styleBlockTitle">Размер текста: <b id="titleSizeValue">'+s.size+' px</b></div><input id="titleSize" type="range" min="14" max="28" step="1" value="'+s.size+'" class="styleRange">'+
-    '<div class="hint styleBlockTitle">Шрифт</div><input id="titleFont" type="hidden" value="'+esc(s.font)+'"><div id="fontGrid" class="styleGrid fontGrid">'+fontOptions(s.font)+'</div></div>';
+  return '<div class="cardStylePicker styleCompactGrid">'+
+    '<section class="styleSection styleSection-palette"><div class="styleSectionTitle">Цвет рубашки</div><input id="cardPalette" type="hidden" value="'+esc(s.palette)+'"><div id="paletteGrid" class="styleGrid">'+paletteOptions(s.palette)+'</div></section>'+
+    '<section class="styleSection styleSection-visibility"><div class="styleSectionTitle">Надпись на карте</div><input id="titleVisible" type="hidden" value="'+(s.visible?"true":"false")+'"><button type="button" class="btn secondary titleVisibleToggle" id="titleVisibleToggle" aria-pressed="'+(s.visible?"true":"false")+'">'+(s.visible?"Скрыть название":"Показывать название")+'</button><div class="hint styleHelp">Код и изображение карты сохраняются.</div></section>'+
+    '<section class="styleSection styleSection-position"><div class="styleSectionTitle">Положение надписи</div><input id="titlePosition" type="hidden" value="'+esc(s.position)+'"><button type="button" class="btn secondary titlePositionOpen" id="titlePositionOpen" aria-label="Выбрать положение надписи" title="Выбрать положение надписи">⌗ Выбрать</button><div class="hint titlePositionCurrent" id="titlePositionCurrent">'+esc(CARD_TEXT_POSITIONS[s.position]||"По центру")+'</div></section>'+
+    '<section class="styleSection styleSection-background"><div class="styleSectionTitle">Фон названия</div><input id="titleBackground" type="hidden" value="'+esc(s.background)+'"><div id="backgroundGrid" class="styleGrid">'+backgroundOptions(s.background)+'</div></section>'+
+    '<section class="styleSection styleSection-textcolor"><div class="styleSectionTitle">Цвет текста</div><input id="titleColor" type="hidden" value="'+esc(s.textColor)+'"><div id="textColorGrid" class="textColorGrid">'+textColorOptions(s.textColor)+'</div></section>'+
+    '<section class="styleSection styleSection-size"><div class="styleSectionTitle">Размер текста <b id="titleSizeValue">'+s.size+' px</b></div><input id="titleSize" type="range" min="14" max="28" step="1" value="'+s.size+'" class="styleRange"></section>'+
+    '<section class="styleSection styleSection-font"><div class="styleSectionTitle">Шрифт</div><input id="titleFont" type="hidden" value="'+esc(s.font)+'"><div id="fontGrid" class="styleGrid fontGrid">'+fontOptions(s.font)+'</div></section></div>';
 }
 function openTitlePositionPicker(){
   const input=document.getElementById("titlePosition");
