@@ -383,6 +383,21 @@ header{padding:18px 20px 10px;background:#f6f7fbf5}
   .cardStylePicker .styleColorChoice{min-height:62px;font-size:10px}
 }
 
+
+/* CARD111 custom color editor: touch-friendly color swatches and single-color mode */
+.gradientColorControls{display:grid;grid-template-columns:minmax(0,1fr) 94px;gap:12px;align-items:start;margin:10px 0}
+.gradientPalette{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px}
+.gradientPaletteColor{aspect-ratio:1;border:1px solid #0002;border-radius:7px;min-width:0;padding:0;touch-action:manipulation}
+.gradientPaletteColor.selected{outline:3px solid #1677ff;outline-offset:1px}
+.gradientSwatchWrap{display:flex;flex-direction:column;gap:6px;font-size:11px;color:#626873}
+.gradientSwatch{width:100%;aspect-ratio:1;border:1px solid #0002;border-radius:10px;box-shadow:inset 0 0 0 1px #ffffff55}
+.gradientSwatchWrap input[type=color]{height:30px!important;padding:0!important}
+.gradientColorInputs{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px!important;align-items:start!important}
+.gradientColorInputs label{min-width:0;margin-top:0!important}
+.gradientDialog select{padding:10px;border:1px solid #d9dce3;border-radius:10px;background:#fff}
+#gradientClose{float:right}
+@media(max-width:380px){.gradientPalette{grid-template-columns:repeat(5,minmax(0,1fr))}.gradientColorControls{grid-template-columns:minmax(0,1fr) 76px}}
+
 </style>
 </head>
 <body>
@@ -437,7 +452,7 @@ function cardStyle(c){
   return {palette:CARD_PALETTES[s.palette]?s.palette:"AUTO",textColor:CARD_TEXT_COLORS[s.textColor]?s.textColor:"WHITE",position:CARD_TEXT_POSITIONS[s.position]?s.position:"CENTER",background:CARD_TEXT_BACKGROUNDS[s.background]?s.background:"PILL",size:Math.max(14,Math.min(28,Number(s.size)||19)),font:CARD_FONTS[s.font]?s.font:"SYSTEM",visible:s.visible!==false};
 }
 function cardStyleClass(c){const s=cardStyle(c);return "palette-"+s.palette.toLowerCase()+" title-"+s.position.toLowerCase()+" titlebg-"+s.background.toLowerCase()+(s.visible?"":" title-hidden");}
-function cardStyleInline(c){const s=cardStyle(c),raw=(c&&c.style)||{};let out="--title-color:"+CARD_TEXT_COLORS[s.textColor]+";--title-size:"+s.size+";--title-font:"+CARD_FONTS[s.font]+";";const g=raw.customGradient;if(g&&Array.isArray(g.colors)&&g.colors.length>=2){const cs=g.colors.slice(0,3).filter(x=>/^#[0-9a-f]{6}$/i.test(String(x)));if(cs.length>=2){const a=Math.max(0,Math.min(360,Number(g.angle)||135)),p=Math.max(10,Math.min(90,Number(g.softness)||50));out+="background:linear-gradient("+a+"deg,"+(cs.length===2?cs[0]+" 0%,"+cs[1]+" 100%":cs[0]+" 0%,"+cs[1]+" "+p+"%,"+cs[2]+" 100%")+");";}}return out;}
+function cardStyleInline(c){const s=cardStyle(c),raw=(c&&c.style)||{};let out="--title-color:"+CARD_TEXT_COLORS[s.textColor]+";--title-size:"+s.size+";--title-font:"+CARD_FONTS[s.font]+";";const g=raw.customGradient,solid=raw.customColor;if(solid&&/^#[0-9a-f]{6}$/i.test(String(solid))&&(!g||!Array.isArray(g.colors)||g.colors.length<2))out+="background:"+solid+";";if(g&&Array.isArray(g.colors)&&g.colors.length>=2){const cs=g.colors.slice(0,3).filter(x=>/^#[0-9a-f]{6}$/i.test(String(x)));if(cs.length>=2){const a=Math.max(0,Math.min(360,Number(g.angle)||0)),p=Math.max(10,Math.min(90,Number(g.softness)||50));out+="background:linear-gradient("+a+"deg,"+(cs.length===2?cs[0]+" 0%,"+cs[1]+" 100%":cs[0]+" 0%,"+cs[1]+" "+p+"%,"+cs[2]+" 100%")+");";}}return out;}
 function paletteOptions(selected){return Object.keys(CARD_PALETTES).map(function(k){return '<button type="button" class="styleOption paletteChoice palette-choice-'+k.toLowerCase()+(k===selected?" selected":"")+'" data-palette="'+k+'">'+esc(CARD_PALETTES[k])+'</button>';}).join("");}
 function textColorOptions(selected){return Object.keys(CARD_TEXT_COLORS).map(function(k){return '<button type="button" class="styleColorChoice style-color-'+k.toLowerCase()+(k===selected?" selected":"")+'" data-text-color="'+k+'" title="'+esc(CARD_TEXT_COLOR_LABELS[k])+'"><span></span><b>'+esc(CARD_TEXT_COLOR_LABELS[k])+'</b></button>';}).join("");}
 function positionOptions(selected){return Object.keys(CARD_TEXT_POSITIONS).map(function(k){return '<button type="button" class="styleOption positionChoice '+(k===selected?" selected":"")+'" data-position="'+k+'">'+esc(CARD_TEXT_POSITIONS[k])+'</button>';}).join("");}
@@ -485,7 +500,47 @@ function openTitlePositionPicker(){
     if(typeof refreshEditorPreview==="function")refreshEditorPreview(window.__editorPreviewCard||{});
   };
 }
-function openGradientPicker(){const overlay=document.createElement("div");overlay.className="gradientModal";const card=window.__editorPreviewCard||{},old=(card.style||{}).customGradient||{},saved=Array.isArray(old.colors)?old.colors:["#ef3340","#f5bd2e","#159447"];overlay.innerHTML='<div class="gradientDialog" role="dialog" aria-modal="true"><h3>Рубашка с градиентом</h3><div class="hint">2 или 3 цвета, угол и положение перехода.</div><div id="gradientLive" class="gradientLive"></div><label>Количество цветов<select id="gradientCount"><option value="2">2 цвета</option><option value="3">3 цвета</option></select></label><div class="row"><div><label>Цвет 1<input id="gradientC1" type="color"></label></div><div><label>Цвет 2<input id="gradientC2" type="color"></label></div><div id="gradientC3Wrap"><label>Цвет 3<input id="gradientC3" type="color"></label></div></div><label>Угол: <b id="gradientAngleText">135°</b><input id="gradientAngle" type="range" min="0" max="360" value="135"></label><label>Положение перехода: <b id="gradientSoftText">50%</b><input id="gradientSoft" type="range" min="10" max="90" value="50"></label><div class="row"><button class="btn secondary" id="gradientCancel" type="button">Отмена</button><button class="btn primary" id="gradientApply" type="button">Применить</button></div><button class="btn secondary" id="gradientReset" type="button">Убрать градиент</button></div>';document.body.appendChild(overlay);const $=id=>overlay.querySelector("#"+id);$("gradientCount").value=saved.length===3?"3":"2";$("gradientC1").value=saved[0]||"#ef3340";$("gradientC2").value=saved[1]||"#f5bd2e";$("gradientC3").value=saved[2]||"#159447";$("gradientAngle").value=old.angle||135;$("gradientSoft").value=old.softness||50;function update(){const n=+$("gradientCount").value,a=+$("gradientAngle").value,p=+$("gradientSoft").value,cs=[$("gradientC1").value,$("gradientC2").value];if(n===3)cs.push($("gradientC3").value);$("gradientC3Wrap").style.display=n===3?"":"none";$("gradientAngleText").textContent=a+"°";$("gradientSoftText").textContent=p+"%";$("gradientLive").style.background="linear-gradient("+a+"deg,"+(n===2?cs[0]+" 0%,"+cs[1]+" 100%":cs[0]+" 0%,"+cs[1]+" "+p+"%,"+cs[2]+" 100%")+")";}["gradientCount","gradientC1","gradientC2","gradientC3","gradientAngle","gradientSoft"].forEach(id=>$(id).addEventListener("input",update));$("gradientCancel").onclick=()=>overlay.remove();$("gradientApply").onclick=function(){const n=+$("gradientCount").value,cs=[$("gradientC1").value,$("gradientC2").value];if(n===3)cs.push($("gradientC3").value);card.style=Object.assign({},card.style||{},{customGradient:{colors:cs,angle:+$("gradientAngle").value,softness:+$("gradientSoft").value}});delete card.clearCustomGradient;window.__editorPreviewCard=card;const coverInput=document.getElementById("cover");if(coverInput)coverInput.value="CUSTOM";document.querySelectorAll("#coverGrid .coverOption,#editorCoverGrid .coverOption").forEach(function(x){x.classList.toggle("selected",x.getAttribute("data-cover")==="CUSTOM");});const p=document.getElementById("cardGradientPreview");if(p){p.classList.add("active");p.style.background=$("gradientLive").style.background;}const pal=document.getElementById("cardPalette");if(pal)pal.value="AUTO";document.querySelectorAll("#paletteGrid .paletteChoice").forEach(x=>x.classList.remove("selected"));if(typeof refreshEditorPreview==="function")refreshEditorPreview(card);overlay.remove();};$("gradientReset").onclick=function(){card.style=Object.assign({},card.style||{});delete card.style.customGradient;card.clearCustomGradient=true;window.__editorPreviewCard=card;const coverInput=document.getElementById("cover");if(coverInput&&coverInput.value==="CUSTOM"){coverInput.value="AUTO";document.querySelectorAll("#coverGrid .coverOption,#editorCoverGrid .coverOption").forEach(function(x){x.classList.toggle("selected",x.getAttribute("data-cover")==="AUTO");});}const p=document.getElementById("cardGradientPreview");if(p){p.classList.remove("active");p.style.background="";}if(typeof refreshEditorPreview==="function")refreshEditorPreview(card);overlay.remove();};overlay.addEventListener("click",e=>{if(e.target===overlay)overlay.remove();});update();}
+function openGradientPicker(){
+  const overlay=document.createElement("div");overlay.className="gradientModal";
+  const card=window.__editorPreviewCard||{},old=(card.style||{}).customGradient||{};
+  const saved=Array.isArray(old.colors)&&old.colors.length?old.colors:["#1767d8"];
+  const palette=["#ffffff","#f1f3f5","#adb5bd","#6c757d","#343a40","#17181c","#ff0000","#ff6b6b","#ff922b","#ffd43b","#a9e34b","#2f9e44","#12b886","#15aabf","#228be6","#4263eb","#7950f2","#be4bdb","#f06595","#8d5524","#d9480f","#087f5b","#364fc7","#862e9c"];
+  overlay.innerHTML='<div class="gradientDialog" role="dialog" aria-modal="true" aria-labelledby="gradientHeading"><button type="button" class="close" id="gradientClose" aria-label="Закрыть">×</button><h3 id="gradientHeading">Цвет рубашки</h3><div class="hint">Выбери один цвет для однотонного фона или 2–3 цвета для градиента.</div><div id="gradientLive" class="gradientLive"></div><div class="gradientColorControls"><div id="gradientPalette" class="gradientPalette" aria-label="Палитра цветов"></div><div class="gradientSwatchWrap"><span>Выбранный цвет</span><div id="gradientSwatch" class="gradientSwatch"></div><input id="gradientCustomColor" type="color" aria-label="Точный выбор цвета"></div></div><label>Количество цветов фона<select id="gradientCount"><option value="1">1 — обычный цвет</option><option value="2">2 цвета — градиент</option><option value="3">3 цвета — градиент</option></select></label><div class="row gradientColorInputs"><label>Цвет 1<input id="gradientC1" type="color"></label><label id="gradientC2Wrap">Цвет 2<input id="gradientC2" type="color"></label><label id="gradientC3Wrap">Цвет 3<input id="gradientC3" type="color"></label></div><label id="gradientAngleWrap">Поворот градиента: <b id="gradientAngleText">135°</b><input id="gradientAngle" type="range" min="0" max="360" step="1" value="135"></label><label id="gradientSoftWrap">Положение среднего цвета: <b id="gradientSoftText">50%</b><input id="gradientSoft" type="range" min="10" max="90" step="1" value="50"></label><div class="row"><button class="btn secondary" id="gradientCancel" type="button">Отмена</button><button class="btn primary" id="gradientApply" type="button">Применить</button></div><button class="btn secondary" id="gradientReset" type="button">Сбросить к цвету по умолчанию</button></div>';
+  document.body.appendChild(overlay);const $=id=>overlay.querySelector("#"+id);
+  const count=saved.length>=3?3:(saved.length===2?2:1);
+  $("gradientCount").value=String(count);$("gradientC1").value=saved[0]||"#1767d8";$("gradientC2").value=saved[1]||"#f5bd2e";$("gradientC3").value=saved[2]||"#159447";
+  $("gradientAngle").value=Number.isFinite(Number(old.angle))?Number(old.angle):135;$("gradientSoft").value=Number(old.softness)||50;
+  let activeColor=1;
+  function selectedColor(){return $(activeColor===1?"gradientC1":activeColor===2?"gradientC2":"gradientC3");}
+  palette.forEach(function(color){const b=document.createElement("button");b.type="button";b.className="gradientPaletteColor";b.style.background=color;b.title=color;b.setAttribute("aria-label","Выбрать цвет "+color);b.onclick=function(){selectedColor().value=color;update();};$("gradientPalette").appendChild(b);});
+  function update(){
+    const n=+$("gradientCount").value,a=+$("gradientAngle").value,p=+$("gradientSoft").value,cs=[$("gradientC1").value,$("gradientC2").value,$("gradientC3").value];
+    $("gradientC2Wrap").style.display=n>=2?"":"none";$("gradientC3Wrap").style.display=n===3?"":"none";
+    $("gradientAngleWrap").style.display=n>=2?"":"none";$("gradientSoftWrap").style.display=n===3?"":"none";
+    $("gradientAngleText").textContent=a+"°";$("gradientSoftText").textContent=p+"%";
+    $("gradientLive").style.background=n===1?cs[0]:"linear-gradient("+a+"deg,"+(n===2?cs[0]+" 0%,"+cs[1]+" 100%":cs[0]+" 0%,"+cs[1]+" "+p+"%,"+cs[2]+" 100%")+")";
+    $("gradientSwatch").style.background=selectedColor().value;$("gradientCustomColor").value=selectedColor().value;
+    overlay.querySelectorAll(".gradientPaletteColor").forEach(function(b){b.classList.toggle("selected",b.title.toLowerCase()===selectedColor().value.toLowerCase());});
+  }
+  ["gradientC1","gradientC2","gradientC3"].forEach(function(id,i){$(id).addEventListener("focus",function(){activeColor=i+1;update();});$(id).addEventListener("input",function(){activeColor=i+1;update();});});
+  $("gradientCustomColor").addEventListener("input",function(){selectedColor().value=$("gradientCustomColor").value;update();});
+  ["gradientCount","gradientAngle","gradientSoft"].forEach(id=>$(id).addEventListener("input",update));
+  $("gradientClose").onclick=$("gradientCancel").onclick=()=>overlay.remove();
+  $("gradientApply").onclick=function(){
+    const n=+$("gradientCount").value,cs=[$("gradientC1").value];if(n>=2)cs.push($("gradientC2").value);if(n===3)cs.push($("gradientC3").value);
+    card.style=Object.assign({},card.style||{});
+    if(n===1){delete card.style.customGradient;card.style.customColor=cs[0];card.clearCustomGradient=true;}
+    else{card.style.customColor=cs[0];card.style.customGradient={colors:cs,angle:+$("gradientAngle").value,softness:+$("gradientSoft").value};delete card.clearCustomGradient;}
+    window.__editorPreviewCard=card;const coverInput=document.getElementById("cover");if(coverInput)coverInput.value="CUSTOM";
+    document.querySelectorAll("#coverGrid .coverOption,#editorCoverGrid .coverOption").forEach(x=>x.classList.toggle("selected",x.getAttribute("data-cover")==="CUSTOM"));
+    const pal=document.getElementById("cardPalette");if(pal)pal.value="AUTO";document.querySelectorAll("#paletteGrid .paletteChoice").forEach(x=>x.classList.remove("selected"));
+    if(typeof refreshEditorPreview==="function")refreshEditorPreview(card);
+    const p=document.getElementById("cardGradientPreview");if(p){p.classList.add("active");p.style.background=$("gradientLive").style.background;}
+    overlay.remove();
+  };
+  $("gradientReset").onclick=function(){card.style=Object.assign({},card.style||{});delete card.style.customGradient;delete card.style.customColor;card.clearCustomGradient=true;window.__editorPreviewCard=card;const coverInput=document.getElementById("cover");if(coverInput&&coverInput.value==="CUSTOM")coverInput.value="AUTO";document.querySelectorAll("#coverGrid .coverOption,#editorCoverGrid .coverOption").forEach(x=>x.classList.toggle("selected",x.getAttribute("data-cover")==="AUTO"));const p=document.getElementById("cardGradientPreview");if(p){p.classList.remove("active");p.style.background="";}if(typeof refreshEditorPreview==="function")refreshEditorPreview(card);overlay.remove();};
+  overlay.addEventListener("click",e=>{if(e.target===overlay)overlay.remove();});update();
+}
 function bindStyleEditor(){
   function bindGrid(id,inputId,attr){const grid=document.getElementById(id),input=document.getElementById(inputId);if(!grid||!input)return;grid.querySelectorAll("button").forEach(function(btn){btn.onclick=function(){input.value=btn.getAttribute(attr)||"";grid.querySelectorAll("button").forEach(function(x){x.classList.remove("selected");});btn.classList.add("selected");if(typeof refreshEditorPreview==="function")refreshEditorPreview(window.__editorPreviewCard||{});};});}
   bindGrid("paletteGrid","cardPalette","data-palette");bindGrid("backgroundGrid","titleBackground","data-background");bindGrid("textColorGrid","titleColor","data-text-color");bindGrid("fontGrid","titleFont","data-font");
@@ -493,7 +548,17 @@ function bindStyleEditor(){
   const visibleInput=document.getElementById("titleVisible"),visibleButton=document.getElementById("titleVisibleToggle");
   if(visibleInput&&visibleButton)visibleButton.onclick=function(){const visible=visibleInput.value!=="true";visibleInput.value=visible?"true":"false";visibleButton.textContent=visible?"Без надписи":"Показывать название";visibleButton.setAttribute("aria-pressed",String(visible));if(typeof refreshEditorPreview==="function")refreshEditorPreview(window.__editorPreviewCard||{});};
   const positionOpen=document.getElementById("titlePositionOpen");
-  if(positionOpen)positionOpen.onclick=openTitlePositionPicker;
+  if(positionOpen){
+    let holdTimer=null,longPressed=false,suppressClick=false;
+    function toggleTitle(){const input=document.getElementById("titleVisible"),button=document.getElementById("titleVisibleToggle");if(!input)return;const visible=input.value!=="true";input.value=visible?"true":"false";if(button){button.textContent=visible?"Без надписи":"Показывать название";button.setAttribute("aria-pressed",String(visible));}if(typeof refreshEditorPreview==="function")refreshEditorPreview(window.__editorPreviewCard||{});}
+    function startHold(){longPressed=false;clearTimeout(holdTimer);holdTimer=setTimeout(function(){longPressed=true;suppressClick=true;openTitlePositionPicker();},480);}
+    function endHold(){clearTimeout(holdTimer);}
+    positionOpen.setAttribute("aria-label","Короткое нажатие — включить или скрыть надпись; долгое — выбрать её расположение");
+    positionOpen.title="Короткое нажатие — показать/скрыть надпись. Долгое нажатие — расположение 3×3.";
+    positionOpen.addEventListener("pointerdown",startHold);
+    ["pointerup","pointercancel","pointerleave"].forEach(function(ev){positionOpen.addEventListener(ev,endHold);});
+    positionOpen.addEventListener("click",function(e){if(suppressClick){suppressClick=false;e.preventDefault();return;}toggleTitle();});
+  }
   const range=document.getElementById("titleSize"),out=document.getElementById("titleSizeValue");if(range&&out)range.oninput=function(){out.textContent=range.value+" px";};
 }
 const BRAND_MARK_SVGS={
@@ -1182,7 +1247,7 @@ function editorPreviewData(c){
     size:Math.max(14,Math.min(28,Number(document.getElementById("titleSize")&&document.getElementById("titleSize").value)||19)),
     font:(document.getElementById("titleFont")&&document.getElementById("titleFont").value)||"SYSTEM",
     visible:!(document.getElementById("titleVisible")&&document.getElementById("titleVisible").value==="false"),
-    customGradient:previousStyle.customGradient||null
+    customGradient:previousStyle.customGradient||null,customColor:previousStyle.customColor||null
   };
   return base;
 }
@@ -1409,7 +1474,7 @@ async function updateCard(id){
     size:Math.max(14,Math.min(28,Number(document.getElementById("titleSize")&&document.getElementById("titleSize").value)||19)),
     font:(document.getElementById("titleFont")&&document.getElementById("titleFont").value)||"SYSTEM",
     visible:!(document.getElementById("titleVisible")&&document.getElementById("titleVisible").value==="false"),
-    customGradient:previewCard.clearCustomGradient?null:(previewStyle.customGradient||priorStyle.customGradient||null)
+    customGradient:previewCard.clearCustomGradient?null:(previewStyle.customGradient||priorStyle.customGradient||null),customColor:previewCard.clearCustomGradient?(previewStyle.customColor||null):(previewStyle.customColor||priorStyle.customColor||null)
   };
   let imageData=current.image||"";
   const file=document.getElementById("cardImage")&&document.getElementById("cardImage").files[0];
