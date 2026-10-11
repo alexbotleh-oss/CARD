@@ -1488,6 +1488,7 @@ function manualEdit(id){
     '<div class="editorActionBar"><button type="button" class="btn primary" id="editSave">Сохранить</button>'+
 
     '<button type="button" class="btn secondary" id="editCancel">Отмена</button></div>');
+  document.getElementById("sheet").classList.add("cardEditorSheet");
   document.getElementById("editClose").onclick=function(){openCard(String(id));};
   document.getElementById("rescanEdit").onclick=function(){rescanEdit(String(id));};
   const secondEnabled=document.getElementById("secondCodeEnabled"),secondSettings=document.getElementById("secondCodeSettings");
