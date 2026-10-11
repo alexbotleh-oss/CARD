@@ -1577,7 +1577,7 @@ function delCard(id){
   closeModal();
 }
 function exportData(){
-  const blob=new Blob([JSON.stringify({version:2,cards:cards,brandCovers:brandCovers},null,2)],{type:"application/json"});
+  const blob=new Blob([JSON.stringify({version:3,cards:cards,brandCovers:brandCovers,customCoverPresets:readCustomCoverPresets()},null,2)],{type:"application/json"});
   const a=document.createElement("a");
   a.href=URL.createObjectURL(blob);
   a.download="CARD_backup.json";
@@ -1600,16 +1600,20 @@ function readImport(e){
       });
       if(!importedCards.length)throw new Error("В резервной копии нет пригодных карт.");
       const importedCovers=(!Array.isArray(d)&&d.brandCovers&&typeof d.brandCovers==="object"&&!Array.isArray(d.brandCovers))?d.brandCovers:null;
+      const importedPresets=(!Array.isArray(d)&&Array.isArray(d.customCoverPresets))?d.customCoverPresets.filter(function(p){return p&&typeof p.id==="string"&&typeof p.name==="string"&&(typeof p.customColor==="string"||p.customGradient&&Array.isArray(p.customGradient.colors));}):null;
       if(!confirm("Восстановить "+importedCards.length+" карт? Текущий набор карт будет заменён."))return;
       const oldCardsRaw=localStorage.getItem(KEY);
       const oldSafeRaw=localStorage.getItem(SAFE_KEY);
       const oldCoversRaw=localStorage.getItem(COVER_DEFAULTS_KEY);
+      const oldCustomPresetsRaw=localStorage.getItem(CUSTOM_COVERS_KEY);
       const nextCardsRaw=JSON.stringify(importedCards);
       const nextCoversRaw=importedCovers?JSON.stringify(importedCovers):oldCoversRaw;
+      const nextCustomPresetsRaw=importedPresets?JSON.stringify(importedPresets):oldCustomPresetsRaw;
       try{
         try{localStorage.setItem(SAFE_KEY,oldCardsRaw!==null?oldCardsRaw:JSON.stringify(cards));}catch(snapshotError){}
         localStorage.setItem(KEY,nextCardsRaw);
         if(importedCovers)localStorage.setItem(COVER_DEFAULTS_KEY,nextCoversRaw);
+        if(importedPresets)localStorage.setItem(CUSTOM_COVERS_KEY,nextCustomPresetsRaw);
       }catch(saveError){
         const rollbackErrors=[];
         function restoreStorageKey(key,raw){
@@ -1620,6 +1624,7 @@ function readImport(e){
         }
         restoreStorageKey(KEY,oldCardsRaw);
         restoreStorageKey(COVER_DEFAULTS_KEY,oldCoversRaw);
+        restoreStorageKey(CUSTOM_COVERS_KEY,oldCustomPresetsRaw);
         restoreStorageKey(SAFE_KEY,oldSafeRaw);
         const suffix=rollbackErrors.length?" ОШИБКА отката для "+rollbackErrors.join(", ")+". Не закрывайте страницу; попробуйте экспортировать данные для восстановления.":" Старые сохранённые данные восстановлены.";
         alert("Не удалось восстановить резервную копию. "+String(saveError&&saveError.message||saveError)+"."+suffix);
