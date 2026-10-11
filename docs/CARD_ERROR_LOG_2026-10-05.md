@@ -406,3 +406,16 @@ Evidence: changed source re-read from the work branch. Visual confirmation in br
 **Корректировка:** в коммите `1fe16e4e78b62df251fe8037491ab189da4095bb` уменьшено превью, исправлена сетка вкладок на две колонки, ограничена высота галереи рубашек, добавлена нижняя закреплённая панель действий.
 
 **Статус:** JavaScript-синтаксис подтверждён; реальный экран после обновления и визуальное соответствие пока не проверены.
+
+
+## 2026-10-11 — duplicate title-visibility control and persistent mobile scroll
+
+**User finding:** the «Без надписи» button duplicates the title-position control, and the editor still feels like a long form instead of the intended compact mockup. Previous CSS-only shrinking did not sufficiently address the structure.
+
+**Change:** removed the separate visibility section and consolidated behavior into the position button: short tap toggles title visibility, long press opens the 3×3 position picker. Renamed the button to reflect visibility state. On screens up to 520 px, the cover gallery now has bounded height and its own vertical scrolling, with smaller tiles, to reduce whole-page scrolling.
+
+**Commits:** `14a926ac93331fc269cfd8ac7a8412e7471963d6`, `e5a3aa3516ae4a6b622130d449955d5e2a2531dc`.
+
+**Verification:** re-read `index.html` from the working branch; both inline JavaScript blocks compile; no old «Без надписи»/«Показывать название» labels remain; one control/input pair remains; mobile gallery CSS is present.
+
+**Not verified:** real Android rendering, long-press behavior in Yandex Browser, whether the whole editor now visually matches the mockup. If the user still sees the old UI, first verify published Pages source/deployment and cache; do not treat the branch commit as proof that the live site has updated.
