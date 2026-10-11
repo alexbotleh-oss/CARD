@@ -34,3 +34,14 @@ Related files: index.html; /mnt/data/МакетКАРТ.html; docs/CARD111_DESIG
 History refs: history/2026-10-11.md; docs/WORKLOG.md; docs/CARD_ERROR_LOG_2026-10-05.md.
 
   - [ ] V8 parser выполнен на двух inline JS script-контентах CSS-коммита (побайтная идентичность с parent подтверждена); сам parser не запускался в этой среде.
+
+
+## TASK-20261011-03 — уточнение активного объёма (2026-10-11 18:13 UTC)
+Status: active — implementation not yet changed.
+Target visual reference: uploaded `CARD111-_D0_9C_D0_B0_D0_BA_D0_B5_D1_82_D0_9A_D0_90_D0_A0_D0_A2-_D0_B8_D1_81_D0_BF_D1_80_D0_B0_D0_B2_D0_BB_D0_B5_D0_BD_D0_BD_D0_B0_D1_8F-_D0_B8_D0_BD_D1_82_D0_B5_D0_B3_D0_B8_D1_80_D0_B0_D1_86_D0_B8_D1_8F(1).html` (91,748 bytes; read from the uploaded file).
+Goal: Make CARD111 match this exact HTML as the visual foundation while preserving working functionality and stored user data.
+Verified scope conflict: target and current candidate index.html are different implementations, not just different CSS. Target has card/visit editor, shirt-based appearance, camera scanning, image decoding/crop, QR/barcode rendering and JSON backup import/export; storage key `card111.maketkart.v1`. Current candidate uses `card_wallet_v1` and `card111_business_cards_v1`, and has diagnostic log/export, custom brand-cover presets, second-code support, camera switching, torch and auto-save settings. Target scanner file input has `capture="environment"`; its Photo and Select Photo controls use the same input, so mobile may route selection to camera rather than gallery.
+Risks: Replacing index.html with target verbatim would remove current-only functions and could strand existing data under incompatible storage keys. A CSS-only patch cannot reproduce target because DOM and editor model differ. Do not overwrite active app until migration and function parity are addressed.
+Acceptance criteria: target layout/screens/proportions remain source of truth; camera and gallery are separate flows; QR/barcode generation and camera/photo/crop/manual scan work; backup export/import and diagnostics remain available; existing cards and visits migrate safely/reversibly; unique existing functions are ported or remain reachable; JS syntax passes; desktop/mobile visual checks are recorded honestly.
+Plan: map storage schemas/features; preserve a verified recovery artifact; port migration and missing controls into target foundation; run JS syntax and static ID/handler checks; perform available desktop/mobile visual checks; update and reread memory/history/handoff.
+Next step: build the feature-parity/storage migration map from both actual HTML files. No application code changed in this update. Local Git status is unavailable through the remote API.
