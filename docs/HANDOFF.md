@@ -130,3 +130,12 @@
 - History: 86266ce scanner/JSON changes → 22f1fd22 full MaketKart transfer → 0dea63a fixes → 97f47a2 latest index update.
 - Storage compatibility: mockup uses card111.maketkart.v1; wallet uses card_wallet_v1. Do not alter storage as part of a CSS visual fix.
 - Next: verify exact source SHA, remove only conflicting preview width/max-width overrides, preserve DOM/JS/functions, run parse/reverse-diff, then compare desktop and phone. No deployment before verification and user acceptance.
+
+## 2026-10-11 19:42 — CSS patch предпросмотра: commit создан, ветка требует проверки
+
+- CSS-only commit: https://github.com/alexbotleh-oss/CARD/commit/87c68ac7eb71885378c31c20d225401dd8ae25dd; parent f38ef76df5183c92a204374434da59bd9384887a; index blob 444ca4e92c9c558b920bfc53c912407d333d56db.
+- Убраны preview width caps 210/190/224/200px. Восстановлены width:min(100%,340px), max-width:340px, aspect-ratio:1.586/1.
+- Подтверждено после повторного чтения: два inline JS блока побайтно идентичны исходным, ключевые функции сохранены. Новые CSS присутствуют, старые caps отсутствуют.
+- Важное ограничение: branch ref candidate на момент последней проверки указывал на f38ef76df5183c92a204374434da59bd9384887a; не считать patch текущей версией ветки без продвижения ref и контрольного чтения.
+- Не выполнено: V8 syntax parser, render на ПК/телефоне, проверка Pages source/deployment.
+- Следующее: V8 parse; проверить ref, выполнить update_ref с expected_sha, если HEAD неизменен; затем визуальная проверка.
