@@ -122,8 +122,10 @@ Plan:
   - [x] Проверить логику предъявления: renderPresentedCode очищает область перед рендером; primary/secondary выбирается одним индексом; переключатель второго кода скрывается, если второй код отключён или пуст.
   - [x] Перечитать index.html из candidate; V8 compilation inline JS passed; точечные статические проверки прошли.
   - [x] Обновить context, lessons и append-only history.
+  - [x] Сверить точный эталон `CARD111-МакетКАРТ-исправленная-интеграция(1).html` с candidate: CSS совпадает полностью (17,559 символов), целевой markup предпросмотра требует контейнер `.flipper`.
+  - [x] Подтверждено, что в candidate патч предпросмотра применён поверх идентичного CSS эталона; кодовый рендерер очищает область перед отрисовкой и выбирает primary/secondary по одному индексу.
   - [ ] Проверить визуально на реальном браузере/телефоне; воспроизвести сообщение о двух кодах на карте пользователя.
-Next step: пользователь проверяет обновлённую страницу после обновления GitHub Pages/кэша; если лишний код сохраняется, прислать скрин экрана предъявления с видимым переключателем основного/дополнительного кода и фактическими значениями карточки.
+Next step: проверить обновлённую страницу на телефоне. Если лишний код сохраняется, прислать скрин экрана предъявления с видимым переключателем основного/дополнительного кода и фактическими значениями карточки.
 
 
 Progress 2026-10-11: commit `c25104ca18f3d06091718c8a1d66197474aa1c30` обновил candidate, blob `index.html` = `9e5906dcf7bd2b0c37353cc7e9f0bb2ff98ae82e`. Исправлен только markup editor preview: `#cardPreview` теперь находится внутри `.flipper.editor-flipper`, задающего позиционированный контейнер с исходным соотношением сторон 1.586:1. Повторное чтение файла из candidate подтверждено; inline JS компилируется в V8. Статический разбор кода предъявления подтвердил очистку `presentCodeArea` перед каждым рендером и отображение primary/secondary по одному индексу; переключатель второго кода скрывается при отключённом/пустом дополнительном коде. Физический мобильный рендер и фактическое воспроизведение лишнего кода пока не проверены.
@@ -139,3 +141,6 @@ Goal: Make the later corrected/integrated HTML the visual source of truth; prese
 Risk/error: Assistant incorrectly treated the older `МакетКАРТ.html` as the reference and made candidate commit `c25104ca18f3d06091718c8a1d66197474aa1c30` based on the wrong inferred geometry. Do not assume this patch is valid for the correct target; do not revert or rewrite history without need, but compare/rebase it against the correct artifact before further code edits.
 Acceptance: Read exact bytes of later target and current candidate; identify structural/style differences; decide whether `c25104c` should be ported, adapted, or omitted based on target; update task/context/history/lessons; no new UI code until target identity and patch applicability are established.
 Next step: compare later uploaded target with candidate `index.html` and record the actual canonical target identity in handoff/decision docs.
+
+
+Verified comparison 2026-10-11: correct reference `CARD111-МакетКАРТ-исправленная-интеграция(1).html` (file id `file_0000000067a081f48a4dc55780db9c27`) was read fully and compared with candidate `index.html` blob `9e5906dcf7bd2b0c37353cc7e9f0bb2ff98ae82e`. CSS blocks are byte-for-byte identical (17,559 characters each); candidate markup/script adds functions (second code, diagnostics, autosave, migration etc.) over the same base. Therefore the preview wrapper patch is compatible with the correct reference CSS and should be retained. No physical mobile/browser verification yet.
