@@ -45,3 +45,12 @@ Risks: Replacing index.html with target verbatim would remove current-only funct
 Acceptance criteria: target layout/screens/proportions remain source of truth; camera and gallery are separate flows; QR/barcode generation and camera/photo/crop/manual scan work; backup export/import and diagnostics remain available; existing cards and visits migrate safely/reversibly; unique existing functions are ported or remain reachable; JS syntax passes; desktop/mobile visual checks are recorded honestly.
 Plan: map storage schemas/features; preserve a verified recovery artifact; port migration and missing controls into target foundation; run JS syntax and static ID/handler checks; perform available desktop/mobile visual checks; update and reread memory/history/handoff.
 Next step: build the feature-parity/storage migration map from both actual HTML files. No application code changed in this update. Local Git status is unavailable through the remote API.
+
+
+## Уточнение от пользователя — исходный объём задачи восстановлен (2026-10-11)
+Пользователь справедливо указал, что это уже было в исходном контексте и было упущено при предыдущем разборе. Обязательные требования:
+1. Указанный HTML-макет является фундаментом и визуальным источником истины.
+2. Из старого CARD111 переносить только функции, которых в макете действительно нет; не переосмысливать задачу как равноправное сравнение двух интерфейсов.
+3. Исправить сканирование QR: «камера» запускает камеру, «галерея/выбрать фото» открывает выбор изображения и не переходит в camera flow.
+4. Исправить несовместимость старых backup-файлов: импорт должен восстанавливать карты в актуальную модель и показывать их без ручного повторного добавления.
+Приоритет реализации: макет-first UI, минимальные функциональные дополнения, совместимость старых backup. Не подменять это повторным обоснованием архитектурных различий. Проверять реальные форматы backup и миграцию до отметки выполнено.
