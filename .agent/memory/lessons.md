@@ -40,3 +40,12 @@ Applied to: CARD111 remote GitHub edits.
 Additional evidence for LESSON-20261011-04: expected_sha update_ref succeeded, and a follow-up read confirmed candidate HEAD points at the CSS commit. Both inline scripts are unchanged byte-for-byte; parser and visual tests remain pending.
 
 **Follow-up (2026-10-11 19:48):** Попытка запустить JavaScript parser локально заблокирована сетевой недоступностью raw.githubusercontent.com из контейнера. Не объявлять синтаксис проверенным; byte-for-byte JS diff остаётся подтверждённым отдельно.
+
+
+## LESSON-20261011-05: Визуальный эталон может быть другой реализацией, а не CSS-вариантом
+Date: 2026-10-11
+Situation: Пользователь указал HTML-файл, к которому нужно привести визуал CARD111.
+Problem: Целевой файл и текущий index.html имеют разные DOM, модель карточек и storage keys; у каждой реализации есть уникальные функции.
+Lesson: До замены UI сравнивать не только CSS, но и модель данных, обработчики, доступность функций и совместимость сохранённых данных.
+Rule: Не заменять активный index эталоном без плана миграции/отката и списка функций, которые должны быть перенесены. Отдельно проверять, что выбор файла из галереи не запускает камеру через capture attribute.
+Applied to: CARD111 MaketKart UI integration.
