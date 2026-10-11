@@ -1063,7 +1063,7 @@ function deleteVisit(id){if(!confirm("Удалить визитку?"))return;vi
 
 function showWallet(){setScreen("cards");}
 function showSettings(){
-  currentScreen="settings";document.getElementById("cards").hidden=false;document.getElementById("visits").hidden=true;document.querySelector(".walletHeader h1").textContent="Мои карты";document.querySelector(".searchBar").hidden=false;document.querySelectorAll(".bottomNavItem").forEach(b=>b.classList.toggle("active",b.dataset.screen==="settings"));
+  currentScreen="settings";document.getElementById("cards").hidden=false;document.getElementById("visits").hidden=true;document.querySelector(".walletHeader h1").textContent="Мои карты";document.querySelector(".searchBar").hidden=false;document.querySelector(".addBtn b").textContent="Добавить";document.querySelector(".addBtn").onclick=function(){addMenu();};document.querySelectorAll(".bottomNavItem").forEach(b=>b.classList.toggle("active",b.dataset.screen==="settings"));
   openModal('<button class="close" onclick="closeModal()">×</button><h2>Настройки</h2>'+
     '<button class="btn primary" onclick="exportData()">Сохранить резервную копию</button>'+
     '<button class="btn secondary" onclick="importData()">Восстановить из файла</button>'+
@@ -1779,7 +1779,7 @@ function readImport(e){
   if(input)input.value="";
 }
 if("serviceWorker" in navigator){
-  window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js?v=20").catch(function(){});});
+  window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js?v=21").catch(function(){});});
 }
 render();
 </script>
