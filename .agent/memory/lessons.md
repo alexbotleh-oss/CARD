@@ -74,3 +74,9 @@ Applied to: CARD111 code format parity.
 Situation: `#cardPreview` показывался как узкая полоса в редакторе, потому что `.card-preview` позиционируется через `position:absolute; inset:0`, а родитель не задавал высоту.
 Rule: Если визуальный компонент использует absolute inset, его ближайший контейнер должен иметь позиционирование и определённую геометрию (например, aspect-ratio). При интеграции не добавлять произвольные размеры к самой карточке, если уже есть подходящий контейнер компонента.
 Limit: Статический DOM/CSS и JS-парсер не доказывают реальный вид на телефоне; визуальный acceptance должен оставаться отдельным пунктом.
+
+
+## LESSON-20261011-11: Distinguish similarly named mockup versions by identity, not substring
+Failure: Treated original `МакетКАРТ.html` as the canonical visual target even though a later corrected/integrated HTML had been uploaded. The later file's filename also contains `МакетКАРТ`, which made a name-based shortcut misleading.
+Rule: For visual-source decisions, compare exact upload identity, timestamp, size, and contents. Maintain separate records for original vs corrected/integrated variants. The latest user-designated artifact is canonical even when its filename resembles an older one. Before CSS/DOM edits, verify the candidate against that exact artifact; never infer geometry from the previous version or from screenshots alone if the source file is available.
+Recovery: Candidate commit `c25104ca18f3d06091718c8a1d66197474aa1c30` was based on the wrong inferred baseline; leave history intact but treat the patch as unvalidated until compared to the correct target.
