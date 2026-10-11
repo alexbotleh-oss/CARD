@@ -113,3 +113,6 @@
 **Ref promotion check (2026-10-11 19:44):** branch candidate now points at CSS commit 87c68ac7eb71885378c31c20d225401dd8ae25dd; post-update fetch confirms index blob 444ca4e92c9c558b920bfc53c912407d333d56db. JavaScript blocks equal parent byte-for-byte. V8 parser/render still pending; task remains open.
 
 **Parser limitation:** Node.js установлен в контейнере, но скачать исходник для запуска parser не удалось из-за DNS/NameResolutionError при доступе к raw.githubusercontent.com. Синтаксическая проверка не выполнена; не повышать статус задачи. JS byte-for-byte equality и CSS статически подтверждены.
+
+
+**2026-10-11 — generator parity update:** candidate index now has all 11 code formats and an explicit secondary-code toggle. Recovery schema `format`/`secondFormat` is mapped; second code is preserved while disabled. Code commits eadd08e8e42a80f2051ad771c627a4d781a1a3cf and c572b675194323a237f5f28db28cc67964ad6859; index blob 6a548f65638028a58aebdb8d8dc92e7abdd93008. V8 and mocked generator-dispatch tests passed. Real browser/mobile render and scan are not yet verified.
