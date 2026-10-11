@@ -438,6 +438,12 @@ window.addEventListener("unhandledrejection",function(e){diagError("unhandledrej
 diagLog("app.start",{version:"diagnostics-v2",build:CARD111_BUILD,online:navigator.onLine});
 
 const colors=["#17181c","#3157d5","#16845b","#a35b17","#7b3db7","#c23b55"];
+const CUSTOM_COVERS_KEY="card_custom_cover_presets_v1";
+function readCustomCoverPresets(){try{const v=JSON.parse(localStorage.getItem(CUSTOM_COVERS_KEY)||"[]");return Array.isArray(v)?v.filter(x=>x&&typeof x.id==="string"&&typeof x.name==="string"):[];}catch(e){return [];}}
+function writeCustomCoverPresets(items){try{localStorage.setItem(CUSTOM_COVERS_KEY,JSON.stringify(items));return true;}catch(e){alert("Не удалось сохранить заготовку оформления. Проверьте свободное место в памяти браузера.");return false;}}
+function customCoverBackground(p){if(!p)return "#1767d8";const g=p.customGradient;if(g&&Array.isArray(g.colors)&&g.colors.length>=2){const cs=g.colors.slice(0,3).filter(x=>/^#[0-9a-f]{6}$/i.test(String(x)));if(cs.length>=2){const a=Math.max(0,Math.min(360,Number(g.angle)||0)),mid=Math.max(10,Math.min(90,Number(g.softness)||50));return "linear-gradient("+a+"deg,"+(cs.length===2?cs[0]+" 0%,"+cs[1]+" 100%":cs[0]+" 0%,"+cs[1]+" "+mid+"%,"+cs[2]+" 100%")+")";}}return p.customColor||"#1767d8";}
+function saveCurrentCoverPreset(card){const style=card&&card.style||{},colors=style.customGradient&&Array.isArray(style.customGradient.colors)?style.customGradient.colors:[style.customColor].filter(Boolean);if(!colors.length)return null;const presets=readCustomCoverPresets();const signature=JSON.stringify({customColor:style.customColor||null,customGradient:style.customGradient||null});const existing=presets.find(p=>JSON.stringify({customColor:p.customColor||null,customGradient:p.customGradient||null})===signature);if(existing)return existing;const preset={id:"USER_COVER_"+Date.now().toString(36)+"_"+Math.random().toString(36).slice(2,6),name:"Моё оформление "+(presets.length+1),customColor:style.customColor||null,customGradient:style.customGradient?JSON.parse(JSON.stringify(style.customGradient)):null,createdAt:new Date().toISOString()};presets.push(preset);if(!writeCustomCoverPresets(presets))return null;return preset;}
+
 const COVER_LABELS={AUTO:"Автоматически по магазину",MAGNIT:"Магнит",PYATEROCHKA:"Пятёрочка",PEREKRESTOK:"Перекрёсток",LENTA:"Лента",OKEI:"О’КЕЙ",DIKSI:"Дикси",CHIZHIK:"Чижик",ASHAN:"Ашан",GLOBUS:"Глобус",VkusVill:"ВкусВилл",RIGLA:"Ригла",BUDZOROV:"Будь Здоров",ZDRAVCITY:"Здравсити",STOLICHKI:"Столички",GORZDRAV:"Горздрав",APTEKA366:"36,6",NEOFARM:"Неофарм",PLANETA_ZDOROVYA:"Планета здоровья",MAXAVIT:"Максавит",OSTIN:"O’STIN",KARI:"Kari",RENDEZVOUS:"Rendez-Vous",HC:"ХЦ",LCWAIKIKI:"LC Waikiki",MAXIDOM:"Максидом",MVIDEO:"М.Видео",ELDORADO:"Эльдорадо",DETMIR:"Детский мир",DNS:"DNS",ANTEY:"Аптека Антей",RODINA_UDACHA:"Родина / УДАЧА / Высшая лига",BRISTOL:"Бристоль",K_B:"Красное & Белое",CUSTOM:"Свой вариант"};
 function coverForName(name){
   const n=String(name||"").toLowerCase().replace(/ё/g,"е").replace(/[’']/g,"");
@@ -554,8 +560,11 @@ function openGradientPicker(){
     const cs=colors.slice(0,count);card.style=Object.assign({},card.style||{});
     if(count===1){delete card.style.customGradient;card.style.customColor=cs[0];card.clearCustomGradient=true;}
     else{card.style.customColor=cs[0];card.style.customGradient={colors:cs,angle:+$("gradientAngle").value,softness:+$("gradientSoft").value};delete card.clearCustomGradient;}
-    window.__editorPreviewCard=card;const coverInput=document.getElementById("cover");if(coverInput)coverInput.value="CUSTOM";
-    document.querySelectorAll("#coverGrid .coverOption,#editorCoverGrid .coverOption").forEach(x=>x.classList.toggle("selected",x.getAttribute("data-cover")==="CUSTOM"));
+    const savedPreset=saveCurrentCoverPreset(card);
+    window.__editorPreviewCard=card;const coverInput=document.getElementById("cover");if(coverInput)coverInput.value=savedPreset?savedPreset.id:"CUSTOM";
+    const grid=document.getElementById("editorCoverGrid")||document.getElementById("coverGrid");
+    if(grid){grid.innerHTML=coverOptions(coverInput?coverInput.value:"CUSTOM");bindCoverPicker();}
+    document.querySelectorAll("#coverGrid .coverOption,#editorCoverGrid .coverOption").forEach(x=>x.classList.toggle("selected",x.getAttribute("data-cover")===(coverInput?coverInput.value:"CUSTOM")));
     const pal=document.getElementById("cardPalette");if(pal)pal.value="AUTO";document.querySelectorAll("#paletteGrid .paletteChoice").forEach(x=>x.classList.remove("selected"));
     if(typeof refreshEditorPreview==="function")refreshEditorPreview(card);
     const p=document.getElementById("cardGradientPreview");if(p){p.classList.add("active");p.style.background=makeGradient();}
@@ -637,9 +646,13 @@ function brandMarkup(cover,name){
 function coverForCard(c){const v=String(c.cover||"AUTO");return v==="AUTO"?coverForName(c.name):COVER_LABELS[v]?v:"CUSTOM";}
 function coverClass(c){return "cover-"+coverForCard(c).toLowerCase();}
 function coverOptions(selected){
-  return Object.keys(COVER_LABELS).map(function(k){
+  const builtIn=Object.keys(COVER_LABELS).map(function(k){
     return '<button type="button" class="coverOption '+("cover-"+k.toLowerCase())+(k===selected?" selected":"")+'" data-cover="'+k+'">'+esc(COVER_LABELS[k])+'</button>';
   }).join("");
+  const custom=readCustomCoverPresets().map(function(p){
+    return '<button type="button" class="coverOption userCoverOption'+(p.id===selected?" selected":"")+'" data-cover="'+esc(p.id)+'" style="background:'+customCoverBackground(p)+';color:#fff;text-shadow:0 1px 3px #000b">'+esc(p.name)+'</button>';
+  }).join("");
+  return builtIn+custom;
 }
 function bindCoverPicker(){
   const input=document.getElementById("cover");
@@ -650,8 +663,14 @@ function bindCoverPicker(){
       if(input)input.value=selected;
       const draft=window.__editorPreviewCard||(window.__editorPreviewCard={style:{}});
       draft.style=Object.assign({},draft.style||{});
-      if(selected!=="CUSTOM"){
-        delete draft.style.customGradient;
+      const savedPreset=readCustomCoverPresets().find(function(p){return p.id===selected;});
+      if(savedPreset){
+        if(savedPreset.customGradient)draft.style.customGradient=JSON.parse(JSON.stringify(savedPreset.customGradient));else delete draft.style.customGradient;
+        if(savedPreset.customColor)draft.style.customColor=savedPreset.customColor;else delete draft.style.customColor;
+        delete draft.clearCustomGradient;
+        const preview=document.getElementById("cardGradientPreview");if(preview){preview.classList.add("active");preview.style.background=customCoverBackground(savedPreset);}
+      }else if(selected!=="CUSTOM"){
+        delete draft.style.customGradient;delete draft.style.customColor;
         draft.clearCustomGradient=true;
         const preview=document.getElementById("cardGradientPreview");
         if(preview){preview.classList.remove("active");preview.style.background="";preview.style.backgroundImage="";preview.style.backgroundSize="";preview.style.backgroundPosition="";}
@@ -1022,7 +1041,7 @@ async function addCard(){
       if(!secondCode){alert("Включён второй код, но он не добавлен. Введите его или отсканируйте.");return;}
     }
     if(!code){alert("Введите код карты");return;}
-    const style={palette:(document.getElementById("cardPalette")&&document.getElementById("cardPalette").value)||"AUTO",textColor:(document.getElementById("titleColor")&&document.getElementById("titleColor").value)||"WHITE",position:(document.getElementById("titlePosition")&&document.getElementById("titlePosition").value)||"CENTER",background:(document.getElementById("titleBackground")&&document.getElementById("titleBackground").value)||"PILL",size:Math.max(14,Math.min(28,Number(document.getElementById("titleSize")&&document.getElementById("titleSize").value)||19)),font:(document.getElementById("titleFont")&&document.getElementById("titleFont").value)||"SYSTEM",visible:!(document.getElementById("titleVisible")&&document.getElementById("titleVisible").value==="false"),customGradient:(window.__editorPreviewCard&&window.__editorPreviewCard.style&&window.__editorPreviewCard.style.customGradient)||null};
+    const style={palette:(document.getElementById("cardPalette")&&document.getElementById("cardPalette").value)||"AUTO",textColor:(document.getElementById("titleColor")&&document.getElementById("titleColor").value)||"WHITE",position:(document.getElementById("titlePosition")&&document.getElementById("titlePosition").value)||"CENTER",background:(document.getElementById("titleBackground")&&document.getElementById("titleBackground").value)||"PILL",size:Math.max(14,Math.min(28,Number(document.getElementById("titleSize")&&document.getElementById("titleSize").value)||19)),font:(document.getElementById("titleFont")&&document.getElementById("titleFont").value)||"SYSTEM",visible:!(document.getElementById("titleVisible")&&document.getElementById("titleVisible").value==="false"),customGradient:(window.__editorPreviewCard&&window.__editorPreviewCard.style&&window.__editorPreviewCard.style.customGradient)||null,customColor:(window.__editorPreviewCard&&window.__editorPreviewCard.style&&window.__editorPreviewCard.style.customColor)||null};
     const file=document.getElementById("cardImage")&&document.getElementById("cardImage").files[0];
     let image="";
     if(file)image=await readImage(file);
