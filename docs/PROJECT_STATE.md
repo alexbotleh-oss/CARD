@@ -83,3 +83,11 @@
 - **Не проверено:** JS parser после последнего изменения, browser integration, Android/device, фактический источник и ответ GitHub Pages. Не считать патч завершённым или опубликованным.
 - **Следующий шаг:** JS syntax check candidate/index.html; затем целевые browser scenarios и Pages-source verification.
 
+
+## 8. Correction — branch/ref mismatch (2026-10-11)
+
+- Commit `86266ce012de5785b0c6df5d7519f769e8d849db` существует, его diff содержит patch, а blob index в том commit: `bd20167d44c3e3e88b1c0fb49702551806e763d4`.
+- Повторное чтение `candidate/CARD111-ui-2xN-20261006/index.html` по имени ветки вернуло blob `ca419b9f1a8e388ea09263f64104d6f3c755f1f4` (91,748 bytes) без новых маркеров. Данные GitHub API конфликтуют; текущий HEAD не подтверждён.
+- Status: **blocked** — прежде чем делать syntax/runtime проверки, однозначно определить branch ref и tree. Не говорить, что изменения commit 86266ce сейчас доступны из candidate HEAD или опубликованы.
+- Next action: resolve current branch ref discrepancy; then parse/tests against the exact current head.
+
