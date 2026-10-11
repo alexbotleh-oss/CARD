@@ -338,3 +338,14 @@ Evidence: changed source re-read from the work branch. Visual confirmation in br
 **Verification:** both inline JavaScript blocks passed V8 `new Function` parsing; the updated file was re-read from the branch. No real browser, camera/gallery scan, or Android device test was performed.
 
 **Next:** continue full editor menu audit and test field/draft/UI/save consistency; keep runtime checks open until exercised.
+
+
+## UI finding — custom cover color controls and title-position gesture (2026-10-11)
+
+**Finding:** the editor had a gradient dialog with native color inputs only, no quick palette/current-color swatch, and it did not offer a one-color solid-background mode. The title-position control opened the position grid on click rather than distinguishing a short press from a long press.
+
+**Change:** added touch-friendly color swatches and current-color square, a 1/2/3-color selector, a 0–360 degree gradient angle control, and a three-color midpoint control. One-color mode removes the previous gradient and stores the chosen solid color. The title-position control now toggles title visibility on short press and opens the 3×3 position grid after a ~480 ms hold.
+
+**Commit:** `62aa17975345fbf7f479190f6da9d961b29cc077`.
+
+**Verification:** both inline JavaScript blocks passed V8 syntax parsing; structural feature checks passed. Mobile browser/Android gesture behavior and persistence after reload remain unverified.
