@@ -59,3 +59,7 @@ Rule: Сначала выполнить конкретные указанные 
 
 ## LESSON-20261011-07 — Совместимость резервных копий
 При интеграции UI наличие кнопки импорта не доказывает совместимость. Нужно учитывать старые формы данных, необязательные массивы, соответствие полей и то, что восстановленные карты действительно отображаются. Исходные ключи localStorage нельзя удалять до успешной миграции и проверки.
+
+
+## LESSON-20261011-08 — Не смешивать syntax check и UI acceptance
+V8 compilation and static marker checks can confirm syntax and presence of flows, but cannot prove camera permissions, gallery picker behavior, visual fidelity, or real backup restore in the browser. Keep those as separate acceptance checks and report them as pending until actually exercised.
