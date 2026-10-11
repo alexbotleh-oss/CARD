@@ -310,3 +310,18 @@ Evidence: changed source re-read from the work branch. Visual confirmation in br
 5. До закрытия максимальной задачи нельзя объявлять CARD111 завершённым.
 
 **Следующий шаг:** в новом чате сопоставить всё дерево прогресса с реальными функциями/обработчиками `index.html`; затем реализовывать недостающие связи редактора и проверять полный сценарий. После каждого завершённого блока обновлять каноническое дерево и журнал, а непроведённые browser/device-тесты оставлять явно открытыми.
+
+
+## 2026-10-11 — CARD111 editor format menu markup correction
+
+**Finding:** inspection of the current `index.html` on `candidate/CARD111-ui-2xN-20261006` found 18 occurrences of duplicated closing tags (`</button></button>`) in the primary-code format menu strings. The malformed fragments existed in both the new-card form and existing-card editor. This was a source-level finding; a browser-visible failure was not reproduced in this session.
+
+**Change:** removed one redundant `</button>` from each of the 18 affected format-option strings. No format choices or event-handler logic were changed.
+
+**Commit:** `28ceb56467e5a3713cce83339349c417347c757e`.
+
+**Verification:** re-read the source before the change; confirmed exactly 18 matching constructs before and zero after. Both inline JavaScript blocks passed V8 `new Function` parsing after the edit. The updated file was saved through the GitHub Contents API.
+
+**Not verified:** HTML DOM interpretation/rendering, opening/selecting every format in a browser, Android behavior, scanning, and end-to-end card save/reopen/backup. No local working-copy status is available through this remote API workflow.
+
+**Next:** continue the editor-menu audit and validate field → preview → save → reopen links; keep runtime/browser/device criteria open until actually exercised.
