@@ -1066,8 +1066,15 @@ function addMenu(){
   openModal('<button class="close" onclick="closeModal()">×</button><h2>Добавить карту</h2>'+
     '<button class="btn primary" onclick="scanner()">▣ Сканировать штрихкод / QR</button>'+
     '<button class="btn secondary" onclick="manual()">Ввести данные вручную</button>'+
-    ''+
-    '<p class="hint">Карта сохраняется локально в этом браузере. На iPhone камера работает через HTTPS после разрешения доступа.</p>');
+    '<button class="btn secondary" onclick="createCardLayout()">✦ Создать макет карты</button>'+
+    '<p class="hint">Можно отсканировать готовую карту, ввести её данные или сначала оформить собственный макет. Все варианты используют штатный редактор CARD111.</p>');
+}
+function createCardLayout(){
+  manual();
+  setTimeout(function(){
+    const tab=document.querySelector('.editorTab[data-tab="appearance"]');
+    if(tab)tab.click();
+  },80);
 }
 function manual(data){
   data=data||{};
