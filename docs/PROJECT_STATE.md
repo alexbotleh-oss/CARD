@@ -109,3 +109,5 @@
 - **Проверено (E1/reverse-diff):** файл повторно прочитан по commit; оба inline JS-блока побайтно равны исходным; новые CSS правила присутствуют и четыре старых caps отсутствуют.
 - **Не проверено:** V8 syntax parser, браузер/телефон, источник/deployment GitHub Pages.
 - **Следующий шаг:** запустить parser, проверить актуальный ref и продвинуть его только с expected SHA; затем визуальная проверка.
+
+**Ref promotion check (2026-10-11 19:44):** branch candidate now points at CSS commit 87c68ac7eb71885378c31c20d225401dd8ae25dd; post-update fetch confirms index blob 444ca4e92c9c558b920bfc53c912407d333d56db. JavaScript blocks equal parent byte-for-byte. V8 parser/render still pending; task remains open.
