@@ -109,3 +109,7 @@
 - **Решение:** memory/docs вести в main, непроверенный код оставить в candidate, recovery не менять.
 - **Следующий шаг:** parser syntax check candidate/index.html; затем целевые browser tests и проверка Pages source.
 
+
+## Correction — конфликт candidate ref / commit 86266ce (2026-10-11)
+
+Повторное чтение через GitHub API выявило расхождение: commit `86266ce012de5785b0c6df5d7519f769e8d849db` существует и его diff содержит scanner/JSON settings patch (blob index `bd20167d44c3e3e88b1c0fb49702551806e763d4`), но current ref `candidate/CARD111-ui-2xN-20261006` вернул blob `ca419b9f1a8e388ea09263f64104d6f3c755f1f4` без этих маркеров. Причина не установлена. Следующий шаг — установить фактический HEAD ref, не заявляя, что patch сейчас в рабочей голове или опубликован.
