@@ -139,3 +139,7 @@
 - Важное ограничение: branch ref candidate на момент последней проверки указывал на f38ef76df5183c92a204374434da59bd9384887a; не считать patch текущей версией ветки без продвижения ref и контрольного чтения.
 - Не выполнено: V8 syntax parser, render на ПК/телефоне, проверка Pages source/deployment.
 - Следующее: V8 parse; проверить ref, выполнить update_ref с expected_sha, если HEAD неизменен; затем визуальная проверка.
+
+
+### Ref promotion completed — 2026-10-11 19:44
+The candidate branch has now been advanced with expected_sha lease. HEAD: 87c68ac7eb71885378c31c20d225401dd8ae25dd; index blob: 444ca4e92c9c558b920bfc53c912407d333d56db. Post-update API read confirms the new dimensions and no remaining old width caps. Two inline JS blocks equal parent byte-for-byte. Still pending: executing JavaScript parser and viewing the rendering on desktop/phone. Do not call the task complete before those.
