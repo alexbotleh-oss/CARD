@@ -71,3 +71,27 @@ Latest candidate HEAD: `04751b1a77fad7e1067cf678af4694e9ede0d8fc`.
 Further additions on target-first UI: optional second card code with separate format and presentation switch; diagnostic export panel; camera front/rear switch and torch controls; reusable shirt presets which can read legacy `card_cover_defaults_v1` and `card_custom_cover_presets_v1`; auto-save setting retained and persisted under `card_wallet_settings_v1`. These are additive controls around the target layout.
 Validation: latest branch/blob re-read; exact committed inline JS passed V8 compilation; static markers for gallery separation, legacy backup import/storage migration, second code, diagnostics, camera switch, torch, shirt presets and auto-save passed. Focused Node harness passed import of a legacy version-3 backup without visits, import of a target backup with visits, and import of a root-array backup; when legacy backup omits visits, existing visits remain and cards are persisted.
 Still pending: test with the user's actual old backup file, inspect full rendered layout on desktop/mobile, and check camera/gallery behavior on a real phone. Do not mark complete until those are verified.
+
+## TASK-20261011-04: Восстановить полный набор генераторов кодов и выбор одного/двух кодов
+
+Status: active — implementation planned.
+Priority: high.
+Created: 2026-10-11.
+Request: В текущем CARD111 вернуть настройку выбора одного или двух кодов на карте и полный набор форматов генерации, которые были в старой версии; для карты «Пятёрочка» нужен второй PDF417.
+Goal: Сохранить в макет-first реализации выбор одного/двух кодов и генерацию всех форматов, подтверждённых recovery-версией.
+Context: Candidate candidate/CARD111-ui-2xN-20261006, текущий index.html blob SHA 3ae4ba7b26947323f85e3bb378ef8bc93509fc0c. Старая реализация в recovery/CARD111-before-scanner-integration-20261011, blob SHA 97cb89dc774278cf2891098172f23494a29c9f38. Подтверждённые форматы старой версии: CODE_128, EAN_13, EAN_8, CODE_39, CODE_93, ITF, UPC_A, UPC_E, PDF417, DATA_MATRIX, QR_CODE. Старая реализация использует JsBarcode для линейных кодов и bwip-js для PDF417/Data Matrix.
+Risks: Не сломать текущий макет и хранение карт; не подменять PDF417 на CODE128; старые карточки со вторым кодом должны продолжить работать.
+Acceptance criteria:
+  - [ ] В редакторе есть явный выбор использовать один или два кода.
+  - [ ] Форматы обоих кодов включают все 11 вариантов из recovery-версии.
+  - [ ] PDF417 и Data Matrix рендерятся через bwip-js; CODE_93 и UPC_E — через JsBarcode.
+  - [ ] При выключенном втором коде он не показывается, но сохранённые данные не стираются.
+  - [ ] Существующие карточки со вторым кодом и старые форматы нормализуются без потери.
+  - [ ] Проверены синтаксис JS и тесты format mapping/render dispatch; ветка и файл перечитаны после записи.
+Plan:
+  - [x] Прочитать project memory/decisions/lessons/history и сравнить текущую и recovery-версии.
+  - [x] Зафиксировать точный список прежних форматов и способ их генерации.
+  - [ ] Минимально дополнить UI, нормализацию и генератор в candidate.
+  - [ ] Запустить доступные syntax/logic checks и проверить результат из ветки.
+  - [ ] Обновить context, lessons, append-only history и handoff.
+Next step: реализовать явный toggle второго кода и поддержку всех 11 форматов без изменения основного дизайна.
