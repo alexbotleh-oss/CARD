@@ -127,3 +127,15 @@ Next step: пользователь проверяет обновлённую с
 
 
 Progress 2026-10-11: commit `c25104ca18f3d06091718c8a1d66197474aa1c30` обновил candidate, blob `index.html` = `9e5906dcf7bd2b0c37353cc7e9f0bb2ff98ae82e`. Исправлен только markup editor preview: `#cardPreview` теперь находится внутри `.flipper.editor-flipper`, задающего позиционированный контейнер с исходным соотношением сторон 1.586:1. Повторное чтение файла из candidate подтверждено; inline JS компилируется в V8. Статический разбор кода предъявления подтвердил очистку `presentCodeArea` перед каждым рендером и отображение primary/secondary по одному индексу; переключатель второго кода скрывается при отключённом/пустом дополнительном коде. Физический мобильный рендер и фактическое воспроизведение лишнего кода пока не проверены.
+
+
+## TASK-20261011-06: Зафиксировать правильный эталон CARD111 и исправить ошибку выбора основы
+
+Status: active — источник уточнён, код пока не меняется.
+Priority: high.
+Created: 2026-10-11.
+User correction: Эталоном НЕ является первоначальный файл `МакетКАРТ.html`. Эталон — более поздний загруженный HTML `CARD111-_D0_9C_D0_B0_D0_BA_D0_B5_D1_82_D0_9A_D0_90_D0_A0_D0_A2-_D0_B8_D1_81_D0_BF_D1_80_D0_B0_D0_BB_D0_BB_D0_B5_D0_BD_D0_BD_D0_B0_D1_8F-_D0_B8_D0_BD_D1_82_D0_B5_D0_B3_D1_80_D0_B0_D1_86_D0_B8_D1_8F(1).html` (decoded display name: `CARD111-МакетКАРТ-исправленная-интеграция(1).html`; upload recorded 2026-10-11 18:05 UTC; 91,748 bytes). This is a distinct later artifact, even though its name contains the string МакетКАРТ. Do not confuse it with `МакетКАРТ.html` (71,600 bytes, uploaded 2026-10-11 11:20 UTC).
+Goal: Make the later corrected/integrated HTML the visual source of truth; preserve its exact structure, proportions, colors, placements, modal behavior and responsive layout. Port only missing functions from old CARD111 implementation.
+Risk/error: Assistant incorrectly treated the older `МакетКАРТ.html` as the reference and made candidate commit `c25104ca18f3d06091718c8a1d66197474aa1c30` based on the wrong inferred geometry. Do not assume this patch is valid for the correct target; do not revert or rewrite history without need, but compare/rebase it against the correct artifact before further code edits.
+Acceptance: Read exact bytes of later target and current candidate; identify structural/style differences; decide whether `c25104c` should be ported, adapted, or omitted based on target; update task/context/history/lessons; no new UI code until target identity and patch applicability are established.
+Next step: compare later uploaded target with candidate `index.html` and record the actual canonical target identity in handoff/decision docs.
