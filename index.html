@@ -210,7 +210,7 @@ header{padding:18px 20px 10px;background:#f6f7fbf5}
 .styleSection .styleOption{min-height:36px;padding:6px 5px;font-size:12px;border-radius:9px}
 .styleSection .styleColorChoice{min-height:48px;padding:4px 2px;font-size:10px;border-radius:9px}
 .styleSection .styleColorChoice span{width:16px;height:16px;margin-bottom:2px}
-.styleSection .titleVisibleToggle,.styleSection .titlePositionOpen{width:100%;min-height:38px;margin:0;padding:7px 5px;font-size:12px;border-radius:9px}
+.styleSection .titlePositionOpen{width:100%;min-height:38px;margin:0;padding:7px 5px;font-size:12px;border-radius:9px}
 .styleSection .styleHelp{font-size:10px;line-height:1.25;margin-top:5px}
 .styleSection .titlePositionCurrent{font-size:11px;line-height:1.2;margin-top:5px}
 .styleSection .styleRange{margin:3px 0 0}
@@ -524,8 +524,7 @@ function styleEditor(c){
   const s=cardStyle(c);
   return '<div class="cardStylePicker styleCompactGrid">'+
     '<section class="styleSection styleSection-palette"><div class="styleSectionTitle">Цвет рубашки</div><input id="cardPalette" type="hidden" value="'+esc(s.palette)+'"><div id="paletteGrid" class="styleGrid">'+paletteOptions(s.palette)+'</div></section>'+
-    '<section class="styleSection styleSection-visibility"><div class="styleSectionTitle">Надпись на карте</div><input id="titleVisible" type="hidden" value="'+(s.visible?"true":"false")+'"><button type="button" class="btn secondary titleVisibleToggle" id="titleVisibleToggle" aria-pressed="'+(s.visible?"true":"false")+'">'+(s.visible?"Скрыть название":"Показывать название")+'</button><div class="hint styleHelp">Код и изображение карты сохраняются.</div></section>'+
-    '<section class="styleSection styleSection-position"><div class="styleSectionTitle">Положение надписи</div><input id="titlePosition" type="hidden" value="'+esc(s.position)+'"><button type="button" class="btn secondary titlePositionOpen" id="titlePositionOpen" aria-label="Выбрать положение надписи" title="Выбрать положение надписи">⌗ Выбрать</button><div class="hint titlePositionCurrent" id="titlePositionCurrent">'+esc(CARD_TEXT_POSITIONS[s.position]||"По центру")+'</div></section>'+
+    '<section class="styleSection styleSection-position"><div class="styleSectionTitle">Название и положение</div><input id="titleVisible" type="hidden" value="'+(s.visible?"true":"false")+'"><input id="titlePosition" type="hidden" value="'+esc(s.position)+'"><button type="button" class="btn secondary titlePositionOpen" id="titlePositionOpen" aria-pressed="'+(s.visible?"true":"false")+'" aria-label="Короткое нажатие — показать или скрыть название; долгое — выбрать положение" title="Короткое нажатие — показать/скрыть. Долгое нажатие — положение 3×3.">'+(s.visible?"Название: включено":"Название: скрыто")+'</button><div class="hint titlePositionCurrent" id="titlePositionCurrent">'+esc(CARD_TEXT_POSITIONS[s.position]||"По центру")+'</div></section>'+
     '<section class="styleSection styleSection-background"><div class="styleSectionTitle">Фон названия</div><input id="titleBackground" type="hidden" value="'+esc(s.background)+'"><div id="backgroundGrid" class="styleGrid">'+backgroundOptions(s.background)+'</div></section>'+
     '<section class="styleSection styleSection-textcolor"><div class="styleSectionTitle">Цвет текста</div><input id="titleColor" type="hidden" value="'+esc(s.textColor)+'"><div id="textColorGrid" class="textColorGrid">'+textColorOptions(s.textColor)+'</div></section>'+
     '<section class="styleSection styleSection-size"><div class="styleSectionTitle">Размер текста <b id="titleSizeValue">'+s.size+' px</b></div><input id="titleSize" type="range" min="14" max="28" step="1" value="'+s.size+'" class="styleRange"></section>'+
@@ -621,19 +620,19 @@ function bindStyleEditor(){
   function bindGrid(id,inputId,attr){const grid=document.getElementById(id),input=document.getElementById(inputId);if(!grid||!input)return;grid.querySelectorAll("button").forEach(function(btn){btn.onclick=function(){input.value=btn.getAttribute(attr)||"";grid.querySelectorAll("button").forEach(function(x){x.classList.remove("selected");});btn.classList.add("selected");if(typeof refreshEditorPreview==="function")refreshEditorPreview(window.__editorPreviewCard||{});};});}
   bindGrid("paletteGrid","cardPalette","data-palette");bindGrid("backgroundGrid","titleBackground","data-background");bindGrid("textColorGrid","titleColor","data-text-color");bindGrid("fontGrid","titleFont","data-font");
   
-  const visibleInput=document.getElementById("titleVisible"),visibleButton=document.getElementById("titleVisibleToggle");
-  if(visibleInput&&visibleButton)visibleButton.onclick=function(){const visible=visibleInput.value!=="true";visibleInput.value=visible?"true":"false";visibleButton.textContent=visible?"Без надписи":"Показывать название";visibleButton.setAttribute("aria-pressed",String(visible));if(typeof refreshEditorPreview==="function")refreshEditorPreview(window.__editorPreviewCard||{});};
-  const positionOpen=document.getElementById("titlePositionOpen");
-  if(positionOpen){
-    let holdTimer=null,longPressed=false,suppressClick=false;
-    function toggleTitle(){const input=document.getElementById("titleVisible"),button=document.getElementById("titleVisibleToggle");if(!input)return;const visible=input.value!=="true";input.value=visible?"true":"false";if(button){button.textContent=visible?"Без надписи":"Показывать название";button.setAttribute("aria-pressed",String(visible));}if(typeof refreshEditorPreview==="function")refreshEditorPreview(window.__editorPreviewCard||{});}
-    function startHold(){longPressed=false;clearTimeout(holdTimer);holdTimer=setTimeout(function(){longPressed=true;suppressClick=true;openTitlePositionPicker();},480);}
+  const positionOpen=document.getElementById("titlePositionOpen"),visibleInput=document.getElementById("titleVisible");
+  if(positionOpen&&visibleInput){
+    let holdTimer=null,suppressClick=false;
+    function syncTitleToggle(){const visible=visibleInput.value==="true";positionOpen.textContent=visible?"Название: включено":"Название: скрыто";positionOpen.setAttribute("aria-pressed",String(visible));}
+    function toggleTitle(){visibleInput.value=visibleInput.value==="true"?"false":"true";syncTitleToggle();if(typeof refreshEditorPreview==="function")refreshEditorPreview(window.__editorPreviewCard||{});}
+    function startHold(){suppressClick=false;clearTimeout(holdTimer);holdTimer=setTimeout(function(){suppressClick=true;openTitlePositionPicker();},480);}
     function endHold(){clearTimeout(holdTimer);}
-    positionOpen.setAttribute("aria-label","Короткое нажатие — включить или скрыть надпись; долгое — выбрать её расположение");
-    positionOpen.title="Короткое нажатие — показать/скрыть надпись. Долгое нажатие — расположение 3×3.";
+    positionOpen.setAttribute("aria-label","Короткое нажатие — показать или скрыть название; долгое нажатие — выбрать положение в сетке 3 на 3");
+    positionOpen.title="Короткое нажатие — показать/скрыть название. Долгое нажатие — положение 3×3.";
     positionOpen.addEventListener("pointerdown",startHold);
     ["pointerup","pointercancel","pointerleave"].forEach(function(ev){positionOpen.addEventListener(ev,endHold);});
     positionOpen.addEventListener("click",function(e){if(suppressClick){suppressClick=false;e.preventDefault();return;}toggleTitle();});
+    syncTitleToggle();
   }
   const range=document.getElementById("titleSize"),out=document.getElementById("titleSizeValue");if(range&&out)range.oninput=function(){out.textContent=range.value+" px";};
 }
@@ -1395,7 +1394,7 @@ function restoreEditorDraft(draft){
   const sf=document.getElementById("secondFormat"),sfSelect=document.getElementById("secondFormatSelect"),sl=document.getElementById("secondFormatLabel");if(sfSelect&&sf)sfSelect.value=sf.value;if(sf&&sl)sl.textContent=formatLabel(sf.value);
   const cover=document.getElementById("cover");document.querySelectorAll("#editorCoverGrid .coverOption").forEach(function(b){b.classList.toggle("selected",!!cover&&b.getAttribute("data-cover")===cover.value);});
   [["paletteGrid","data-palette","cardPalette"],["backgroundGrid","data-background","titleBackground"],["textColorGrid","data-text-color","titleColor"],["fontGrid","data-font","titleFont"]].forEach(function(a){const grid=document.getElementById(a[0]),input=document.getElementById(a[2]);if(grid&&input)grid.querySelectorAll("button").forEach(function(b){b.classList.toggle("selected",b.getAttribute(a[1])===input.value);});});
-  const on=document.getElementById("titleVisible"),toggle=document.getElementById("titleVisibleToggle");if(on&&toggle){toggle.textContent=on.value==="true"?"Без надписи":"Показывать название";toggle.setAttribute("aria-pressed",on.value==="true");}
+  const on=document.getElementById("titleVisible"),toggle=document.getElementById("titlePositionOpen");if(on&&toggle){toggle.textContent=on.value==="true"?"Название: включено":"Название: скрыто";toggle.setAttribute("aria-pressed",on.value==="true");}
   const position=document.getElementById("titlePosition"),positionLabel=document.getElementById("titlePositionCurrent");if(position&&positionLabel){const key=position.value||"CENTER";positionLabel.textContent="Текущее положение: "+(CARD_TEXT_POSITIONS[key]||CARD_TEXT_POSITIONS.CENTER||"По центру");}
   const size=document.getElementById("titleSizeValue");if(size&&document.getElementById("titleSize"))size.textContent=document.getElementById("titleSize").value+" px";
   const enabled=document.getElementById("secondCodeEnabled"),settings=document.getElementById("secondCodeSettings");if(enabled&&settings)settings.style.display=enabled.checked?"block":"none";
