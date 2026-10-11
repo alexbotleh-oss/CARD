@@ -18,11 +18,11 @@ Acceptance criteria:
 Plan:
   - [x] Прочитать AGENTS.md, универсальную инструкцию, memory, дневную history и canonical handoff/docs.
   - [x] Проверить файл candidate/index.html и восстановительную ветку через GitHub API.
-  - [ ] Обновить tasks/context/decisions/lessons/history в main.
-  - [ ] Обновить WORKLOG/PROJECT_STATE/HANDOFF.
-  - [ ] Повторно прочитать записанные документы и подтвердить SHA.
-Current state: Удалённый GitHub API доступен; локальный Git status недоступен. Рабочий index candidate был повторно прочитан, его blob SHA bd20167d44c3e3e88b1c0fb49702551806e763d4. Recovery-ветка сохранена до патча.
-Next action: Записать memory и docs в main; затем выполнить контрольное чтение.
+  - [x] Обновить tasks/context/decisions/lessons/history в main.
+  - [x] Обновить WORKLOG/PROJECT_STATE/HANDOFF.
+  - [x] Повторно прочитать записанные документы и подтвердить SHA.
+Current state: Файлы memory/history/docs записаны в main и повторно прочитаны через GitHub API с подтверждёнными blob SHA. Рабочий index candidate blob SHA bd20167d44c3e3e88b1c0fb49702551806e763d4. Recovery-ветка сохранена до патча.
+Next action: Выполнить JS syntax check обновлённого candidate/index.html; затем целевые browser checks.
 Blockers: Browser/Android runtime и фактический источник Pages не проверены. После последнего патча JavaScript parser не запускался.
 Related files: .agent/memory/tasks.md; .agent/memory/context.md; .agent/memory/decisions.md; .agent/memory/lessons.md; history/2026-10-11.md; docs/WORKLOG.md; docs/PROJECT_STATE.md; docs/HANDOFF.md; index.html.
 History refs: history/2026-10-11.md; docs/WORKLOG.md.
