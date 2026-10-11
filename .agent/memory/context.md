@@ -1,21 +1,19 @@
 # Контекст проекта
 
-Updated: 2026-10-11 18:32
-Project goal: CARD111 — веб-кошелёк скидочных карт и визиток: хранение, оформление рубашек, предъявление QR/штрихкодов, сканирование камерой и по фото, импорт/экспорт; дальнейшее направление — APK.
-Current focus: Инициализация устойчивой памяти завершена; сейчас нужно устранить конфликт между commit 86266ce и содержимым текущей ветки candidate, прежде чем проверять код.
-Environment: HTML/CSS/JavaScript приложение в GitHub repository alexbotleh-oss/CARD. В этой сессии использовался удалённый GitHub API; локальный Git status и незакоммиченные изменения недоступны.
-Constraints: Следовать точной спецификации пользователя. Не менять макет/логику от себя. Не переносить непроверенный код в main и не объявлять публикацию без доказательств. Recovery-точку не изменять.
+Updated: 2026-10-11 19:12
+Project goal: CARD111 — веб-кошелёк скидочных карт и визиток. Текущий UI приоритет — реализовать присланный пользователем макет без самовольной смены дизайна и встроить в него уже отлаженные scanner, генератор QR/штрихкодов, чтение фото из галереи, backup/restore, export/import и diagnostics.
+Current focus: TASK-20261011-03 — устранить причину сжатого preview, найденную в истории CSS.
+Environment: HTML/CSS/JavaScript; GitHub repository alexbotleh-oss/CARD. Commit history и исходники прочитаны через GitHub API; для сравнения используется /mnt/data/МакетКАРТ.html. Локальный Git status недоступен.
+Constraints: Оригинальный макет — источник истины. Визуальные изменения только минимальные и обоснованные сравнением исходников. Сохранять работающие функции, модель данных и storage. Не публиковать непроверенный код.
 Important files:
-  - index.html — приложение.
-  - .agent/memory/tasks.md — активные задачи и критерии.
-  - .agent/memory/context.md — текущий контекст.
-  - .agent/memory/decisions.md — принятые решения.
-  - .agent/memory/lessons.md — уроки.
-  - history/YYYY-MM-DD.md — append-only история.
-  - docs/WORKLOG.md — хронология.
-  - docs/PROJECT_STATE.md — актуальный статус.
-  - docs/HANDOFF.md — передача следующему агенту.
-  - docs/CARD_ERROR_LOG_2026-10-05.md — история инцидентов.
-Current state: memory/history/docs в main обновлены и повторно прочитаны. Commit 86266ce012de5785b0c6df5d7519f769e8d849db существует, его diff содержит scanner/camera controls, JSON replace/merge и auto-save (index blob bd20167d44c3e3e88b1c0fb49702551806e763d4). Но запрос текущего ref candidate/CARD111-ui-2xN-20261006 вернул index blob ca419b9f1a8e388ea09263f64104d6f3c755f1f4 (91,748 bytes) без этих маркеров. Это конфликт API-источников; HEAD ветки не установлен с достаточной определённостью. Recovery branch recovery/CARD111-before-scanner-integration-20261011 содержит pre-patch index blob 97cb89dc774278cf2891098172f23494a29c9f38.
-Next action: Однозначно установить HEAD candidate и выяснить, входит ли commit 86266ce в текущую историю ветки; только затем проверять синтаксис точного файла.
-Open risks: Не разрешён конфликт branch ref vs commit; JS syntax после patch не проверен; browser/Android runtime и фактический источник GitHub Pages не подтверждены. Не утверждать, что patch присутствует в текущем HEAD или опубликован.
+  - index.html — приложение CARD111.
+  - /mnt/data/МакетКАРТ.html — оригинал; .flipper width:min(100%,340px), aspect-ratio:1.586/1.
+  - docs/CARD111_DESIGN_PROGRESS.md — дерево дизайна/прогресса в candidate.
+  - docs/WORKLOG.md — хронология работ.
+  - docs/PROJECT_STATE.md — статус и блокеры.
+  - docs/HANDOFF.md — передача контекста.
+  - history/2026-10-11.md — append-only history.
+  - .agent/memory/tasks.md — задачи.
+Current state: Candidate commit chain: 86266ce scanner/JSON → 22f1fd22 перенёс МакетКАРТ → 0dea63a внес исправления → 97f47a2 последний listed index update. Current commit API confirms index blob 2f0d203e18774463d1622543cafb8768e8079bd2. В интегрированном index несколько повторных CSS overrides .editorPreviewWrap .editorPreview задают max-width 210px, 190px, 224px и 200px на узких экранах; более специфичное правило .sheet.cardEditorSheet .editorPreviewWrap .editorPreview удерживает preview около 224px/200px. Это объясняет сжатую карточку независимо от типа устройства.
+Next action: На следующем шаге применить минимальный CSS patch только к конфликтующим preview limits на подтверждённом SHA, не менять DOM/JS-функции, проверить syntax/reverse-diff и визуально сравнить desktop/mobile.
+Open risks: Визуальный browser/device render не проверен; Pages source/live HTML не подтверждён. Перед кодовой правкой повторно сверить exact commit SHA/tree. Отдельный mockup uses storage key card111.maketkart.v1, existing wallet uses card_wallet_v1; эту совместимость не менять неявно.
