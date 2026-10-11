@@ -63,3 +63,9 @@ Rule: Сначала выполнить конкретные указанные 
 
 ## LESSON-20261011-08 — Не смешивать syntax check и UI acceptance
 V8 compilation and static marker checks can confirm syntax and presence of flows, but cannot prove camera permissions, gallery picker behavior, visual fidelity, or real backup restore in the browser. Keep those as separate acceptance checks and report them as pending until actually exercised.
+
+## LESSON-20261011-09 — Формат в меню должен соответствовать реальному генератору
+Situation: В старой CARD111 были 11 форматов, но перенос оставил только часть линейных форматов; PDF417 нельзя корректно сгенерировать через JsBarcode.
+Lesson: Перед удалением или переносом генератора сравнивать полный список форматов, UI options, alias normalization и код, который реально создаёт символ. Не подменять неподдерживаемый формат Code 128 по умолчанию.
+Rule: Для каждого формата проверять end-to-end цепочку: сохранённое значение → нормализация → выбранный генератор → формат вывода. Для второго кода проверять отдельные формат и enabled-state; выключение не должно случайно удалять сохранённые данные.
+Applied to: CARD111 code format parity.
