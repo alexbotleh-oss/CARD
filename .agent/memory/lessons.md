@@ -38,3 +38,5 @@ Rule: Не утверждать, что изменение находится в
 Applied to: CARD111 remote GitHub edits.
 
 Additional evidence for LESSON-20261011-04: expected_sha update_ref succeeded, and a follow-up read confirmed candidate HEAD points at the CSS commit. Both inline scripts are unchanged byte-for-byte; parser and visual tests remain pending.
+
+**Follow-up (2026-10-11 19:48):** Попытка запустить JavaScript parser локально заблокирована сетевой недоступностью raw.githubusercontent.com из контейнера. Не объявлять синтаксис проверенным; byte-for-byte JS diff остаётся подтверждённым отдельно.
