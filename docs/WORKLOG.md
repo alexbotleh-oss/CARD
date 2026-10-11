@@ -113,3 +113,14 @@
 ## Correction — конфликт candidate ref / commit 86266ce (2026-10-11)
 
 Повторное чтение через GitHub API выявило расхождение: commit `86266ce012de5785b0c6df5d7519f769e8d849db` существует и его diff содержит scanner/JSON settings patch (blob index `bd20167d44c3e3e88b1c0fb49702551806e763d4`), но current ref `candidate/CARD111-ui-2xN-20261006` вернул blob `ca419b9f1a8e388ea09263f64104d6f3c755f1f4` без этих маркеров. Причина не установлена. Следующий шаг — установить фактический HEAD ref, не заявляя, что patch сейчас в рабочей голове или опубликован.
+
+## 2026-10-11 — аудит интеграции МакетКАРТ и причины уменьшенного предпросмотра
+
+- **Задача:** TASK-20261011-03; пользователь уточнил, что менял только index.html из другого ИИ, а макет был сжат на ПК и телефоне.
+- **История candidate:** 86266ce012de5785b0c6df5d7519f769e8d849db (scanner controls/JSON merge) → 22f1fd227f9c9f33ee0d6bd819b94d404c2d5928 (Перенес полностью код из макета МакетКАРТ) → 0dea63a72abb41cdbd8c556a89b926dde2ffa385 (Внес исправления) → 97f47a2c593e3c5968728eda8809caa3223e4d78 (latest index update), index blob 2f0d203e18774463d1622543cafb8768e8079bd2.
+- **Original geometry:** /mnt/data/МакетКАРТ.html uses .flipper width:min(100%,340px), aspect-ratio:1.586/1.
+- **Причина по исходникам:** repeated .editorPreviewWrap .editorPreview rules set max-width 210/190/224px; a more-specific .sheet.cardEditorSheet .editorPreviewWrap .editorPreview caps it at 224px, 200px for narrow screens. This prevents original preview size.
+- **Compatibility note:** mockup uses storage key card111.maketkart.v1; existing wallet uses card_wallet_v1. This is a compatibility risk; no data loss was established, and storage should not be changed as part of a visual patch.
+- **Проверено:** commit chain, commit-level index blob and static CSS comparison (E1). No application code changed in this audit.
+- **Не проверено:** JavaScript parse, live/browser visual render, Android and Pages deployment.
+- **Решение:** supplied mockup is design source of truth. Next code change should remove only the conflicting CSS width caps, preserve all JS and integrations, then run syntax/reverse-diff and PC/mobile visual checks.
