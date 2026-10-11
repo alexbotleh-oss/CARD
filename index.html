@@ -538,6 +538,9 @@ header{padding:18px 20px 10px;background:#f6f7fbf5}
 <script>
 const KEY="card_wallet_v1";
 const SAFE_KEY=KEY+"_safe_backup";
+const SETTINGS_KEY="card_wallet_settings_v1";
+let settings={autoSave:true};
+try{const storedSettings=JSON.parse(localStorage.getItem(SETTINGS_KEY)||"{}");if(storedSettings&&typeof storedSettings==="object")settings=Object.assign({autoSave:true},storedSettings);}catch(e){}
 const COVER_DEFAULTS_KEY="card_cover_defaults_v1";
 const DIAG_KEY="card_wallet_diagnostics_v1";
 const DIAG_LIMIT=180;
@@ -1065,10 +1068,13 @@ function showWallet(){setScreen("cards");}
 function showSettings(){
   currentScreen="settings";document.getElementById("cards").hidden=false;document.getElementById("visits").hidden=true;document.querySelector(".walletHeader h1").textContent="Мои карты";document.querySelector(".searchBar").hidden=false;document.querySelector(".addBtn b").textContent="Добавить";document.querySelector(".addBtn").onclick=function(){addMenu();};document.querySelectorAll(".bottomNavItem").forEach(b=>b.classList.toggle("active",b.dataset.screen==="settings"));
   openModal('<button class="close" onclick="closeModal()">×</button><h2>Настройки</h2>'+
-    '<button class="btn primary" onclick="exportData()">Сохранить резервную копию</button>'+
-    '<button class="btn secondary" onclick="importData()">Восстановить из файла</button>'+
+    '<h3>Резервное копирование</h3>'+
+    '<button class="btn primary" onclick="exportData()">Экспортировать JSON</button>'+
+    '<button class="btn secondary" onclick="importData()">Импортировать JSON</button>'+
+    '<label class="secondCodeToggle"><input id="autoSaveToggle" type="checkbox" '+(settings.autoSave!==false?'checked':'')+'> Автоматически сохранять изменения</label>'+
     '<button class="btn secondary" onclick="showDiagnostics()">Диагностический код / журнал</button>'+
     '<p class="hint">Карты и настройки хранятся локально на устройстве.</p>');
+  const autoSaveToggle=document.getElementById("autoSaveToggle");if(autoSaveToggle)autoSaveToggle.onchange=function(){settings.autoSave=!!autoSaveToggle.checked;try{localStorage.setItem(SETTINGS_KEY,JSON.stringify(settings));}catch(e){alert("Не удалось сохранить настройку автосохранения.");}};
 }
 function showDiagnostics(){diagLog("diagnostics.open",{});openModal('<button class="close" onclick="showSettings()">×</button><h2>Диагностический код</h2><p class="hint">Последние события и ошибки. Значения штрихкодов, изображения и номера карт не записываются.</p><textarea id="diagnosticText" readonly spellcheck="false" style="width:100%;min-height:42vh;box-sizing:border-box;font:12px/1.45 monospace;white-space:pre;overflow:auto"></textarea><button class="btn primary" onclick="copyDiagnostics()">Скопировать диагностический код</button><button class="btn secondary" onclick="refreshDiagnostics()">Обновить журнал</button><button class="btn secondary" onclick="clearDiagnostics()">Очистить журнал</button>');refreshDiagnostics();}
 function refreshDiagnostics(){const el=document.getElementById("diagnosticText");if(el)el.value=diagExportText();}
@@ -1217,8 +1223,8 @@ async function addCard(){
 }
 function scanner(onResult){
   diagLog("scanner.open",{mode:"camera-and-gallery"});
-  openModal('<button class="close" onclick="closeModal()">×</button><h2>Сканирование скидочной карты</h2><div id="reader"></div><div class="scanTools"><button class="btn primary galleryPrimary" onclick="document.getElementById(\'scanFile\').click()">▣ Сканировать фото из галереи</button><input id="scanFile" type="file" accept="image/*" style="display:none"><p class="hint">Наведите камеру на QR/штрихкод — распознавание происходит автоматически.</p></div>');
-  let controls=null,handled=false,reader=null,detector=null,raf=0,video=null,lastKey="",stableHits=0;
+  openModal('<button class="close" onclick="closeModal()">×</button><h2>Сканирование скидочной карты</h2><div id="reader"></div><div class="row"><button type="button" class="btn secondary" id="scannerSwitchCamera">↻ Сменить камеру</button><button type="button" class="btn secondary" id="scannerTorch">Фонарик: выкл.</button></div><div class="scanTools"><button class="btn primary galleryPrimary" onclick="document.getElementById(\'scanFile\').click()">▣ Сканировать фото из галереи</button><input id="scanFile" type="file" accept="image/*" style="display:none"><button type="button" class="btn secondary" id="scannerManual">Ввести код вручную</button><p class="hint">Наведите камеру на QR/штрихкод — распознавание происходит автоматически.</p></div>');
+  let controls=null,handled=false,reader=null,detector=null,raf=0,video=null,lastKey="",stableHits=0,activeStream=null,activeTrack=null,torchOn=false;window.__card111FacingMode=window.__card111FacingMode||"environment";
   const formats=["qr_code","code_128","code_39","code_93","ean_13","ean_8","itf","upc_a","upc_e","pdf417","data_matrix"];
   function mapFormat(raw){if(typeof raw==="number"){return ({0:"AZTEC",1:"CODABAR",2:"CODE_39",3:"CODE_93",4:"CODE_128",5:"DATA_MATRIX",6:"EAN_8",7:"EAN_13",8:"ITF",9:"MAXICODE",10:"PDF417",11:"QR_CODE",12:"RSS_14",13:"RSS_EXPANDED",14:"UPC_A",15:"UPC_E",16:"UPC_EAN_EXTENSION"})[raw]||"UNKNOWN_"+raw;}const s=String(raw||"").toUpperCase().replace(/[\\s-]+/g,"_");if(s.indexOf("QR")>=0)return "QR_CODE";if(s.indexOf("DATA_MATRIX")>=0||s==="DATAMATRIX")return "DATA_MATRIX";if(s.indexOf("EAN_13")>=0)return "EAN_13";if(s.indexOf("EAN_8")>=0)return "EAN_8";if(s.indexOf("CODE_128")>=0)return "CODE_128";if(s.indexOf("CODE_39")>=0)return "CODE_39";if(s.indexOf("CODE_93")>=0)return "CODE_93";if(s.indexOf("UPC_A")>=0)return "UPC_A";if(s.indexOf("UPC_E")>=0)return "UPC_E";if(s.indexOf("ITF")>=0)return "ITF";if(s.indexOf("PDF_417")>=0||s.indexOf("PDF417")>=0)return "PDF417";if(s==="CODE128")return "CODE_128";if(s==="EAN13")return "EAN_13";if(s==="EAN8")return "EAN_8";return s||"UNKNOWN_FORMAT";}
   function cleanup(reason){diagLog("scanner.cleanup",{handled:handled,reason:reason||"unspecified"});if(window.__card111StopScanner===cleanup)window.__card111StopScanner=null;if(raf){cancelAnimationFrame(raf);raf=0;}try{if(controls)controls.stop();}catch(e){diagError("scanner.cleanup.controls",e);}try{if(reader&&reader.reset)reader.reset();}catch(e){diagError("scanner.cleanup.reader",e);}try{if(video&&video.srcObject){const tracks=video.srcObject.getTracks();tracks.forEach(function(t){t.stop();});diagLog("scanner.camera.tracks.stopped",{count:tracks.length});video.srcObject=null;}}catch(e){diagError("scanner.cleanup.tracks",e);}}
@@ -1226,7 +1232,11 @@ function scanner(onResult){
   function finish(text,raw,fromImage){if(handled||!text){diagLog("scanner.result.ignored",{source:fromImage?"gallery":"camera",handled:handled,hasText:!!text});return;}const code=String(text).trim();if(!code){diagLog("scanner.result.empty",{source:fromImage?"gallery":"camera"});return;}const format=mapFormat(raw),key=format+"|"+code;diagLog("scanner.result.detected",{source:fromImage?"gallery":"camera",format:format,codeLength:code.length});if(!fromImage){if(key!==lastKey){lastKey=key;stableHits=1;return;}stableHits++;if(stableHits<2)return;}handled=true;diagLog("scanner.result.accepted",{source:fromImage?"gallery":"camera",format:format,codeLength:code.length});cleanup("result-accepted");closeModal();const resultData={code:code,format:format};setTimeout(function(){try{diagLog("scanner.result.dispatch",{source:fromImage?"gallery":"camera",target:typeof onResult==="function"?"onResult":"manual"});if(typeof onResult==="function")onResult(resultData);else manual(resultData);}catch(e){diagError("scanner.result.dispatch",e);alert("Код распознан, но не удалось открыть форму карты: "+String(e&&e.message||e));}},0);}
   async function nativeLoop(){if(!detector||!video||handled)return;try{const found=await detector.detect(video);if(found&&found.length)finish(found[0].rawValue,found[0].format);else{lastKey="";stableHits=0;}}catch(e){}if(!handled)raf=requestAnimationFrame(nativeLoop);}
   const readerBox=document.getElementById("reader");video=document.createElement("video");video.setAttribute("playsinline","");video.setAttribute("autoplay","");video.setAttribute("muted","");video.muted=true;video.style.width="100%";video.style.height="100%";video.style.objectFit="cover";readerBox.appendChild(video);
-  navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:"environment"},width:{ideal:1280,max:1280},height:{ideal:720,max:720},focusMode:"continuous"},audio:false}).then(function(stream){video.srcObject=stream;return video.play();}).then(function(){if("BarcodeDetector" in window){return BarcodeDetector.getSupportedFormats().then(function(supported){const use=formats.filter(function(x){return supported.indexOf(x)>=0;});if(use.length)detector=new BarcodeDetector({formats:use});if(detector)nativeLoop();else throw Error("BarcodeDetector unavailable");});}throw Error("BarcodeDetector unavailable");}).catch(function(){try{reader=new ZXingBrowser.BrowserMultiFormatReader();}catch(e){reader=null;}if(!reader){readerBox.innerHTML='<p style="padding:30px;color:white;text-align:center">Камера недоступна. Можно выбрать фото из галереи.</p>';return;}reader.decodeFromVideoElement(video,function(result){if(result){const text=result.getText?result.getText():result.text;const fmt=result.getBarcodeFormat?result.getBarcodeFormat():"CODE_128";finish(text,fmt);}}).then(function(c){controls=c;}).catch(function(){});});
+  navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:window.__card111FacingMode||"environment"},width:{ideal:1280,max:1280},height:{ideal:720,max:720},focusMode:"continuous"},audio:false}).then(function(stream){activeStream=stream;activeTrack=stream.getVideoTracks()[0]||null;video.srcObject=stream;return video.play();}).then(function(){if("BarcodeDetector" in window){return BarcodeDetector.getSupportedFormats().then(function(supported){const use=formats.filter(function(x){return supported.indexOf(x)>=0;});if(use.length)detector=new BarcodeDetector({formats:use});if(detector)nativeLoop();else throw Error("BarcodeDetector unavailable");});}throw Error("BarcodeDetector unavailable");}).catch(function(){try{reader=new ZXingBrowser.BrowserMultiFormatReader();}catch(e){reader=null;}if(!reader){readerBox.innerHTML='<p style="padding:30px;color:white;text-align:center">Камера недоступна. Можно выбрать фото из галереи.</p>';return;}reader.decodeFromVideoElement(video,function(result){if(result){const text=result.getText?result.getText():result.text;const fmt=result.getBarcodeFormat?result.getBarcodeFormat():"CODE_128";finish(text,fmt);}}).then(function(c){controls=c;}).catch(function(){});});
+  const switchBtn=document.getElementById("scannerSwitchCamera"),torchBtn=document.getElementById("scannerTorch"),manualBtn=document.getElementById("scannerManual");
+  if(switchBtn)switchBtn.onclick=function(){window.__card111FacingMode=(window.__card111FacingMode||"environment")==="environment"?"user":"environment";cleanup("camera-switch");scanner(onResult);};
+  if(torchBtn)torchBtn.onclick=async function(){try{if(!activeTrack||!activeTrack.getCapabilities||!activeTrack.getCapabilities().torch){alert("Фонарик не поддерживается этой камерой или браузером.");return;}torchOn=!torchOn;await activeTrack.applyConstraints({advanced:[{torch:torchOn}]});torchBtn.textContent="Фонарик: "+(torchOn?"вкл.":"выкл.");}catch(e){torchOn=false;torchBtn.textContent="Фонарик: выкл.";alert("Не удалось переключить фонарик на этой камере.");}};
+  if(manualBtn)manualBtn.onclick=function(){const code=prompt("Введите значение QR-кода или штрихкода:");if(code===null||!String(code).trim())return;const data={code:String(code).trim(),format:"CODE_128"};cleanup("manual-input");closeModal();if(typeof onResult==="function")onResult(data);else manual(data);};
   document.getElementById("scanFile").onchange=async function(e){const file=e.target.files[0];if(!file||handled)return;diagLog("scanner.gallery.selected",{type:file.type||"unknown",sizeBytes:file.size||0,nameLength:(file.name||"").length});try{cleanup();await decodeGalleryFile(file,reader,finish);diagLog("scanner.gallery.processing.finished",{});}catch(err){diagError("scanner.gallery.process",err);alert("Код не найден. Увеличьте фото, переместите рамку на код и попробуйте снова.");}e.target.value="";};
 }
 async function decodeGalleryFile(file,reader,finish){
@@ -1370,8 +1380,9 @@ function openCard(id){
   const hasSecond=!!String(c.secondCode||"").trim();
   const primaryFormat=normalizeFormat(c.format||c.barcodeFormat||c.type||"CODE_128");
   const secondFormat=normalizeFormat(c.secondFormat||"CODE_128");
-  const primaryLabel=primaryFormat==="QR_CODE"?"QR-код":"Штрихкод";
-  const secondLabel=secondFormat==="QR_CODE"?"QR-код":"Штрихкод";
+  const codeLabel=function(f){return f==="QR_CODE"?"QR-код":f==="PDF417"?"PDF417":f==="DATA_MATRIX"?"Data Matrix":"Штрихкод";};
+  const primaryLabel=codeLabel(primaryFormat);
+  const secondLabel=codeLabel(secondFormat);
   openModal('<button class="close" id="cardClose">×</button><div class="detail">'+
     '<div class="brand">'+esc(c.name)+'</div>'+
     (hasSecond?'<div class="codeModeSwitch" role="group" aria-label="Тип кода"><button type="button" class="btn secondary active" id="showPrimaryCode">'+primaryLabel+'</button><button type="button" class="btn secondary" id="showSecondCode">'+secondLabel+'</button></div>':'')+
@@ -1737,12 +1748,16 @@ function readImport(e){
       if(!importedCards.length)throw new Error("В резервной копии нет пригодных карт.");
       const importedCovers=(!Array.isArray(d)&&d.brandCovers&&typeof d.brandCovers==="object"&&!Array.isArray(d.brandCovers))?d.brandCovers:null;
       const importedPresets=(!Array.isArray(d)&&Array.isArray(d.customCoverPresets))?d.customCoverPresets.filter(function(p){return p&&typeof p.id==="string"&&typeof p.name==="string"&&(typeof p.customColor==="string"||p.customGradient&&Array.isArray(p.customGradient.colors));}):null;
-      if(!confirm("Восстановить "+importedCards.length+" карт? Текущий набор карт будет заменён."))return;
+      const importMode=prompt("Как импортировать данные?\nВведите replace — заменить текущие карты; merge — объединить с текущими.", "replace");
+      if(importMode===null)return;
+      const normalizedImportMode=String(importMode).trim().toLowerCase();
+      if(normalizedImportMode!=="replace"&&normalizedImportMode!=="merge"){alert("Введите replace или merge.");return;}
+      const nextCardsToSave=normalizedImportMode==="merge"?(function(){const seen=new Set(cards.map(function(c){return normalizeFormat(c.format||"CODE_128")+"|"+String(c.code||"").trim();}));const merged=cards.slice();importedCards.forEach(function(c){const key=normalizeFormat(c.format||"CODE_128")+"|"+String(c.code||"").trim();if(!seen.has(key)){seen.add(key);if(merged.some(function(x){return String(x.id)===String(c.id);}))c.id=String(Date.now())+"-"+Math.random().toString(36).slice(2,8);merged.push(c);}});return merged;})():importedCards;
       const oldCardsRaw=localStorage.getItem(KEY);
       const oldSafeRaw=localStorage.getItem(SAFE_KEY);
       const oldCoversRaw=localStorage.getItem(COVER_DEFAULTS_KEY);
       const oldCustomPresetsRaw=localStorage.getItem(CUSTOM_COVERS_KEY);
-      const nextCardsRaw=JSON.stringify(importedCards);
+      const nextCardsRaw=JSON.stringify(nextCardsToSave);
       const nextCoversRaw=importedCovers?JSON.stringify(importedCovers):oldCoversRaw;
       const nextCustomPresetsRaw=importedPresets?JSON.stringify(importedPresets):oldCustomPresetsRaw;
       try{
@@ -1766,12 +1781,12 @@ function readImport(e){
         alert("Не удалось восстановить резервную копию. "+String(saveError&&saveError.message||saveError)+"."+suffix);
         return;
       }
-      cards=importedCards;
+      cards=nextCardsToSave;
       if(importedCovers)brandCovers=importedCovers;
       storageState="ok";storageError="";
       render();
       closeModal();
-      alert("Карты восстановлены: "+cards.length);
+      alert((normalizedImportMode==="merge"?"Карты объединены: ":"Карты восстановлены: ")+cards.length);
     }catch(x){alert("Не удалось прочитать резервную копию: "+String(x&&x.message||x));}
   };
   reader.onerror=function(){alert("Не удалось прочитать файл резервной копии.");};
