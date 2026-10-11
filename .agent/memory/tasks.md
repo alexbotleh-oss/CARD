@@ -79,7 +79,7 @@ Priority: high.
 Created: 2026-10-11.
 Request: В текущем CARD111 вернуть настройку выбора одного или двух кодов на карте и полный набор форматов генерации, которые были в старой версии; для карты «Пятёрочка» нужен второй PDF417.
 Goal: Сохранить в макет-first реализации выбор одного/двух кодов и генерацию всех форматов, подтверждённых recovery-версией.
-Context: Candidate candidate/CARD111-ui-2xN-20261006. Implementation commits: eadd08e8e42a80f2051ad771c627a4d781a1a3cf and c572b675194323a237f5f28db28cc67964ad6859. Current index.html blob SHA 6a548f65638028a58aebdb8d8dc92e7abdd93008. Source parity was verified against recovery/CARD111-before-scanner-integration-20261011, blob SHA 97cb89dc774278cf2891098172f23494a29c9f38. Confirmed formats: CODE_128, EAN_13, EAN_8, CODE_39, CODE_93, ITF, UPC_A, UPC_E, PDF417, DATA_MATRIX, QR_CODE. JsBarcode handles linear formats; bwip-js handles PDF417/Data Matrix.
+Context: Candidate candidate/CARD111-ui-2xN-20261006. Implementation commits: eadd08e8e42a80f2051ad771c627a4d781a1a3cf, c572b675194323a237f5f28db28cc67964ad6859, and 8770bf4e2947b18cd18ad0e192919c11addcd75c. Current index.html blob SHA 8dcd66661a4260e04ca29a7855eed768ecf0014d. Source parity was verified against recovery/CARD111-before-scanner-integration-20261011, blob SHA 97cb89dc774278cf2891098172f23494a29c9f38. Confirmed formats: CODE_128, EAN_13, EAN_8, CODE_39, CODE_93, ITF, UPC_A, UPC_E, PDF417, DATA_MATRIX, QR_CODE. JsBarcode handles linear formats; bwip-js handles PDF417/Data Matrix.
 Risks: Не сломать текущий макет и хранение карт; не подменять PDF417 на CODE128; старые карточки со вторым кодом должны продолжить работать.
 Acceptance criteria:
   - [x] В редактор добавлен явный переключатель использования второго кода.
