@@ -266,6 +266,7 @@ input[type=number],input[type=text]{border:1px solid var(--border);border-radius
       <div class="code-fields">
         <input id="cardSecondCodeInput" type="text" autocomplete="off" placeholder="Дополнительный QR / штрихкод" aria-label="Дополнительный код карты">
         <select id="cardSecondCodeFormat" aria-label="Формат дополнительного кода"><option value="QR_CODE">QR-код</option><option value="CODE_128">Code 128</option><option value="EAN_13">EAN-13</option><option value="EAN_8">EAN-8</option><option value="CODE_39">Code 39</option><option value="CODE_93">Code 93</option><option value="ITF">ITF</option><option value="UPC_A">UPC-A</option><option value="UPC_E">UPC-E</option><option value="PDF417">PDF417</option><option value="DATA_MATRIX">Data Matrix</option></select>
+        <button id="btnScanSecondCodeIntoCard" class="btn wide" type="button">Сканировать дополнительный код камерой / по фото</button>
       </div>
       <p class="hint">Второй код можно настроить отдельно. При предъявлении он будет доступен как отдельный код карты.</p>
     </div>
@@ -713,7 +714,9 @@ function bind(){
   $("cardSecondCodeFormat").onchange=()=>{if(editCard)editCard.secondCodeFormat=normalizeCodeFormat($("cardSecondCodeFormat").value)};
   $("secondCodeEnabled").onchange=()=>{if(!editCard)return;editCard.secondCodeEnabled=$("secondCodeEnabled").checked;$("secondCodeSettings").classList.toggle("hidden",!editCard.secondCodeEnabled)};
   $("btnSaveShirtPreset").onclick=()=>{if(!editCard)return;const name=(prompt("Название заготовки рубашки:","Моя рубашка")||"").trim();if(!name)return;const presets=readSavedShirtPresets();presets.push({id:"shirt-"+Date.now().toString(36),name:name,shirt:clone(editCard.shirt)});try{localStorage.setItem("card111_custom_shirt_presets_v1",JSON.stringify(presets));renderCardEditor();toast("Рубашка сохранена в заготовки")}catch(e){alert("Не удалось сохранить рубашку: "+e.message)}};
-  $("btnScanIntoCard").onclick=()=>openScanner(result=>{if(!editCard)return;editCard.code=result.code;editCard.codeFormat=result.format;$("cardCodeInput").value=result.code;$("cardCodeFormat").value=result.format;toast("Код добавлен в карту")});
+  function scanCodeIntoCard(which){if(!editCard)return;if(which==="second"&&!editCard.secondCodeEnabled){toast("Сначала включите «Использовать второй код».");return}openScanner(result=>{if(!editCard)return;if(which==="second"){editCard.secondCode=result.code;editCard.secondCodeFormat=normalizeCodeFormat(result.format);$("cardSecondCodeInput").value=result.code;$("cardSecondCodeFormat").value=editCard.secondCodeFormat;toast("Дополнительный код добавлен в карту")}else{editCard.code=result.code;editCard.codeFormat=normalizeCodeFormat(result.format);$("cardCodeInput").value=result.code;$("cardCodeFormat").value=editCard.codeFormat;toast("Основной код добавлен в карту")}})}
+  $("btnScanIntoCard").onclick=()=>scanCodeIntoCard("primary");
+  $("btnScanSecondCodeIntoCard").onclick=()=>scanCodeIntoCard("second");
   $("cBtnFont").onclick=()=>openFontPicker(editCard.font,f=>{editCard.font=f;renderCardEditor()});
   $("cBtnFontSize").onclick=()=>openSizePicker(editCard.fontSize,s=>{editCard.fontSize=s;renderCardEditor()});
   $("cBtnTextColor").onclick=()=>openColorPicker(editCard.textColor,c=>{editCard.textColor=c;renderCardEditor()});
