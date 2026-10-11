@@ -112,3 +112,11 @@
 2. Если она проходит, проверить целевые сценарии: camera start/stop/switch; недоступный torch; ручной ввод; camera/gallery/crop; основной/второй код и подписи; JSON replace/merge; reload/persistence.
 3. Отдельно установить актуальный Pages source/live HTML. Не объявлять код опубликованным до проверки.
 
+
+## 9. Correction — состояние candidate index после повторного чтения (2026-10-11 18:32)
+
+- Commit `86266ce012de5785b0c6df5d7519f769e8d849db` существует; его commit diff документирует изменения camera switch/torch/manual input, labels, JSON replace/merge и auto-save; blob index в коммите `bd20167d44c3e3e88b1c0fb49702551806e763d4`.
+- Однако текущий ответ GitHub Contents API для ref `candidate/CARD111-ui-2xN-20261006` после повторного запроса вернул `index.html` blob `ca419b9f1a8e388ea09263f64104d6f3c755f1f4`, 91,748 bytes и без маркеров scannerSwitchCamera/normalizedImportMode.
+- Причина не установлена; фактический HEAD candidate конфликтует с ранее записанной рабочей точкой. Не утверждать, что этот patch сейчас находится на голове ветки или развернут.
+- **Следующий шаг:** однозначно установить branch HEAD/ref, проверить, есть ли commit 86266ce в цепочке текущей ветки; лишь после этого запускать parse/runtime и определять дальнейшие действия.
+
