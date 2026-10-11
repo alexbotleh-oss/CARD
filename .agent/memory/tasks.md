@@ -74,24 +74,26 @@ Still pending: test with the user's actual old backup file, inspect full rendere
 
 ## TASK-20261011-04: Восстановить полный набор генераторов кодов и выбор одного/двух кодов
 
-Status: active — implementation planned.
+Status: active — code changes committed; browser/device acceptance pending.
 Priority: high.
 Created: 2026-10-11.
 Request: В текущем CARD111 вернуть настройку выбора одного или двух кодов на карте и полный набор форматов генерации, которые были в старой версии; для карты «Пятёрочка» нужен второй PDF417.
 Goal: Сохранить в макет-first реализации выбор одного/двух кодов и генерацию всех форматов, подтверждённых recovery-версией.
-Context: Candidate candidate/CARD111-ui-2xN-20261006, текущий index.html blob SHA 3ae4ba7b26947323f85e3bb378ef8bc93509fc0c. Старая реализация в recovery/CARD111-before-scanner-integration-20261011, blob SHA 97cb89dc774278cf2891098172f23494a29c9f38. Подтверждённые форматы старой версии: CODE_128, EAN_13, EAN_8, CODE_39, CODE_93, ITF, UPC_A, UPC_E, PDF417, DATA_MATRIX, QR_CODE. Старая реализация использует JsBarcode для линейных кодов и bwip-js для PDF417/Data Matrix.
+Context: Candidate candidate/CARD111-ui-2xN-20261006. Implementation commits: eadd08e8e42a80f2051ad771c627a4d781a1a3cf and c572b675194323a237f5f28db28cc67964ad6859. Current index.html blob SHA 6a548f65638028a58aebdb8d8dc92e7abdd93008. Source parity was verified against recovery/CARD111-before-scanner-integration-20261011, blob SHA 97cb89dc774278cf2891098172f23494a29c9f38. Confirmed formats: CODE_128, EAN_13, EAN_8, CODE_39, CODE_93, ITF, UPC_A, UPC_E, PDF417, DATA_MATRIX, QR_CODE. JsBarcode handles linear formats; bwip-js handles PDF417/Data Matrix.
 Risks: Не сломать текущий макет и хранение карт; не подменять PDF417 на CODE128; старые карточки со вторым кодом должны продолжить работать.
 Acceptance criteria:
-  - [ ] В редакторе есть явный выбор использовать один или два кода.
-  - [ ] Форматы обоих кодов включают все 11 вариантов из recovery-версии.
-  - [ ] PDF417 и Data Matrix рендерятся через bwip-js; CODE_93 и UPC_E — через JsBarcode.
-  - [ ] При выключенном втором коде он не показывается, но сохранённые данные не стираются.
-  - [ ] Существующие карточки со вторым кодом и старые форматы нормализуются без потери.
-  - [ ] Проверены синтаксис JS и тесты format mapping/render dispatch; ветка и файл перечитаны после записи.
+  - [x] В редактор добавлен явный переключатель использования второго кода.
+  - [x] Оба селектора содержат все 11 форматов из recovery-версии.
+  - [x] PDF417 и Data Matrix направляются в bwip-js; CODE_93 и UPC_E — в JsBarcode.
+  - [x] Выключение второго кода скрывает его и не стирает сохранённые поля.
+  - [x] Старые поля format/secondFormat нормализуются; существующая карта со вторым кодом автоматически сохраняет его доступность.
+  - [x] V8 syntax check, format-normalization tests и mocked render-dispatch tests пройдены; файл повторно прочитан из candidate.
+  - [ ] Проверить реальное отображение и предъявление кода в браузере/на телефоне.
 Plan:
   - [x] Прочитать project memory/decisions/lessons/history и сравнить текущую и recovery-версии.
   - [x] Зафиксировать точный список прежних форматов и способ их генерации.
-  - [ ] Минимально дополнить UI, нормализацию и генератор в candidate.
-  - [ ] Запустить доступные syntax/logic checks и проверить результат из ветки.
-  - [ ] Обновить context, lessons, append-only history и handoff.
-Next step: реализовать явный toggle второго кода и поддержку всех 11 форматов без изменения основного дизайна.
+  - [x] Минимально дополнить UI, нормализацию и генератор в candidate.
+  - [x] Запустить доступные syntax/logic checks и перечитать результат из ветки.
+  - [x] Обновить context, lessons, append-only history и handoff.
+  - [ ] Провести browser/device acceptance.
+Next step: открыть карточку «Пятёрочка», включить второй код, выбрать PDF417, ввести/восстановить исходное значение и проверить рендер/сканирование на устройстве.
