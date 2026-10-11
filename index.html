@@ -221,6 +221,11 @@ input[type=number],input[type=text]{border:1px solid var(--border);border-radius
       <input id="backupFile" class="hidden" type="file" accept=".json,application/json">
     </div>
     <div class="settings-section">
+      <h2>Автосохранение</h2>
+      <label class="hint" style="display:flex;align-items:center;gap:10px"><input id="autoSaveToggle" type="checkbox" checked> Автоматически сохранять карты и визитки при сворачивании приложения или закрытии страницы</label>
+      <p id="autoSaveStatus" class="hint" aria-live="polite">Автосохранение включено.</p>
+    </div>
+    <div class="settings-section">
       <h2>Диагностика</h2>
       <p class="hint">Экспорт технических событий поможет проверить ошибки сохранения и работы интерфейса. Данные карт и коды в журнал не записываются.</p>
       <div class="settings-actions"><button id="btnExportDiagnostics" class="btn">Экспорт диагностики</button></div>
@@ -464,6 +469,9 @@ let _id=0;const uid=()=>"x"+(++_id)+Date.now().toString(36);
 
 const CARD111_STORAGE_KEY="card111.maketkart.v1";
 const DIAG_KEY="card_wallet_diagnostics_v1";
+const SETTINGS_KEY="card_wallet_settings_v1";
+let autoSaveEnabled=true;
+try{const savedSettings=JSON.parse(localStorage.getItem(SETTINGS_KEY)||"{}");if(savedSettings&&typeof savedSettings.autoSave==="boolean")autoSaveEnabled=savedSettings.autoSave}catch(e){}
 function diagLog(event,details){try{let a=JSON.parse(localStorage.getItem(DIAG_KEY)||"[]");if(!Array.isArray(a))a=[];a.push({time:new Date().toISOString(),event:String(event||"event"),details:details||{}});localStorage.setItem(DIAG_KEY,JSON.stringify(a.slice(-180)))}catch(e){}}
 function exportDiagnostics(){try{const events=JSON.parse(localStorage.getItem(DIAG_KEY)||"[]");const data={app:"CARD111",build:"mockup-foundation",exportedAt:new Date().toISOString(),userAgent:navigator.userAgent,online:navigator.onLine,cardCount:cards.length,visitCount:visits.length,events:Array.isArray(events)?events.slice(-60):[]};const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="CARD111-diagnostics.json";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);const status=$("diagnosticsStatus");if(status)status.textContent="Экспортирована диагностика ("+(Array.isArray(events)?events.length:0)+" событий)."}catch(e){const status=$("diagnosticsStatus");if(status)status.textContent="Не удалось экспортировать диагностику: "+e.message}}
 window.addEventListener("error",e=>diagLog("window.error",{message:String(e.message||"unknown").slice(0,200),line:Number(e.lineno)||0}));
@@ -805,6 +813,8 @@ function bind(){
   $("btnEditCodeFromPresent").onclick=()=>{if(presentCard){openCardEditor(presentCard)}};
   $("btnExportBackup").onclick=exportBackup;
   $("btnExportDiagnostics").onclick=exportDiagnostics;
+  $("autoSaveToggle").checked=autoSaveEnabled;
+  $("autoSaveToggle").onchange=()=>{autoSaveEnabled=$("autoSaveToggle").checked;try{localStorage.setItem(SETTINGS_KEY,JSON.stringify({autoSave:autoSaveEnabled}));$("autoSaveStatus").textContent=autoSaveEnabled?"Автосохранение включено.":"Автосохранение выключено; используйте «Сохранить» в редакторах.";diagLog("settings.autosave",{enabled:autoSaveEnabled})}catch(e){$("autoSaveStatus").textContent="Не удалось сохранить настройку: "+e.message}};
   $("btnImportBackup").onclick=()=>$("backupFile").click();
   $("backupFile").addEventListener("change",importBackup);
   $("btnScanSettings").onclick=()=>openScanner(result=>{const c=defaultCard();c.name="Отсканированная карта";c.code=result.code;c.codeFormat=result.format;cards.push(c);persistState();renderMain();show("screen-main");toast("Код сохранён в новой карте")});
@@ -856,7 +866,7 @@ function bindScanner(){
  $("scannerPickPhoto").onclick=()=>$("scannerFile").click();$("scannerFile").onchange=e=>{const f=e.target.files&&e.target.files[0];if(f)showScannerPhoto(f);e.target.value=""};$("scannerCropDecode").onclick=()=>decodeCrop().catch(e=>{$("scannerStatus").textContent="Ошибка распознавания: "+e.message});$("scannerRetry").onclick=()=>{scannerImage=null;$("scannerCropDecode").classList.add("scan-hidden");$("scannerCropHint").classList.add("scan-hidden");startScannerCamera()};$("scannerManual").onclick=()=>{const code=prompt("Введите значение QR-кода или штрихкода:");if(code&&code.trim()){const f=prompt("Формат: QR_CODE, CODE_128, EAN_13, EAN_8 или CODE_39","QR_CODE");acceptScan(code,f||"QR_CODE")}};$("scannerSwitchMode").onclick=()=>$("scannerFile").click();
 }
 function init(){buildStatic();bind();bindScanner();renderMain();renderVisits();show("screen-main");if(savedState)toast("Карты и визитки восстановлены из памяти");else persistState()}
-window.addEventListener("beforeunload",persistState);document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="hidden")persistState()});
+window.addEventListener("beforeunload",()=>{if(autoSaveEnabled)persistState()});document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="hidden"&&autoSaveEnabled)persistState()});
 init();
 </script>
 </body>
