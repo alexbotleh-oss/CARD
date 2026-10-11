@@ -80,3 +80,7 @@ Limit: Статический DOM/CSS и JS-парсер не доказываю
 Failure: Treated original `МакетКАРТ.html` as the canonical visual target even though a later corrected/integrated HTML had been uploaded. The later file's filename also contains `МакетКАРТ`, which made a name-based shortcut misleading.
 Rule: For visual-source decisions, compare exact upload identity, timestamp, size, and contents. Maintain separate records for original vs corrected/integrated variants. The latest user-designated artifact is canonical even when its filename resembles an older one. Before CSS/DOM edits, verify the candidate against that exact artifact; never infer geometry from the previous version or from screenshots alone if the source file is available.
 Recovery: Candidate commit `c25104ca18f3d06091718c8a1d66197474aa1c30` was based on the wrong inferred baseline; leave history intact but treat the patch as unvalidated until compared to the correct target.
+
+
+## LESSON-20261011-12: Verify patch applicability against the exact target before discarding it
+After the reference identity was corrected, compare the exact target artifact with the candidate instead of assuming the prior patch is invalid. In this case, the CSS blocks matched exactly (17,559 characters), and the target itself defined `.flipper` sizing but omitted it around `#cardPreview`; thus the wrapper fix is consistent with the target's own layout rules. Still distinguish static compatibility from actual browser/device acceptance.
