@@ -468,3 +468,14 @@ Evidence: changed source re-read from the work branch. Visual confirmation in br
 **Проверки:** файлы повторно прочитаны из GitHub; оба inline JavaScript-блока успешно прошли синтаксический разбор V8; баланс фигурных скобок CSS — 0; подтверждены build id, `sw.js?v=19` и `card-pwa-v19`.
 
 **Ограничение:** после изменения нет нового браузерного рендера или проверки на Android. Это подтверждённая запись кода и статических проверок, но не подтверждение визуального результата на устройстве. Резервная ветка не изменялась.
+
+
+## 2026-10-11 — HOME-UI iteration — no regression observed in static checks
+
+**Change:** main-screen composition updated on branch `candidate/CARD111-ui-2xN-20261006`: compact single-line title, count chip, prominent add action, search icon/focus/clear affordance, spacing/card/empty-state refinements, and first nav label changed to «Карты». Existing add flow and card rendering function remain in use.
+
+**PWA:** build ID `CARD111-20261011-HOME-REDESIGN-1`; service worker cache moved from v19 to v20 to avoid retaining the prior UI shell.
+
+**Evidence:** code committed in `19e5eb67316e791aafdcfa36f7794ae71c82542e`, `ffc5f92482c6960729cccd9a0283bda345731aa4`, `d84561c283b9076891887687a4bde3d05bd012ac`. After refetching current branch files, both inline JavaScript blocks passed V8 syntax parsing; CSS brace balance was 0; new header, clear-search handler, two-column grid and v20 cache references were present.
+
+**Limits:** no browser/Android rendering or end-to-end card interaction test was performed. No evidence yet that the GitHub Pages publication source is this branch; do not assume it from the branch name alone. `main` and `backup/stable` were not modified. The navigation's separate «Визитки» functional screen remains open work; scanner navigation was not deceptively relabeled.
