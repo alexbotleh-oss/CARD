@@ -1334,8 +1334,9 @@ function captureEditorDraft(){
   ids.forEach(function(id){const el=document.getElementById(id);if(el)fields[id]=el.type==="checkbox"?{checked:!!el.checked}:{value:el.value};});
   const preview=window.__editorPreviewCard||{};
   const gradient=preview.style&&preview.style.customGradient?JSON.parse(JSON.stringify(preview.style.customGradient)):null;
+  const customColor=preview.style&&preview.style.customColor||null;
   const makeDefault=document.getElementById("coverMakeDefault");
-  return {fields:fields,coverImage:preview.coverImage,hasCoverImage:Object.prototype.hasOwnProperty.call(preview,"coverImage"),gradient:gradient,clearCustomGradient:!!preview.clearCustomGradient,makeDefault:!!(makeDefault&&makeDefault.checked)};
+  return {fields:fields,coverImage:preview.coverImage,hasCoverImage:Object.prototype.hasOwnProperty.call(preview,"coverImage"),gradient:gradient,customColor:customColor,clearCustomGradient:!!preview.clearCustomGradient,makeDefault:!!(makeDefault&&makeDefault.checked)};
 }
 function restoreEditorDraft(draft){
   if(!draft)return;
@@ -1344,6 +1345,7 @@ function restoreEditorDraft(draft){
   preview.style=Object.assign({},preview.style||{});
   if(draft.hasCoverImage)preview.coverImage=draft.coverImage;else delete preview.coverImage;
   if(draft.gradient)preview.style.customGradient=draft.gradient;else delete preview.style.customGradient;
+  if(draft.customColor)preview.style.customColor=draft.customColor;else delete preview.style.customColor;
   if(draft.clearCustomGradient)preview.clearCustomGradient=true;else delete preview.clearCustomGradient;
   const def=document.getElementById("coverMakeDefault");if(def)def.checked=draft.makeDefault;
   const format=document.getElementById("format"),button=document.querySelector(".formatButton");if(format&&button)button.textContent=formatLabel(format.value);
