@@ -541,7 +541,7 @@ const SAFE_KEY=KEY+"_safe_backup";
 const COVER_DEFAULTS_KEY="card_cover_defaults_v1";
 const DIAG_KEY="card_wallet_diagnostics_v1";
 const DIAG_LIMIT=180;
-const CARD111_BUILD="CARD111-20261011-EDITOR-PALETTE-COMPACT-1";
+const CARD111_BUILD="CARD111-20261011-HOME-REDESIGN-1";
 function diagLog(event,details){try{const entry={time:new Date().toISOString(),event:String(event||"event"),details:details||{}};let a=[];try{a=JSON.parse(localStorage.getItem(DIAG_KEY)||"[]");if(!Array.isArray(a))a=[];}catch(e){}a.push(entry);if(a.length>DIAG_LIMIT)a=a.slice(-DIAG_LIMIT);localStorage.setItem(DIAG_KEY,JSON.stringify(a));}catch(e){try{console.warn("CARD111 diagnostic write failed",e);}catch(ignore){}}}
 function diagError(stage,error){diagLog("error",{stage:String(stage),message:String(error&&error.message?error.message:error||"unknown").slice(0,240),name:error&&error.name?String(error.name):""});}
 function diagRead(){try{const a=JSON.parse(localStorage.getItem(DIAG_KEY)||"[]");return Array.isArray(a)?a:[];}catch(e){return [];}}
@@ -1760,7 +1760,7 @@ function readImport(e){
   if(input)input.value="";
 }
 if("serviceWorker" in navigator){
-  window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js?v=19").catch(function(){});});
+  window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js?v=20").catch(function(){});});
 }
 render();
 </script>
