@@ -21,7 +21,7 @@ Plan:
   - [x] Обновить tasks/context/decisions/lessons/history в main.
   - [x] Обновить WORKLOG/PROJECT_STATE/HANDOFF.
   - [x] Повторно прочитать записанные документы и подтвердить SHA.
-Current state: Файлы memory/history/docs записаны в main и повторно прочитаны через GitHub API с подтверждёнными blob SHA. Рабочий index candidate blob SHA bd20167d44c3e3e88b1c0fb49702551806e763d4. Recovery-ветка сохранена до патча.
+Current state: Файлы memory/history/docs записаны в main и повторно прочитаны через GitHub API. Commit 86266ce существует, но current candidate ref вернул index blob ca419b9f1a8e388ea09263f64104d6f3c755f1f4, не совпадающий с blob bd20167d44c3e3e88b1c0fb49702551806e763d4 из указанного commit. Recovery-ветка сохранена до патча.
 Next action: Выполнить JS syntax check обновлённого candidate/index.html; затем целевые browser checks.
 Blockers: Browser/Android runtime и фактический источник Pages не проверены. После последнего патча JavaScript parser не запускался.
 Related files: .agent/memory/tasks.md; .agent/memory/context.md; .agent/memory/decisions.md; .agent/memory/lessons.md; history/2026-10-11.md; docs/WORKLOG.md; docs/PROJECT_STATE.md; docs/HANDOFF.md; index.html.
