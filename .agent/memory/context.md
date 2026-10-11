@@ -2,7 +2,7 @@
 
 Updated: 2026-10-11 19:42
 Project goal: CARD111 — веб-кошелёк скидочных карт и визиток. Текущий UI приоритет — реализовать присланный пользователем макет без самовольной смены дизайна и встроить в него уже отлаженные scanner, генератор QR/штрихкодов, чтение фото из галереи, backup/restore, export/import и diagnostics.
-Current focus: TASK-20261011-03 — устранить причину сжатого preview, найденную в истории CSS.
+Current focus: TASK-20261011-04 — вернуть прежние форматы генерации кодов и явный выбор одного/двух кодов.
 Environment: HTML/CSS/JavaScript; GitHub repository alexbotleh-oss/CARD. Commit history и исходники прочитаны через GitHub API; для сравнения используется /mnt/data/МакетКАРТ.html. Локальный Git status недоступен.
 Constraints: Оригинальный макет — источник истины. Визуальные изменения только минимальные и обоснованные сравнением исходников. Сохранять работающие функции, модель данных и storage. Не публиковать непроверенный код.
 Important files:
@@ -37,3 +37,8 @@ Candidate branch HEAD: `d3d4dcd76fa8c477f77f7bdeb2ede6a2d2de8d5b`. The target HT
 ## 2026-10-11 — latest target-first feature parity patch
 Candidate HEAD: `04751b1a77fad7e1067cf678af4694e9ede0d8fc`. Alongside gallery/backup compatibility, target UI now has optional second code + format selector and presentation switch, diagnostic export, camera front/rear switch and torch control, saved shirt presets reading legacy brand-cover/custom-cover localStorage, and an auto-save toggle. Existing target HTML remains the foundation; additions use its existing screen/editor/settings patterns.
 Verification: exact committed inline script passes V8 compilation; static markers confirm required controls and backup migration. A focused Node harness passes legacy v3 backup without visits, target backup with visits, and root-array backup; missing visits preserve existing visits and cards are persisted. No real browser/mobile visual run or real phone camera/gallery test has been performed. User's actual backup file has not yet been imported end-to-end.
+
+## 2026-10-11 — восстановление генераторов кодов и выбора второго кода
+Candidate commits: eadd08e8e42a80f2051ad771c627a4d781a1a3cf and c572b675194323a237f5f28db28cc67964ad6859. Current index blob: 6a548f65638028a58aebdb8d8dc92e7abdd93008.
+Compared the recovery version and restored all 11 confirmed formats in both code selectors: QR_CODE, CODE_128, EAN_13, EAN_8, CODE_39, CODE_93, ITF, UPC_A, UPC_E, PDF417, DATA_MATRIX. Added bwip-js for PDF417/Data Matrix and mapped CODE_93/UPC_E to JsBarcode. Added explicit second-code checkbox; turning it off hides but preserves the second-code value/format. Existing legacy secondCode/secondFormat values remain enabled and map to current secondCodeFormat.
+Verification: current inline JS compiles with V8. Format normalization passed aliases CODE 93, UPC-E, PDF-417, DATA MATRIX, EAN13, CODE128 and QR. Mock render harness verified PDF417 and Data Matrix dispatch to bwip-js, CODE_93 and UPC_E to JsBarcode, and QR to QRCode. Legacy card model test confirmed secondFormat=PDF417 is retained and enables the second code. Browser/device rendering and actual scan have not been tested.
