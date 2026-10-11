@@ -265,6 +265,8 @@ input[type=number],input[type=text]{border:1px solid var(--border);border-radius
     <div id="cLayoutChips" class="hscroll"></div>
     <p class="section-title">Цвет рубашки</p>
     <div id="cShirtPresets" class="hscroll"></div>
+    <div class="settings-actions"><button id="btnSaveShirtPreset" class="btn">Сохранить рубашку в мои заготовки</button></div>
+    <div id="savedShirtPresets" class="hscroll"></div>
     <div class="actions"><button class="btn" data-cancel>Отмена</button><button class="btn primary" data-save>Сохранить</button></div>
   </section>
 
@@ -650,6 +652,21 @@ function openPresentVisit(v){$("presentVisitTitle").textContent=v.company||"Ви
 /* ---------- построители рядов ---------- */
 function buildLayoutChips(host,shirt,kind){host.innerHTML="";const plus=document.createElement("button");plus.className="chip";plus.textContent="+";plus.onclick=()=>{if(kind==="card")openBackground(shirt,s=>{editCard.shirt=normShirt(s);renderCardEditor()});};host.appendChild(plus);if(kind!=="card")return;brands.forEach(b=>{const btn=document.createElement("button");btn.className="chip"+(sameShirt(shirt,brandShirts[b.id])?" active":"");btn.textContent=b.name;btn.onclick=()=>{editCard.shirt=normShirt(clone(brandShirts[b.id]));editCard.name=b.name;renderCardEditor()};host.appendChild(btn)})}
 function buildShirtPresets(host,shirt,kind){host.innerHTML="";const plus=document.createElement("button");plus.className="color-square plus";plus.title="Свой вариант / градиент / изображение";plus.innerHTML='<span class="plus-badge">+</span>';if(shirt.mode==="image"&&shirt.image){plus.style.background="center/cover no-repeat url('"+shirt.image+"')"}else{plus.style.background=shirtCss(shirt)}plus.onclick=()=>{const get=()=>kind==="card"?editCard.shirt:kind==="visit-front"?editVisit.front.shirt:editVisit.back.shirt;const set=s=>{if(kind==="card"){editCard.shirt=s;renderCardEditor()}else if(kind==="visit-front"){editVisit.front.shirt=s;renderVisitEditor()}else{editVisit.back.shirt=s;renderVisitEditor()}};openBackground(get(),s=>set(normShirt(s)))};host.appendChild(plus);presetColors.forEach(col=>{const b=document.createElement("button");b.className="color-square"+(shirt.mode==="solid"&&shirt.colors[0]===col?" active":"");b.style.background=col;b.title=col;b.onclick=()=>{const ns={mode:"solid",colors:[col],angle:shirt.angle||90,mid:shirt.mid||50,image:null};if(kind==="card"){editCard.shirt=normShirt(ns);renderCardEditor()}else if(kind==="visit-front"){editVisit.front.shirt=normShirt(ns);renderVisitEditor()}else{editVisit.back.shirt=normShirt(ns);renderVisitEditor()}};host.appendChild(b)})}
+const buildShirtPresetsBase=buildShirtPresets;
+function readSavedShirtPresets(){
+ const out=[];const add=(p)=>{if(p&&typeof p.name==="string"&&p.shirt&&typeof p.shirt==="object"&&!out.some(x=>x.id===p.id))out.push(p)};
+ try{const a=JSON.parse(localStorage.getItem("card111_custom_shirt_presets_v1")||"[]");if(Array.isArray(a))a.forEach(add)}catch(e){}
+ try{const covers=JSON.parse(localStorage.getItem("card_cover_defaults_v1")||"{}");if(covers&&typeof covers==="object"&&!Array.isArray(covers))Object.entries(covers).forEach(([name,value])=>{if(typeof value==="string"&&value.trim()){const isColor=!!normalizeHex(value);add({id:"legacy-cover-"+name,name:String(name),shirt:isColor?{mode:"solid",colors:[normalizeHex(value)],angle:90,mid:50,image:null}:{mode:"image",colors:["#ffffff"],angle:90,mid:50,image:value,imageTransform:{scale:1,nx:0,ny:0}}})}})}catch(e){}
+ try{const a=JSON.parse(localStorage.getItem("card_custom_cover_presets_v1")||"[]");if(Array.isArray(a))a.forEach(p=>{if(p&&typeof p.name==="string"){const g=p.customGradient;let shirt=null;if(g&&Array.isArray(g.colors)&&g.colors.length>=2)shirt={mode:"gradient",colors:g.colors.slice(0,3),angle:Number(g.angle)||0,mid:Number(g.mid||g.softness)||50,image:null};else if(p.customColor)shirt={mode:"solid",colors:[normalizeHex(p.customColor)||"#ffffff"],angle:90,mid:50,image:null};if(shirt)add({id:"legacy-custom-"+p.id,name:p.name,shirt})}})}catch(e){}
+ return out;
+}
+buildShirtPresets=function(host,shirt,kind){
+ buildShirtPresetsBase(host,shirt,kind);
+ const saved=document.getElementById("savedShirtPresets");
+ if(kind!=="card"||!saved)return;
+ saved.innerHTML="";
+ readSavedShirtPresets().forEach(p=>{const b=document.createElement("button");b.className="color-square";b.title=p.name;b.setAttribute("aria-label",p.name);b.style.background=p.shirt.mode==="image"&&p.shirt.image?"center/cover no-repeat url('"+String(p.shirt.image).replace(/'/g,"%27")+"')":shirtCss(p.shirt);b.onclick=()=>{if(editCard){editCard.shirt=normShirt(clone(p.shirt));renderCardEditor()}};saved.appendChild(b)});
+};
 
 /* ---------- СОБЫТИЯ ---------- */
 function bind(){
@@ -680,6 +697,7 @@ function bind(){
   $("cardCodeFormat").onchange=()=>{if(editCard)editCard.codeFormat=normalizeCodeFormat($("cardCodeFormat").value)};
   $("cardSecondCodeInput").oninput=()=>{if(editCard)editCard.secondCode=$("cardSecondCodeInput").value};
   $("cardSecondCodeFormat").onchange=()=>{if(editCard)editCard.secondCodeFormat=normalizeCodeFormat($("cardSecondCodeFormat").value)};
+  $("btnSaveShirtPreset").onclick=()=>{if(!editCard)return;const name=(prompt("Название заготовки рубашки:","Моя рубашка")||"").trim();if(!name)return;const presets=readSavedShirtPresets();presets.push({id:"shirt-"+Date.now().toString(36),name:name,shirt:clone(editCard.shirt)});try{localStorage.setItem("card111_custom_shirt_presets_v1",JSON.stringify(presets));renderCardEditor();toast("Рубашка сохранена в заготовки")}catch(e){alert("Не удалось сохранить рубашку: "+e.message)}};
   $("btnScanIntoCard").onclick=()=>openScanner(result=>{if(!editCard)return;editCard.code=result.code;editCard.codeFormat=result.format;$("cardCodeInput").value=result.code;$("cardCodeFormat").value=result.format;toast("Код добавлен в карту")});
   $("cBtnFont").onclick=()=>openFontPicker(editCard.font,f=>{editCard.font=f;renderCardEditor()});
   $("cBtnFontSize").onclick=()=>openSizePicker(editCard.fontSize,s=>{editCard.fontSize=s;renderCardEditor()});
