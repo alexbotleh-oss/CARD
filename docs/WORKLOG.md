@@ -141,3 +141,5 @@
 
 
 **Update 2026-10-11 — barcode generator parity:** compared candidate and recovery sources; recovered all 11 format choices and the separate one/two-code toggle. Commits: eadd08e8e42a80f2051ad771c627a4d781a1a3cf and c572b675194323a237f5f28db28cc67964ad6859. Current index blob 6a548f65638028a58aebdb8d8dc92e7abdd93008. V8 compile and mocked renderer/normalization tests passed. PDF417/Data Matrix use bwip-js; CODE_93/UPC_E use JsBarcode. Browser/device scan remains pending.
+
+**Final check 2026-10-11:** added validation for an enabled-but-empty second code (commit 8770bf4e2947b18cd18ad0e192919c11addcd75c; index blob 8dcd66661a4260e04ca29a7855eed768ecf0014d). Re-fetched branch source; V8 compile, 11-format option checks, alias normalization, legacy second-format mapping and mocked generator dispatch passed. Physical browser/mobile acceptance remains open.
