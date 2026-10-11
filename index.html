@@ -517,7 +517,7 @@ let cards=savedState?savedState.cards:[defaultCard()];
 let visits=savedState?savedState.visits:[defaultVisit()];
 let editCard=null,editVisit=null,visitSide="front",selectedFieldId=null;
 function persistState(){try{localStorage.setItem(CARD111_STORAGE_KEY,JSON.stringify({version:1,updatedAt:new Date().toISOString(),cards:cards,visits:visits}));return true}catch(e){toast("Не удалось сохранить данные: "+(e&&e.message||e));return false}}
-function ensureCardShape(c){if(!c||typeof c!=="object")return defaultCard();const d=defaultCard();return Object.assign(d,c,{code:String(c.code||""),codeFormat:normalizeCodeFormat(c.codeFormat||c.format||c.barcodeFormat||c.type||"QR_CODE"),secondCode:String(c.secondCode||""),secondCodeFormat:normalizeCodeFormat(c.secondCodeFormat||c.secondFormat||"CODE_128"),secondCodeEnabled:c.secondCodeEnabled===undefined?!!String(c.secondCode||"").trim():!!c.secondCodeEnabled})}
+function ensureCardShape(c){if(!c||typeof c!=="object")return defaultCard();const d=defaultCard();return Object.assign(d,c,{code:String(c.code||""),codeFormat:normalizeCodeFormat(c.codeFormat||c.format||c.barcodeFormat||c.type||"QR_CODE"),secondCode:String(c.secondCode||""),secondCodeFormat:normalizeCodeFormat(c.secondCodeFormat||c.secondFormat||"CODE_128"),secondCodeEnabled:c.secondCodeEnabled===true})}
 cards=cards.map(ensureCardShape);
 
 /* ---------- рендер превью ---------- */
