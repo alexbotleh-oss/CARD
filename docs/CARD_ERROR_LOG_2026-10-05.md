@@ -325,3 +325,16 @@ Evidence: changed source re-read from the work branch. Visual confirmation in br
 **Not verified:** HTML DOM interpretation/rendering, opening/selecting every format in a browser, Android behavior, scanning, and end-to-end card save/reopen/backup. No local working-copy status is available through this remote API workflow.
 
 **Next:** continue the editor-menu audit and validate field → preview → save → reopen links; keep runtime/browser/device criteria open until actually exercised.
+
+
+## 2026-10-11 — Editor draft restore left stale title-position label
+
+**Finding:** `restoreEditorDraft()` restores the hidden `titlePosition` field after a scan callback rebuilds the editor, but did not refresh the visible `titlePositionCurrent` label. This could leave the displayed position inconsistent with the actual restored field. The stored value itself was not shown to be lost; the finding concerns stale UI state.
+
+**Fix:** after restoring draft fields, update `titlePositionCurrent` from `CARD_TEXT_POSITIONS`, with a CENTER fallback.
+
+**Commit:** `c6f9ac45e93e968d1616aaf575a5276901a13f0f`.
+
+**Verification:** both inline JavaScript blocks passed V8 `new Function` parsing; the updated file was re-read from the branch. No real browser, camera/gallery scan, or Android device test was performed.
+
+**Next:** continue full editor menu audit and test field/draft/UI/save consistency; keep runtime checks open until exercised.
