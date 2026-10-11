@@ -124,3 +124,12 @@
 - **Проверено:** commit chain, commit-level index blob and static CSS comparison (E1). No application code changed in this audit.
 - **Не проверено:** JavaScript parse, live/browser visual render, Android and Pages deployment.
 - **Решение:** supplied mockup is design source of truth. Next code change should remove only the conflicting CSS width caps, preserve all JS and integrations, then run syntax/reverse-diff and PC/mobile visual checks.
+
+## 2026-10-11 19:42 — CSS-патч предпросмотра CARD111 (commit создан; продвижение ветки отдельно)
+
+- **Цель:** восстановить геометрию предпросмотра из МакетКАРТ без изменений JS/данных.
+- **Исходная точка:** ветка candidate, parent commit f38ef76df5183c92a204374434da59bd9384887a, исходный index blob 2f0d203e18774463d1622543cafb8768e8079bd2.
+- **Изменено:** commit 87c68ac7eb71885378c31c20d225401dd8ae25dd; index blob 444ca4e92c9c558b920bfc53c912407d333d56db. Пять точечных CSS replacements убрали ограничения ширины 210px/190px/224px/200px и вернули width:min(100%,340px), max-width:340px, aspect-ratio:1.586/1.
+- **Проверено:** повторно получен index по commit SHA; новые правила присутствуют, старые caps отсутствуют. Оба inline JavaScript-блока побайтно совпадают с родительской версией; ключевые функции scanner/import/export/code-preview/update/delete присутствуют.
+- **Ограничения:** V8 syntax parser, браузер/телефон и GitHub Pages не проверены. После создания commit ref candidate всё ещё указывал на parent f38ef76df5183c92a204374434da59bd9384887a; commit создан, но ещё не на HEAD ветки.
+- **Следующий шаг:** V8 syntax parser; затем проверить branch ref и продвинуть его с expected_sha, если он не изменился; визуальная проверка перед публикацией.
