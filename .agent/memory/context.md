@@ -1,6 +1,6 @@
 # Контекст проекта
 
-Updated: 2026-10-11 19:12
+Updated: 2026-10-11 19:42
 Project goal: CARD111 — веб-кошелёк скидочных карт и визиток. Текущий UI приоритет — реализовать присланный пользователем макет без самовольной смены дизайна и встроить в него уже отлаженные scanner, генератор QR/штрихкодов, чтение фото из галереи, backup/restore, export/import и diagnostics.
 Current focus: TASK-20261011-03 — устранить причину сжатого preview, найденную в истории CSS.
 Environment: HTML/CSS/JavaScript; GitHub repository alexbotleh-oss/CARD. Commit history и исходники прочитаны через GitHub API; для сравнения используется /mnt/data/МакетКАРТ.html. Локальный Git status недоступен.
@@ -15,5 +15,6 @@ Important files:
   - history/2026-10-11.md — append-only history.
   - .agent/memory/tasks.md — задачи.
 Current state: Candidate commit chain: 86266ce scanner/JSON → 22f1fd22 перенёс МакетКАРТ → 0dea63a внес исправления → 97f47a2 последний listed index update. Current commit API confirms index blob 2f0d203e18774463d1622543cafb8768e8079bd2. В интегрированном index несколько повторных CSS overrides .editorPreviewWrap .editorPreview задают max-width 210px, 190px, 224px и 200px на узких экранах; более специфичное правило .sheet.cardEditorSheet .editorPreviewWrap .editorPreview удерживает preview около 224px/200px. Это объясняет сжатую карточку независимо от типа устройства.
-Next action: На следующем шаге применить минимальный CSS patch только к конфликтующим preview limits на подтверждённом SHA, не менять DOM/JS-функции, проверить syntax/reverse-diff и визуально сравнить desktop/mobile.
+CSS patch commit: 87c68ac7eb71885378c31c20d225401dd8ae25dd; parent f38ef76df5183c92a204374434da59bd9384887a; index blob 444ca4e92c9c558b920bfc53c912407d333d56db. Убраны пределы 210/190/224/200px, восстановлена геометрия 340px / 1.586:1. Повторное чтение commit подтверждает новые CSS правила; два inline JS-блока побайтно совпадают с исходником. Branch ref candidate на момент последней проверки всё ещё указывает на f38ef76df5183c92a204374434da59bd9384887a; commit ещё не находится на HEAD ветки. V8 parser и браузерный рендер не выполнялись.
+Next action: выполнить V8 parser; проверить актуальный ref и продвинуть candidate с expected_sha lease только если HEAD не изменился; затем визуально проверить ПК/телефон.
 Open risks: Визуальный browser/device render не проверен; Pages source/live HTML не подтверждён. Перед кодовой правкой повторно сверить exact commit SHA/tree. Отдельный mockup uses storage key card111.maketkart.v1, existing wallet uses card_wallet_v1; эту совместимость не менять неявно.
