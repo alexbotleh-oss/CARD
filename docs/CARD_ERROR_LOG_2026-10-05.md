@@ -419,3 +419,16 @@ Evidence: changed source re-read from the work branch. Visual confirmation in br
 **Verification:** re-read `index.html` from the working branch; both inline JavaScript blocks compile; no old «Без надписи»/«Показывать название» labels remain; one control/input pair remains; mobile gallery CSS is present.
 
 **Not verified:** real Android rendering, long-press behavior in Yandex Browser, whether the whole editor now visually matches the mockup. If the user still sees the old UI, first verify published Pages source/deployment and cache; do not treat the branch commit as proof that the live site has updated.
+
+
+## 2026-10-11 — повторная попытка: единый мобильный экран редактора
+
+**Исходный дефект:** несмотря на двухколоночную сетку, редактирование оставалось длинной страницей; превью и нижние кнопки конкурировали с содержимым за высоту, галерея и параметры рубашки занимали слишком много вертикального пространства.
+
+**Коррекция:** добавлен специальный класс `.cardEditorSheet` только для редактора существующей карты. Он использует высоту viewport, фиксирует заголовок/превью/вкладки/панель действий, отдаёт прокрутку внутренней области, а галерею ограничивает отдельной прокруткой. Необязательные действия с изображением и стандартной рубашкой свёрнуты в `details`. Кэш PWA повышен до v18, чтобы новый код не оставался за старым кэшем.
+
+**Коммиты:** `6f22ed6bdae0892147356a470b4d15ba374df4a0`, `6d5aff931fec10a68fc46b0131647f45739869f5`, `d97e43f98a4ab85ebb44548e2fb36375153ab372`.
+
+**Проверено:** JavaScript синтаксически корректен; CSS скобки сбалансированы; наличие ключевых узлов и сохранённых обработчиков проверено по актуальному файлу GitHub.
+
+**Не проверено:** фактическая визуальная отрисовка на Android и соответствие макету; источник и статус публикации GitHub Pages. Не объявлять визуальную задачу завершённой до проверки экрана в целевой среде.
