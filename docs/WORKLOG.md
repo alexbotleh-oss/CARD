@@ -133,3 +133,6 @@
 - **Проверено:** повторно получен index по commit SHA; новые правила присутствуют, старые caps отсутствуют. Оба inline JavaScript-блока побайтно совпадают с родительской версией; ключевые функции scanner/import/export/code-preview/update/delete присутствуют.
 - **Ограничения:** V8 syntax parser, браузер/телефон и GitHub Pages не проверены. После создания commit ref candidate всё ещё указывал на parent f38ef76df5183c92a204374434da59bd9384887a; commit создан, но ещё не на HEAD ветки.
 - **Следующий шаг:** V8 syntax parser; затем проверить branch ref и продвинуть его с expected_sha, если он не изменился; визуальная проверка перед публикацией.
+
+
+**Update 2026-10-11 19:44:** `candidate/CARD111-ui-2xN-20261006` was moved using expected_sha lease from f38ef76df5183c92a204374434da59bd9384887a to 87c68ac7eb71885378c31c20d225401dd8ae25dd. Follow-up API read confirms branch HEAD and index blob 444ca4e92c9c558b920bfc53c912407d333d56db. Both inline JS script bodies are byte-for-byte identical to the parent source (121901 and 3303 characters); width caps 210/190/224/200px are absent. V8 parser and browser/device visual render were not run.
