@@ -36,3 +36,5 @@ Problem: GitHub Git Data API create_commit сохраняет объект ко�
 Lesson: После создания commit отдельно проверять branch ref и, при допустимом продвижении, использовать expected_sha lease; затем перечитывать ref и файл.
 Rule: Не утверждать, что изменение находится в ветке, пока ref явно не указывает на новый commit.
 Applied to: CARD111 remote GitHub edits.
+
+Additional evidence for LESSON-20261011-04: expected_sha update_ref succeeded, and a follow-up read confirmed candidate HEAD points at the CSS commit. Both inline scripts are unchanged byte-for-byte; parser and visual tests remain pending.
