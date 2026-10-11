@@ -143,3 +143,5 @@
 
 ### Ref promotion completed — 2026-10-11 19:44
 The candidate branch has now been advanced with expected_sha lease. HEAD: 87c68ac7eb71885378c31c20d225401dd8ae25dd; index blob: 444ca4e92c9c558b920bfc53c912407d333d56db. Post-update API read confirms the new dimensions and no remaining old width caps. Two inline JS blocks equal parent byte-for-byte. Still pending: executing JavaScript parser and viewing the rendering on desktop/phone. Do not call the task complete before those.
+
+**Дополнительное ограничение проверки:** Node.js имеется в контейнере, но локальный V8 syntax-check не был запущен: попытка получить сырой исходник с raw.githubusercontent.com заблокирована ошибкой DNS. JS reverse-diff остаётся положительным; parser/runtime и browser/phone render — pending.
