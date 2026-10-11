@@ -169,3 +169,7 @@ Checks passed: exact committed inline JS compiles with V8; static feature marker
 Latest candidate commits: eadd08e8e42a80f2051ad771c627a4d781a1a3cf, followed by c572b675194323a237f5f28db28cc67964ad6859. Re-read index blob: 6a548f65638028a58aebdb8d8dc92e7abdd93008.
 Restored the full 11-format set from the recovery implementation: QR_CODE, CODE_128, EAN_13, EAN_8, CODE_39, CODE_93, ITF, UPC_A, UPC_E, PDF417, DATA_MATRIX. bwip-js is used for PDF417/Data Matrix; JsBarcode for linear types. Added explicit second-code toggle, legacy secondFormat mapping, and preservation of hidden secondary-code data.
 Checks passed: V8 compilation, format alias normalization, mocked render routing for PDF417/Data Matrix/CODE_93/UPC_E/QR, legacy secondary-code model mapping. Still pending: real browser/mobile display and scanner validation, especially the Pyaterochka second PDF417. Do not claim real-device verification.
+
+## Final patch after validation (2026-10-11)
+Commit 8770bf4e2947b18cd18ad0e192919c11addcd75c is the latest candidate code change; final index blob is 8dcd66661a4260e04ca29a7855eed768ecf0014d. It prevents saving a card when the second-code switch is enabled but its value is blank.
+Final exact-branch V8 compilation and mocked generator dispatch tests passed. All 11 formats are present in both selectors. Legacy secondFormat=PDF417 is preserved and enables the secondary code. Real device/browser validation is still pending.
