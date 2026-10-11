@@ -63,3 +63,11 @@ Completed: (1) removed `capture="environment"` from target's image file input so
 Checks: branch HEAD and index blob re-read; committed inline JS passed V8 compilation check via `new Function`; static markers for gallery, old backup formats and legacy storage migration passed; local Node syntax check passed; focused Node harness passed legacy storage/card/visit mapping tests.
 Not yet complete: full parity audit and port of current-only features not present in target (e.g. second code, diagnostic export, custom brand-cover presets, camera switch/torch) and actual browser/device visual check. Do not mark task complete until those are assessed/ported and backup import is verified end-to-end with representative real files.
 Next: implement the remaining required functions that are genuinely absent without changing the target visual layout; then test representative old backup payloads and desktop/mobile rendering.
+
+
+## Продолжение интеграции — функции старого CARD111 перенесены в макет (2026-10-11)
+Status: active pending real-device/end-to-end validation.
+Latest candidate HEAD: `04751b1a77fad7e1067cf678af4694e9ede0d8fc`.
+Further additions on target-first UI: optional second card code with separate format and presentation switch; diagnostic export panel; camera front/rear switch and torch controls; reusable shirt presets which can read legacy `card_cover_defaults_v1` and `card_custom_cover_presets_v1`; auto-save setting retained and persisted under `card_wallet_settings_v1`. These are additive controls around the target layout.
+Validation: latest branch/blob re-read; exact committed inline JS passed V8 compilation; static markers for gallery separation, legacy backup import/storage migration, second code, diagnostics, camera switch, torch, shirt presets and auto-save passed. Focused Node harness passed import of a legacy version-3 backup without visits, import of a target backup with visits, and import of a root-array backup; when legacy backup omits visits, existing visits remain and cards are persisted.
+Still pending: test with the user's actual old backup file, inspect full rendered layout on desktop/mobile, and check camera/gallery behavior on a real phone. Do not mark complete until those are verified.
