@@ -120,3 +120,13 @@
 - Причина не установлена; фактический HEAD candidate конфликтует с ранее записанной рабочей точкой. Не утверждать, что этот patch сейчас находится на голове ветки или развернут.
 - **Следующий шаг:** однозначно установить branch HEAD/ref, проверить, есть ли commit 86266ce в цепочке текущей ветки; лишь после этого запускать parse/runtime и определять дальнейшие действия.
 
+
+## 10. 2026-10-11 — ключевая причина масштаба МакетКАРТ
+
+Пользователь уточнил: он заменял только index.html на файл другого ИИ. Вне проекта файл отображался нормально, а внутри CARD111 карта оставалась сжатой одинаково на ПК и телефоне. Требуется точный исходный макет и сохранение отлаженных функций: сканер, генератор QR/штрихкодов, чтение фото из галереи, резервная копия/восстановление, экспорт/импорт и диагностика.
+
+- Original /mnt/data/МакетКАРТ.html: .preview-wrap centered; .flipper width:min(100%,340px), aspect-ratio:1.586/1.
+- Integrated candidate source commit 97f47a2c593e3c5968728eda8809caa3223e4, index blob 2f0d203e18774463d1622543cafb8768e8079bd2, contains repeated preview rules limiting width to 190–224px. The more-specific .sheet.cardEditorSheet .editorPreviewWrap .editorPreview caps it at 224px (200px on narrow widths). Source-level root cause is confirmed; browser/device render was not tested.
+- History: 86266ce scanner/JSON changes → 22f1fd22 full MaketKart transfer → 0dea63a fixes → 97f47a2 latest index update.
+- Storage compatibility: mockup uses card111.maketkart.v1; wallet uses card_wallet_v1. Do not alter storage as part of a CSS visual fix.
+- Next: verify exact source SHA, remove only conflicting preview width/max-width overrides, preserve DOM/JS/functions, run parse/reverse-diff, then compare desktop and phone. No deployment before verification and user acceptance.
