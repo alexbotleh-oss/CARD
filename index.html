@@ -194,7 +194,7 @@ header{padding:18px 20px 10px;background:#f6f7fbf5}
 .bottomNav{position:fixed;left:50%;bottom:12px;transform:translateX(-50%);width:min(420px,calc(100% - 24px));height:70px;display:grid;grid-template-columns:repeat(3,1fr);gap:4px;padding:6px;background:#fff;border:1px solid #e4e6eb;border-radius:22px;box-shadow:0 8px 28px #00000018;z-index:20}
 .bottomNavItem{border:0;background:transparent;border-radius:16px;color:#737780;font:inherit;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:12px}
 .bottomNavItem span{font-size:23px;line-height:22px}.bottomNavItem.active{color:#1677ff;background:#f3f7ff}
-.bottomNavItem b{font-size:12px}
+.bottomNavItem b{font-size:12px}[hidden]{display:none!important}.visitCard{background:linear-gradient(135deg,var(--visit-bg,#26364a),#101820);color:#fff;border:0;border-radius:18px;min-height:118px;aspect-ratio:1.48/1;padding:14px;text-align:left;display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 7px 18px #0002;overflow:hidden}.visitCard strong{font-size:16px}.visitCard span{font-size:12px;opacity:.85}.visitAdd{border:2px dashed #c8ccd5;background:#fff;color:#5e6571;border-radius:18px;min-height:118px;aspect-ratio:1.48/1;font-size:30px}
 .fab{display:none!important}
 .editorExtra{background:#fff;border:1px solid #e5e7eb;border-radius:18px;padding:14px;margin-bottom:12px}
 .editorExtra .btn{margin-bottom:9px}
@@ -531,9 +531,9 @@ header{padding:18px 20px 10px;background:#f6f7fbf5}
 <div class="app">
 <header class="walletHeader"><div class="walletHead"><div class="eyebrow">CARD111 · КОШЕЛЁК</div><h1>Мои карты</h1><div class="sub" id="count">0 карт</div></div><button class="btn addBtn" aria-label="Добавить карту" title="Добавить карту" onclick="addMenu()"><span aria-hidden="true">＋</span><b>Добавить</b></button></header>
 <div class="search searchBar"><span class="searchIcon" aria-hidden="true">⌕</span><input id="search" aria-label="Поиск карты" placeholder="Найти карту" oninput="render()"><button class="searchClear" type="button" aria-label="Очистить поиск" onclick="clearCardSearch()">×</button></div>
-<main id="cards" class="grid"></main>
+<main id="cards" class="grid"></main><main id="visits" class="grid" hidden></main>
 </div>
-<nav class="bottomNav" aria-label="Навигация"><button class="bottomNavItem active" onclick="showWallet()"><span>▣</span><b>Карты</b></button><button class="bottomNavItem" onclick="scanner()"><span>⌗</span><b>Сканер</b></button><button class="bottomNavItem" onclick="showSettings()"><span>⚙</span><b>Настройки</b></button></nav>
+<nav class="bottomNav" aria-label="Навигация"><button class="bottomNavItem active" data-screen="cards" onclick="showWallet()"><span>▣</span><b>Карты</b></button><button class="bottomNavItem" data-screen="visits" onclick="showVisits()"><span>▤</span><b>Визитки</b></button><button class="bottomNavItem" data-screen="settings" onclick="showSettings()"><span>⚙</span><b>Настройки</b></button></nav>
 <div id="modal" class="overlay" onclick="if(event.target===this)closeModal()"><div class="sheet" id="sheet"></div></div><input id="importFile" type="file" accept="application/json,.json" style="display:none">
 <script>
 const KEY="card_wallet_v1";
@@ -541,7 +541,7 @@ const SAFE_KEY=KEY+"_safe_backup";
 const COVER_DEFAULTS_KEY="card_cover_defaults_v1";
 const DIAG_KEY="card_wallet_diagnostics_v1";
 const DIAG_LIMIT=180;
-const CARD111_BUILD="CARD111-20261011-HOME-REDESIGN-1";
+const CARD111_BUILD="CARD111-20261011-WALLET-VISITS-2";
 function diagLog(event,details){try{const entry={time:new Date().toISOString(),event:String(event||"event"),details:details||{}};let a=[];try{a=JSON.parse(localStorage.getItem(DIAG_KEY)||"[]");if(!Array.isArray(a))a=[];}catch(e){}a.push(entry);if(a.length>DIAG_LIMIT)a=a.slice(-DIAG_LIMIT);localStorage.setItem(DIAG_KEY,JSON.stringify(a));}catch(e){try{console.warn("CARD111 diagnostic write failed",e);}catch(ignore){}}}
 function diagError(stage,error){diagLog("error",{stage:String(stage),message:String(error&&error.message?error.message:error||"unknown").slice(0,240),name:error&&error.name?String(error.name):""});}
 function diagRead(){try{const a=JSON.parse(localStorage.getItem(DIAG_KEY)||"[]");return Array.isArray(a)?a:[];}catch(e){return [];}}
@@ -1007,6 +1007,7 @@ function syncCardsFromStorage(){
 }
 function clearCardSearch(){const el=document.getElementById("search");if(el){el.value="";render();el.focus();}}
 function render(){
+  if(currentScreen!=="cards")return;
   if(!cards.length)syncCardsFromStorage();
   const search=document.getElementById("search");
   const q=(search.value||"").toLowerCase().trim();
@@ -1046,12 +1047,23 @@ function openModal(html){
   document.getElementById("modal").classList.add("open");
 }
 function closeModal(){diagLog("ui.modal.close",{});try{if(typeof window.__card111StopScanner==="function")window.__card111StopScanner("modal-close");}catch(e){diagError("scanner.stop.on-modal-close",e);}document.getElementById("modal").classList.remove("open");}
-function showWallet(){
-  document.querySelectorAll(".bottomNavItem").forEach((b,i)=>b.classList.toggle("active",i===0));
-  closeModal();
-}
+
+const VISITS_KEY="card111_business_cards_v1";
+let visits=[];
+let currentScreen="cards";
+function readVisits(){try{const a=JSON.parse(localStorage.getItem(VISITS_KEY)||"[]");visits=Array.isArray(a)?a:[];}catch(e){visits=[];}}
+function saveVisits(){try{localStorage.setItem(VISITS_KEY,JSON.stringify(visits));return true;}catch(e){alert("Не удалось сохранить визитку в памяти устройства.");return false;}}
+function setScreen(name){currentScreen=name;const visit=name==="visits";document.getElementById("cards").hidden=visit;document.getElementById("visits").hidden=!visit;document.querySelector(".walletHeader h1").textContent=visit?"Мои визитки":"Мои карты";document.querySelector(".walletHead .eyebrow").textContent=visit?"CARD111 · ВИЗИТКИ":"CARD111 · КОШЕЛЁК";document.querySelector(".searchBar").hidden=visit;document.querySelector(".addBtn b").textContent=visit?"Создать":"Добавить";document.querySelector(".addBtn").onclick=visit?function(){editVisit();}:function(){addMenu();};document.querySelectorAll(".bottomNavItem").forEach(b=>b.classList.toggle("active",b.dataset.screen===name));closeModal();if(visit)renderVisits();else render();}
+function showWallet(){setScreen("cards");}
+function showVisits(){readVisits();setScreen("visits");}
+function renderVisits(){const out=document.getElementById("visits");document.getElementById("count").textContent=visits.length+" визиток";out.innerHTML=visits.map(v=>'<button class="visitCard" style="--visit-bg:'+esc(v.bg||"#26364a")+'" onclick="editVisit(\''+esc(v.id)+'\')"><strong>'+esc(v.name)+'</strong><span>'+esc(v.role||v.phone||v.email||"Визитка")+'</span></button>').join("")+'<button class="visitAdd" onclick="editVisit()" aria-label="Создать визитку">＋</button>';}
+function editVisit(id){const v=visits.find(x=>String(x.id)===String(id))||{id:"",name:"",role:"",phone:"",email:"",bg:"#26364a"};openModal(`<button class="close" onclick="closeModal()">×</button><h2>${v.id?"Редактировать визитку":"Новая визитка"}</h2><label>Имя / название<input id="visitName" maxlength="80" value="${esc(v.name)}" placeholder="Имя или компания"></label><label>Должность / компания<input id="visitRole" maxlength="100" value="${esc(v.role)}" placeholder="Должность"></label><label>Телефон<input id="visitPhone" maxlength="60" value="${esc(v.phone)}"></label><label>Электронная почта<input id="visitEmail" maxlength="100" value="${esc(v.email)}"></label><label>Цвет фона<input id="visitBg" type="color" value="${esc(v.bg)}" style="height:48px"></label><button class="btn primary" onclick="saveVisit('${esc(v.id)}')">Сохранить визитку</button>${v.id?`<button class="btn danger" onclick="deleteVisit('${esc(v.id)}')">Удалить визитку</button>`:""}<p class="hint">Визитки хранятся отдельно от скидочных карт.</p>`);}
+function saveVisit(id){const name=document.getElementById("visitName").value.trim();if(!name){alert("Укажи имя или название визитки.");return;}const v={id:id||("visit-"+Date.now()),name,role:document.getElementById("visitRole").value.trim(),phone:document.getElementById("visitPhone").value.trim(),email:document.getElementById("visitEmail").value.trim(),bg:document.getElementById("visitBg").value};const i=visits.findIndex(x=>String(x.id)===String(v.id));if(i<0)visits.push(v);else visits[i]=v;if(saveVisits()){closeModal();renderVisits();}}
+function deleteVisit(id){if(!confirm("Удалить визитку?"))return;visits=visits.filter(v=>String(v.id)!==String(id));if(saveVisits()){closeModal();renderVisits();}}
+
+function showWallet(){setScreen("cards");}
 function showSettings(){
-  document.querySelectorAll(".bottomNavItem").forEach((b,i)=>b.classList.toggle("active",i===2));
+  currentScreen="settings";document.getElementById("cards").hidden=false;document.getElementById("visits").hidden=true;document.querySelector(".walletHeader h1").textContent="Мои карты";document.querySelector(".searchBar").hidden=false;document.querySelectorAll(".bottomNavItem").forEach(b=>b.classList.toggle("active",b.dataset.screen==="settings"));
   openModal('<button class="close" onclick="closeModal()">×</button><h2>Настройки</h2>'+
     '<button class="btn primary" onclick="exportData()">Сохранить резервную копию</button>'+
     '<button class="btn secondary" onclick="importData()">Восстановить из файла</button>'+
