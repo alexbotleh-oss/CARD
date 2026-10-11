@@ -257,15 +257,18 @@ input[type=number],input[type=text]{border:1px solid var(--border);border-radius
     <p class="section-title">Код карты</p>
     <div class="code-fields">
       <input id="cardCodeInput" type="text" autocomplete="off" placeholder="Значение QR / штрихкода" aria-label="Значение кода карты">
-      <select id="cardCodeFormat" aria-label="Формат кода"><option value="QR_CODE">QR-код</option><option value="CODE_128">Code 128</option><option value="EAN_13">EAN-13</option><option value="EAN_8">EAN-8</option><option value="CODE_39">Code 39</option><option value="UPC_A">UPC-A</option><option value="ITF">ITF</option></select>
+      <select id="cardCodeFormat" aria-label="Формат кода"><option value="QR_CODE">QR-код</option><option value="CODE_128">Code 128</option><option value="EAN_13">EAN-13</option><option value="EAN_8">EAN-8</option><option value="CODE_39">Code 39</option><option value="CODE_93">Code 93</option><option value="ITF">ITF</option><option value="UPC_A">UPC-A</option><option value="UPC_E">UPC-E</option><option value="PDF417">PDF417</option><option value="DATA_MATRIX">Data Matrix</option></select>
       <button id="btnScanIntoCard" class="btn wide">Сканировать камерой / по фото</button>
     </div>
-    <p class="section-title">Дополнительный код (необязательно)</p>
-    <div class="code-fields">
-      <input id="cardSecondCodeInput" type="text" autocomplete="off" placeholder="Дополнительный QR / штрихкод" aria-label="Дополнительный код карты">
-      <select id="cardSecondCodeFormat" aria-label="Формат дополнительного кода"><option value="QR_CODE">QR-код</option><option value="CODE_128">Code 128</option><option value="EAN_13">EAN-13</option><option value="EAN_8">EAN-8</option><option value="CODE_39">Code 39</option><option value="UPC_A">UPC-A</option><option value="ITF">ITF</option></select>
+    <label class="switch-row second-code-toggle"><span>Использовать второй код</span><input id="secondCodeEnabled" type="checkbox" aria-label="Использовать второй код" style="width:20px;height:20px;flex:0 0 auto"></label>
+    <div id="secondCodeSettings" class="hidden">
+      <p class="section-title">Дополнительный код</p>
+      <div class="code-fields">
+        <input id="cardSecondCodeInput" type="text" autocomplete="off" placeholder="Дополнительный QR / штрихкод" aria-label="Дополнительный код карты">
+        <select id="cardSecondCodeFormat" aria-label="Формат дополнительного кода"><option value="QR_CODE">QR-код</option><option value="CODE_128">Code 128</option><option value="EAN_13">EAN-13</option><option value="EAN_8">EAN-8</option><option value="CODE_39">Code 39</option><option value="CODE_93">Code 93</option><option value="ITF">ITF</option><option value="UPC_A">UPC-A</option><option value="UPC_E">UPC-E</option><option value="PDF417">PDF417</option><option value="DATA_MATRIX">Data Matrix</option></select>
+      </div>
+      <p class="hint">Второй код можно настроить отдельно. При предъявлении он будет доступен как отдельный код карты.</p>
     </div>
-    <p class="hint">Дополнительный код необязателен. При предъявлении можно переключаться между кодами карты.</p>
     <p class="section-title">Макет карты</p>
     <div id="cLayoutChips" class="hscroll"></div>
     <p class="section-title">Цвет рубашки</p>
@@ -436,6 +439,7 @@ input[type=number],input[type=text]{border:1px solid var(--border);border-radius
 <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
 <script src="https://unpkg.com/@zxing/browser@0.2.1"></script>
+<script src="https://cdn.jsdelivr.net/npm/bwip-js@4.5.1/dist/bwip-js-min.js"></script>
 <script>
 const $=id=>document.getElementById(id);
 const POS_LABEL={tl:'слева сверху',tc:'сверху',tr:'справа сверху',ml:'слева',mc:'центр',mr:'справа',bl:'слева снизу',bc:'снизу',br:'справа снизу'};
@@ -463,7 +467,7 @@ function paintShirt(el,sh){const s=normShirt(clone(sh));let layer=[...el.childre
 function sameShirt(a,b){try{return a.mode===b.mode&&(a.colors||[]).join()===(b.colors||[]).join()&&+a.angle===+b.angle&&+a.mid===+b.mid&&(a.image||null)===(b.image||null)}catch{return false}}
 
 function defaultLabel(){return{enabled:false,text:"VIP",position:"tr",bg:"#111111",color:"#ffffff",fontSize:13}}
-function defaultCard(){return{id:uid(),name:"Моя карта",category:"продукты",code:"",codeFormat:"QR_CODE",secondCode:"",secondCodeFormat:"CODE_128",font:"system-ui",fontSize:20,textColor:"#ffffff",textEnabled:true,textPosition:"mc",label:defaultLabel(),shirt:normShirt({mode:"gradient",colors:["#d1001f","#ffffff"],angle:135,mid:50,image:null})}}
+function defaultCard(){return{id:uid(),name:"Моя карта",category:"продукты",code:"",codeFormat:"QR_CODE",secondCode:"",secondCodeFormat:"CODE_128",secondCodeEnabled:false,font:"system-ui",fontSize:20,textColor:"#ffffff",textEnabled:true,textPosition:"mc",label:defaultLabel(),shirt:normShirt({mode:"gradient",colors:["#d1001f","#ffffff"],angle:135,mid:50,image:null})}}
 function defaultVisit(){return{id:uid(),company:"Моя фирма",front:{font:"system-ui",fontSize:20,textColor:"#ffffff",textEnabled:true,textPosition:"mc",label:defaultLabel(),shirt:normShirt({mode:"solid",colors:["#ffffff"],angle:90,mid:50,image:null})},back:{font:"system-ui",fontSize:16,color:"#111111",fields:[],shirt:normShirt({mode:"solid",colors:["#f2f3f5"],angle:90,mid:50,image:null}),photo:null}}}
 let _id=0;const uid=()=>"x"+(++_id)+Date.now().toString(36);
 
@@ -484,7 +488,7 @@ function normalizeImportedCard(value){
  if(!shirt&&c.coverImage)shirt={mode:"image",colors:["#ffffff"],angle:90,mid:50,image:String(c.coverImage),imageTransform:{scale:1,nx:0,ny:0}};
  if(!shirt&&gradient&&gradient.colors.length>=2)shirt={mode:"gradient",colors:gradient.colors.slice(0,3),angle:Number(gradient.angle)||0,mid:Number(gradient.mid||gradient.softness)||50,image:null};
  if(!shirt&&(style.customColor||c.color))shirt={mode:"solid",colors:[normalizeHex(style.customColor||c.color)||"#ffffff"],angle:90,mid:50,image:null};
- const mapped=Object.assign({},c,{id:String(c.id||uid()),name:String(c.name||c.title||"Моя карта"),code:String(c.code||c.barcode||c.number||c.cardNumber||""),codeFormat:String(c.codeFormat||c.format||c.barcodeFormat||"QR_CODE")});
+ const mapped=Object.assign({},c,{id:String(c.id||uid()),name:String(c.name||c.title||"Моя карта"),code:String(c.code||c.barcode||c.number||c.cardNumber||""),codeFormat:String(c.codeFormat||c.format||c.barcodeFormat||c.type||"QR_CODE"),secondCode:String(c.secondCode||c.code2||""),secondCodeFormat:String(c.secondCodeFormat||c.secondFormat||"CODE_128"),secondCodeEnabled:c.secondCodeEnabled===undefined?!!String(c.secondCode||c.code2||"").trim():!!c.secondCodeEnabled});
  if(shirt)mapped.shirt=shirt;else delete mapped.shirt;
  return ensureCardShape(mapped);
 }
@@ -513,7 +517,7 @@ let cards=savedState?savedState.cards:[defaultCard()];
 let visits=savedState?savedState.visits:[defaultVisit()];
 let editCard=null,editVisit=null,visitSide="front",selectedFieldId=null;
 function persistState(){try{localStorage.setItem(CARD111_STORAGE_KEY,JSON.stringify({version:1,updatedAt:new Date().toISOString(),cards:cards,visits:visits}));return true}catch(e){toast("Не удалось сохранить данные: "+(e&&e.message||e));return false}}
-function ensureCardShape(c){if(!c||typeof c!=="object")return defaultCard();const d=defaultCard();return Object.assign(d,c,{code:String(c.code||""),codeFormat:normalizeCodeFormat(c.codeFormat||"QR_CODE")})}
+function ensureCardShape(c){if(!c||typeof c!=="object")return defaultCard();const d=defaultCard();return Object.assign(d,c,{code:String(c.code||""),codeFormat:normalizeCodeFormat(c.codeFormat||c.format||c.barcodeFormat||c.type||"QR_CODE"),secondCode:String(c.secondCode||""),secondCodeFormat:normalizeCodeFormat(c.secondCodeFormat||c.secondFormat||"CODE_128"),secondCodeEnabled:c.secondCodeEnabled===undefined?!!String(c.secondCode||"").trim():!!c.secondCodeEnabled})}
 cards=cards.map(ensureCardShape);
 
 /* ---------- рендер превью ---------- */
@@ -614,6 +618,8 @@ function renderCardEditor(){
   $("cardCodeFormat").value=normalizeCodeFormat(editCard.codeFormat||"QR_CODE");
   $("cardSecondCodeInput").value=editCard.secondCode||"";
   $("cardSecondCodeFormat").value=normalizeCodeFormat(editCard.secondCodeFormat||"CODE_128");
+  $("secondCodeEnabled").checked=!!editCard.secondCodeEnabled;
+  $("secondCodeSettings").classList.toggle("hidden",!editCard.secondCodeEnabled);
   $("cFontValue").textContent=fontLabel(editCard.font);
   $("cSizeValue").textContent=editCard.fontSize+" px";
   $("cTextState").textContent=editCard.textEnabled?"вкл":"выкл";
@@ -649,12 +655,12 @@ function commitVisit(){const i=visits.findIndex(v=>v.id===editVisit.id);if(i>=0)
 
 /* ---------- предъявление ---------- */
 let presentCard=null,presentCodeMode="qr";
-function normalizeCodeFormat(value){const x=String(value||"").toUpperCase().replace(/[\s-]+/g,"_");if(["QR","QRCODE","QR_CODE"].includes(x))return "QR_CODE";if(x==="EAN13")return "EAN_13";if(x==="EAN8")return "EAN_8";if(x==="CODE128")return "CODE_128";if(x==="CODE39")return "CODE_39";if(x==="UPCA")return "UPC_A";return x||"QR_CODE"}
+function normalizeCodeFormat(value){const x=String(value||"").toUpperCase().replace(/[\s-]+/g,"_");const aliases={QR:"QR_CODE",QRCODE:"QR_CODE",EAN13:"EAN_13",EAN8:"EAN_8",CODE128:"CODE_128",CODE39:"CODE_39",CODE93:"CODE_93",UPCA:"UPC_A",UPCE:"UPC_E",PDF_417:"PDF417",DATAMATRIX:"DATA_MATRIX"};const v=aliases[x]||x;return ["QR_CODE","CODE_128","EAN_13","EAN_8","CODE_39","CODE_93","ITF","UPC_A","UPC_E","PDF417","DATA_MATRIX"].includes(v)?v:"QR_CODE"}
 let presentCodeIndex="primary";
-function openPresent(c){presentCard=c;presentCodeIndex="primary";$("presentTitle").textContent=c.name||"Карта";renderFace($("presentFace"),c,"card","card");$("codeIndexSwitch").classList.toggle("hidden",!String(c.secondCode||"").trim());$("btnSecondCode").classList.remove("active");$("btnPrimaryCode").classList.add("active");setPresentMode("qr");show("screen-present")}
-function setPresentCodeIndex(which){if(which==="second"&&!String(presentCard&&presentCard.secondCode||"").trim())return;presentCodeIndex=which;$("btnPrimaryCode").classList.toggle("active",which==="primary");$("btnSecondCode").classList.toggle("active",which==="second");renderPresentedCode()}
+function openPresent(c){presentCard=c;presentCodeIndex="primary";$("presentTitle").textContent=c.name||"Карта";renderFace($("presentFace"),c,"card","card");$("codeIndexSwitch").classList.toggle("hidden",!(c.secondCodeEnabled&&String(c.secondCode||"").trim()));$("btnSecondCode").classList.remove("active");$("btnPrimaryCode").classList.add("active");setPresentMode(normalizeCodeFormat(c.codeFormat||"QR_CODE")==="QR_CODE"?"qr":"bc");show("screen-present")}
+function setPresentCodeIndex(which){if(which==="second"&&!(presentCard&&presentCard.secondCodeEnabled&&String(presentCard.secondCode||"").trim()))return;presentCodeIndex=which;$("btnPrimaryCode").classList.toggle("active",which==="primary");$("btnSecondCode").classList.toggle("active",which==="second");const fmt=normalizeCodeFormat(presentCard&&(which==="second"?presentCard.secondCodeFormat:presentCard.codeFormat)||"QR_CODE");setPresentMode(fmt==="QR_CODE"?"qr":"bc")}
 function setPresentMode(m){presentCodeMode=m;$("pwQR").classList.toggle("active",m==="qr");$("pwBC").classList.toggle("active",m==="bc");renderPresentedCode()}
-function renderPresentedCode(){const box=$("presentCodeArea"),hint=$("presentCodeHint");if(!box||!hint)return;box.innerHTML="";const second=presentCodeIndex==="second";const code=String(presentCard&&(second?presentCard.secondCode:presentCard.code)||"").trim();const fmt=normalizeCodeFormat(presentCard&&(second?presentCard.secondCodeFormat:presentCard.codeFormat)||"CODE_128");if(!code){hint.textContent=second?"Дополнительный код не добавлен. Откройте редактор карты и заполните это поле.":"Код не добавлен. Откройте редактор карты и введите его или отсканируйте.";return}if(presentCodeMode==="qr"){if(typeof QRCode==="undefined"){hint.textContent="Не удалось подключить генератор QR-кода. Проверьте интернет-соединение.";return}const q=document.createElement("div");box.appendChild(q);try{new QRCode(q,{text:code,width:240,height:240,correctLevel:QRCode.CorrectLevel.M});hint.textContent=(second?"Дополнительный ":"")+"QR-код карты"}catch(e){hint.textContent="Ошибка построения QR-кода: "+e.message}}else{if(typeof JsBarcode==="undefined"){hint.textContent="Не удалось подключить генератор штрихкода. Проверьте интернет-соединение.";return}const svg=document.createElementNS("http://www.w3.org/2000/svg","svg");box.appendChild(svg);const map={CODE_128:"CODE128",EAN_13:"EAN13",EAN_8:"EAN8",CODE_39:"CODE39",UPC_A:"UPC",ITF:"ITF"};try{JsBarcode(svg,code,{format:map[fmt]||"CODE128",displayValue:true,height:90,margin:6});hint.textContent=(second?"Дополнительный ":"")+"штрихкод: "+(map[fmt]||"CODE128")}catch(e){box.innerHTML="";hint.textContent="Значение не соответствует формату "+fmt+". Проверьте код в редакторе."}}}
+function renderPresentedCode(){const box=$("presentCodeArea"),hint=$("presentCodeHint");if(!box||!hint)return;box.innerHTML="";const second=presentCodeIndex==="second";const code=String(presentCard&&(second?presentCard.secondCode:presentCard.code)||"").trim();const fmt=normalizeCodeFormat(presentCard&&(second?presentCard.secondCodeFormat:presentCard.codeFormat)||"CODE_128");if(!code){hint.textContent=second?"Дополнительный код не добавлен. Откройте редактор карты и заполните это поле.":"Код не добавлен. Откройте редактор карты и введите его или отсканируйте.";return}if(fmt==="QR_CODE"||(presentCodeMode==="qr"&&fmt!=="PDF417"&&fmt!=="DATA_MATRIX")){if(typeof QRCode==="undefined"){hint.textContent="Не удалось подключить генератор QR-кода. Проверьте интернет-соединение.";return}const q=document.createElement("div");box.appendChild(q);try{new QRCode(q,{text:code,width:240,height:240,correctLevel:QRCode.CorrectLevel.M});hint.textContent=(second?"Дополнительный ":"")+"QR-код карты"}catch(e){hint.textContent="Ошибка построения QR-кода: "+e.message}}else if(fmt==="PDF417"||fmt==="DATA_MATRIX"){try{if(typeof bwipjs==="undefined")throw Error("bwip-js unavailable");const canvas=document.createElement("canvas");canvas.style.maxWidth="100%";canvas.style.height="auto";canvas.style.display="block";canvas.style.margin="0 auto";box.appendChild(canvas);bwipjs.toCanvas(canvas,{bcid:fmt==="PDF417"?"pdf417":"datamatrix",text:code,scale:3,includetext:false,backgroundcolor:"FFFFFF",barcolor:"000000",padding:8});hint.textContent=(second?"Дополнительный ":"")+(fmt==="PDF417"?"Штрихкод PDF417":"Код Data Matrix")}catch(e){box.innerHTML="";hint.textContent="Не удалось построить "+fmt+". Проверьте значение и подключение генератора."}}else{if(typeof JsBarcode==="undefined"){hint.textContent="Не удалось подключить генератор штрихкода. Проверьте интернет-соединение.";return}const svg=document.createElementNS("http://www.w3.org/2000/svg","svg");box.appendChild(svg);const map={CODE_128:"CODE128",EAN_13:"EAN13",EAN_8:"EAN8",CODE_39:"CODE39",CODE_93:"CODE93",UPC_A:"UPC",UPC_E:"UPCE",ITF:"ITF"};try{const jsFormat=map[fmt];if(!jsFormat)throw Error("unsupported format");JsBarcode(svg,code,{format:jsFormat,displayValue:true,height:90,margin:6});hint.textContent=(second?"Дополнительный ":"")+"штрихкод: "+fmt}catch(e){box.innerHTML="";hint.textContent="Значение не соответствует формату "+fmt+". Проверьте код в редакторе."}}}
 function openPresentVisit(v){$("presentVisitTitle").textContent=v.company||"Визитка";const el=$("presentVisitBack");el.innerHTML="";if(v.back.photo){el.style.background="center/cover no-repeat url('"+v.back.photo+"')"}else{el.style.background="";renderFace(el,v,"visit","back")}show("screen-present-visit")}
 
 /* ---------- построители рядов ---------- */
@@ -705,6 +711,7 @@ function bind(){
   $("cardCodeFormat").onchange=()=>{if(editCard)editCard.codeFormat=normalizeCodeFormat($("cardCodeFormat").value)};
   $("cardSecondCodeInput").oninput=()=>{if(editCard)editCard.secondCode=$("cardSecondCodeInput").value};
   $("cardSecondCodeFormat").onchange=()=>{if(editCard)editCard.secondCodeFormat=normalizeCodeFormat($("cardSecondCodeFormat").value)};
+  $("secondCodeEnabled").onchange=()=>{if(!editCard)return;editCard.secondCodeEnabled=$("secondCodeEnabled").checked;$("secondCodeSettings").classList.toggle("hidden",!editCard.secondCodeEnabled)};
   $("btnSaveShirtPreset").onclick=()=>{if(!editCard)return;const name=(prompt("Название заготовки рубашки:","Моя рубашка")||"").trim();if(!name)return;const presets=readSavedShirtPresets();presets.push({id:"shirt-"+Date.now().toString(36),name:name,shirt:clone(editCard.shirt)});try{localStorage.setItem("card111_custom_shirt_presets_v1",JSON.stringify(presets));renderCardEditor();toast("Рубашка сохранена в заготовки")}catch(e){alert("Не удалось сохранить рубашку: "+e.message)}};
   $("btnScanIntoCard").onclick=()=>openScanner(result=>{if(!editCard)return;editCard.code=result.code;editCard.codeFormat=result.format;$("cardCodeInput").value=result.code;$("cardCodeFormat").value=result.format;toast("Код добавлен в карту")});
   $("cBtnFont").onclick=()=>openFontPicker(editCard.font,f=>{editCard.font=f;renderCardEditor()});
