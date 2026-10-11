@@ -91,3 +91,13 @@
 - Status: **blocked** — прежде чем делать syntax/runtime проверки, однозначно определить branch ref и tree. Не говорить, что изменения commit 86266ce сейчас доступны из candidate HEAD или опубликованы.
 - Next action: resolve current branch ref discrepancy; then parse/tests against the exact current head.
 
+
+## 9. 2026-10-11 — аудит переноса МакетКАРТ: причина сжатого preview
+
+- **Статус:** причина установлена статическим сравнением; CSS-патч не внесён.
+- **История:** candidate commit chain 86266ce scanner/JSON → 22f1fd22 full MaketKart transfer → 0dea63a fixes → 97f47a2 latest index update. Commit-level API подтверждает index blob 2f0d203e18774463d1622543cafb8768e8079bd2.
+- **Original preview:** .preview-wrap + .flipper width:min(100%,340px), aspect-ratio 1.586/1.
+- **Integrated CSS root cause:** повторные .editorPreviewWrap .editorPreview limits 190–224px и более специфичное .sheet.cardEditorSheet .editorPreviewWrap .editorPreview (224px, 200px на узких экранах). Это перекрывает исходную геометрию и объясняет маленькую карточку на ПК и телефоне.
+- **Требование пользователя:** сохранить точный макет и встроить уже отлаженные функции scanner, QR/barcode generator, gallery/photo decode, backup/restore, export/import и diagnostics; не делать редизайн от себя.
+- **Не проверено:** browser/device render, runtime regression, Pages source/live HTML.
+- **Следующий шаг:** отдельный минимальный CSS patch на подтверждённом SHA, затем syntax/reverse-diff и визуальная проверка на ПК и телефоне. Не публиковать без проверки и принятия.
