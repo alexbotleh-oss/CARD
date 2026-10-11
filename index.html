@@ -628,7 +628,7 @@ function renderCardEditor(){
   buildLayoutChips($("cLayoutChips"),editCard.shirt,"card");
   buildShirtPresets($("cShirtPresets"),editCard.shirt,"card");
 }
-function commitCard(){const i=cards.findIndex(c=>c.id===editCard.id);if(i>=0)cards[i]=editCard;else cards.push(editCard);persistState();renderMain()}
+function commitCard(){if(editCard.secondCodeEnabled&&!String(editCard.secondCode||"").trim()){toast("Включён второй код, но он не добавлен. Введите его или отключите второй код.");return}const i=cards.findIndex(c=>c.id===editCard.id);if(i>=0)cards[i]=editCard;else cards.push(editCard);persistState();renderMain()}
 
 /* ---------- редактор визитки ---------- */
 function openVisitEditor(visit){editVisit=clone(visit);visitSide="front";selectedFieldId=null;renderVisitEditor();show("screen-editor-visit")}
