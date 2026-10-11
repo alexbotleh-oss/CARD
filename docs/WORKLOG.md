@@ -138,3 +138,6 @@
 **Update 2026-10-11 19:44:** `candidate/CARD111-ui-2xN-20261006` was moved using expected_sha lease from f38ef76df5183c92a204374434da59bd9384887a to 87c68ac7eb71885378c31c20d225401dd8ae25dd. Follow-up API read confirms branch HEAD and index blob 444ca4e92c9c558b920bfc53c912407d333d56db. Both inline JS script bodies are byte-for-byte identical to the parent source (121901 and 3303 characters); width caps 210/190/224/200px are absent. V8 parser and browser/device visual render were not run.
 
 **Update 2026-10-11 19:48 — parser limitation:** попытка скачать `index.html` через raw.githubusercontent.com для локального запуска Node/V8 завершилась DNS/NameResolutionError до скачивания. Следовательно, syntax parser не запускался; byte-for-byte сравнение двух inline scripts между candidate и родительским исходником подтверждено через GitHub API. Browser/device render remains pending.
+
+
+**Update 2026-10-11 — barcode generator parity:** compared candidate and recovery sources; recovered all 11 format choices and the separate one/two-code toggle. Commits: eadd08e8e42a80f2051ad771c627a4d781a1a3cf and c572b675194323a237f5f28db28cc67964ad6859. Current index blob 6a548f65638028a58aebdb8d8dc92e7abdd93008. V8 compile and mocked renderer/normalization tests passed. PDF417/Data Matrix use bwip-js; CODE_93/UPC_E use JsBarcode. Browser/device scan remains pending.
