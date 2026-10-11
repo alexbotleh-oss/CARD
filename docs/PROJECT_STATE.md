@@ -71,3 +71,15 @@
 - **Блокеры:** источник GitHub Pages и Android runtime недоступны для прямой проверки; локальный Git status недоступен.
 - **Последний focused patch:** `cadee049c62afc2d42e3ed297e41bb404b819929` — защита от позднего callback/controls в ZXing и согласование `sw.js?v=51`. Статическая проверка JS проходит; runtime и публикация не подтверждены.
 - **Следующий шаг:** подтвердить источник GitHub Pages и сравнить опубликованный `index.html` с blob `dcccba9121dd9af70858634557ce014a647e7f00`; затем тестировать на Android.
+
+## 7. Актуальное состояние на 2026-10-11 18:32
+
+- **Активная задача памяти:** TASK-20261011-02 — синхронизация памяти с реальным состоянием CARD111.
+- **Рабочая ветка приложения:** candidate/CARD111-ui-2xN-20261006.
+- **index commit/blob:** 86266ce012de5785b0c6df5d7519f769e8d849db / bd20167d44c3e3e88b1c0fb49702551806e763d4.
+- **Recovery:** recovery/CARD111-before-scanner-integration-20261011; index blob 97cb89dc774278cf2891098172f23494a29c9f38.
+- **Статически подтверждено:** наличие переключения камеры, кнопки фонарика с capability guard, ручного ввода, фактических подписей форматов второго кода, JSON import replace/merge и UI настройки auto-save.
+- **Проверено:** повторное чтение файла candidate через GitHub API и поиск ключевых маркеров (E1).
+- **Не проверено:** JS parser после последнего изменения, browser integration, Android/device, фактический источник и ответ GitHub Pages. Не считать патч завершённым или опубликованным.
+- **Следующий шаг:** JS syntax check candidate/index.html; затем целевые browser scenarios и Pages-source verification.
+
