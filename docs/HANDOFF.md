@@ -173,3 +173,7 @@ Checks passed: V8 compilation, format alias normalization, mocked render routing
 ## Final patch after validation (2026-10-11)
 Commit 8770bf4e2947b18cd18ad0e192919c11addcd75c is the latest candidate code change; final index blob is 8dcd66661a4260e04ca29a7855eed768ecf0014d. It prevents saving a card when the second-code switch is enabled but its value is blank.
 Final exact-branch V8 compilation and mocked generator dispatch tests passed. All 11 formats are present in both selectors. Legacy secondFormat=PDF417 is preserved and enables the secondary code. Real device/browser validation is still pending.
+
+## 2026-10-17 — Agent workflow / next task
+
+The latest documentation task is `TASK-20261017-01` in `.agent/memory/tasks.md`: export the CARD111 chat as faithful RAW before analysis. Current accessible materials do not establish that the full source transcript is available; the uploaded excerpts are not a complete export. Next action: locate/receive the exact source archive, inventory its conversations and attachments, then import with provenance and a resumable checkpoint. Do not close the older UI tasks or infer their status from this task. The instruction changes are on branch `agent/card111-chat-export-instructions-20261017`; `main` remains untouched.
