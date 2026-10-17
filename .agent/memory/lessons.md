@@ -84,3 +84,13 @@ Recovery: Candidate commit `c25104ca18f3d06091718c8a1d66197474aa1c30` was based 
 
 ## LESSON-20261011-12: Verify patch applicability against the exact target before discarding it
 After the reference identity was corrected, compare the exact target artifact with the candidate instead of assuming the prior patch is invalid. In this case, the CSS blocks matched exactly (17,559 characters), and the target itself defined `.flipper` sizing but omitted it around `#cardPreview`; thus the wrapper fix is consistent with the target's own layout rules. Still distinguish static compatibility from actual browser/device acceptance.
+
+
+## LESSON-20261017-01: Инструкция не доказывает, что Агент реально выполнил действие
+
+Date: 2026-10-17
+Situation: Требуется связать инструкции CARD111 с фактической работой Агента и поставить задачу на выгрузку чата.
+Problem: Доступ к файлам GitHub или наличие инструкции легко ошибочно принять за запуск локального исполнителя либо получение полного экспорта диалога.
+Lesson: Отдельно указывать доступный источник, реально выполненное действие, уровень проверки и недоступные части.
+Rule: Не утверждать автоматический запуск, локальное выполнение или полноту экспорта без наблюдаемого подтверждения; при импорте сохранять RAW и provenance до смыслового анализа.
+Applied to: CARD111, работа Агента, выгрузка истории чатов.
