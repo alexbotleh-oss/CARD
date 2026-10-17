@@ -56,3 +56,13 @@ The correct reference is the later upload `CARD111-МакетКАРТ-испра
 
 ## Verified canonical reference comparison (2026-10-11)
 The correct later target `CARD111-МакетКАРТ-исправленная-интеграция(1).html` (file id `file_0000000067a081f48a4dc55780db9c27`) was read in full. Compared with candidate `index.html` at blob `9e5906dcf7bd2b0c37353cc7e9f0bb2ff98ae82e`, the CSS blocks are exactly identical (17,559 characters each); candidate adds behavior in markup/script but shares target CSS. The editor preview target markup lacked the `.flipper` sizing container although the stylesheet defines `.flipper{width:min(100%,340px);aspect-ratio:1.586/1;position:relative...}` and `.card-preview{position:absolute;inset:0}`. Wrapping `#cardPreview` in `.flipper.editor-flipper` is therefore supported by the correct target's own CSS. Keep this small fix. Code-rendering function clears the code container before drawing and selects primary/secondary from one active index. Device verification remains pending.
+
+
+## 2026-10-17 — Agent workflow and chat-export checkpoint
+
+- Repository source checked: `alexbotleh-oss/CARD`, branch `main` HEAD before this documentation branch: `65846285a8ba6a52299681ee643e0e6ed72a6ca0`. Work is isolated in `agent/card111-chat-export-instructions-20261017`; main was not edited.
+- Current work: align project instructions with explicit Agent/runtime limits and create `TASK-20261017-01` for a faithful CARD111 chat export.
+- Binding export rule: RAW capture first; preserve message order, roles, timestamps, IDs where present, attachments, links, metadata and provenance. Do not merge semantically similar events or summarize during import.
+- Source limitation: the full raw export of the requested chat was not present in the accessible materials read in this session. The two uploaded text excerpts are partial context, not evidence of a complete transcript. Export task is active and blocked on locating/receiving the exact source archive.
+- Agent integration limitation: repository instructions do not cause automatic execution on each ChatGPT turn. Use a runner only when it is actually available and explicitly invoked; distinguish remote GitHub API access from a local working copy and never claim local execution from remote file reads.
+- UI development tasks recorded earlier remain open and are not closed or superseded by this documentation task.
