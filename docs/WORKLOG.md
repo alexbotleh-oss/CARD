@@ -143,3 +143,12 @@
 **Update 2026-10-11 — barcode generator parity:** compared candidate and recovery sources; recovered all 11 format choices and the separate one/two-code toggle. Commits: eadd08e8e42a80f2051ad771c627a4d781a1a3cf and c572b675194323a237f5f28db28cc67964ad6859. Current index blob 6a548f65638028a58aebdb8d8dc92e7abdd93008. V8 compile and mocked renderer/normalization tests passed. PDF417/Data Matrix use bwip-js; CODE_93/UPC_E use JsBarcode. Browser/device scan remains pending.
 
 **Final check 2026-10-11:** added validation for an enabled-but-empty second code (commit 8770bf4e2947b18cd18ad0e192919c11addcd75c; index blob 8dcd66661a4260e04ca29a7855eed768ecf0014d). Re-fetched branch source; V8 compile, 11-format option checks, alias normalization, legacy second-format mapping and mocked generator dispatch passed. Physical browser/mobile acceptance remains open.
+
+## 2026-10-17 — Agent workflow and CARD111 chat export task
+
+- **Goal:** align CARD111 project instructions with actual Agent execution limits and create a concrete task for a faithful chat export.
+- **Source checkpoint:** repository `alexbotleh-oss/CARD`, `main` HEAD `65846285a8ba6a52299681ee643e0e6ed72a6ca0`; new branch `agent/card111-chat-export-instructions-20261017` created from that exact SHA. No app code changed.
+- **Changes proposed:** instruction v1.2.0 adds explicit limits for remote-vs-local access, branch discipline, and a RAW-first, provenance-preserving chat export pipeline. Memory task/decision/lesson and handoff/state updated.
+- **Verified:** canonical instructions and memory/history sources were read through GitHub API; exact source SHA of the branch was confirmed. Full export source not found in accessible materials, so no export or import was performed and completeness is not claimed.
+- **Risk/limitation:** the current chat UI is not directly exportable through the repository connector. The task remains blocked until the exact source export/archive is accessible.
+- **Next step:** locate or receive the full source export, inventory messages and attachments, and only then implement/test resumable RAW import. Keep analysis separate.

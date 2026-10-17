@@ -118,3 +118,11 @@
 **2026-10-11 — generator parity update:** candidate index now has all 11 code formats and an explicit secondary-code toggle. Recovery schema `format`/`secondFormat` is mapped; second code is preserved while disabled. Code commits eadd08e8e42a80f2051ad771c627a4d781a1a3cf and c572b675194323a237f5f28db28cc67964ad6859; index blob 6a548f65638028a58aebdb8d8dc92e7abdd93008. V8 and mocked generator-dispatch tests passed. Real browser/mobile render and scan are not yet verified.
 
 **Final generator verification (2026-10-11):** latest code commit 8770bf4e2947b18cd18ad0e192919c11addcd75c; index blob 8dcd66661a4260e04ca29a7855eed768ecf0014d. Exact branch source compiles in V8. Both selectors expose 11 formats; PDF417/Data Matrix, CODE_93/UPC_E and QR mock-dispatch checks passed; legacy secondFormat=PDF417 survives normalization. Real browser/mobile render and scan are still pending.
+
+## 2026-10-17 — Agent workflow and chat export
+
+- **Documentation change:** proposed on branch `agent/card111-chat-export-instructions-20261017`; this does not modify app code or claim UI validation.
+- **Active task:** `TASK-20261017-01`, full RAW export of the CARD111 chat before experience analysis.
+- **Confirmed:** `main` HEAD at branch creation was `65846285a8ba6a52299681ee643e0e6ed72a6ca0`; the new branch starts from that exact commit.
+- **Not confirmed:** a complete raw export of the requested chat was not found among the sources read in this session. The available text excerpts do not prove completeness. Local working-tree state is unavailable through the remote GitHub API.
+- **Next step:** obtain/locate the exact export, inventory message and attachment coverage, then test resumable/idempotent RAW preservation. Do not start semantic merge during ingestion.

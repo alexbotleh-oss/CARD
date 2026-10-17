@@ -29,3 +29,14 @@ Decision: Удалить только конфликтующие правила 
 Alternatives: Перестраивать редактор по собственному усмотрению; добавлять новые CSS overrides поверх существующих.
 Consequences: Изменение CSS изолировано и легче откатывается; обязательны syntax/reverse-diff и визуальная проверка.
 Related task: TASK-20261011-03
+
+
+## DEC-20261017-01: RAW chat export precedes experience analysis
+
+Date: 2026-10-17
+Status: accepted
+Context: Prior chat-history transfers risked losing conversation-specific evidence when similar facts were combined too early. The current task is to export the CARD111 chat for Agent memory.
+Decision: First preserve the source transcript and provenance with its available order, roles, timestamps, message IDs, attachments, links and relationships. Keep analysis, semantic deduplication and knowledge extraction as separate later stages. Record gaps explicitly; do not reconstruct missing content from summaries.
+Alternatives: Import directly into summarized memory; merge repeated events during export; infer missing messages from prior context.
+Consequences: RAW remains auditable and reprocessable; the export is not considered complete until source coverage and attachment gaps are checked.
+Related task: TASK-20261017-01
